@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+/* ── Finedge accent (overridden dynamically by appearance-settings) ──── */
+:root {
+  --finedge-accent: #38bdf8;
+}
+
+/* ── Finedge Theme Variables — soft “Apple studio” dark ─────────────────── */
+:root, [data-theme="dark"] {
+  --bg-base:        #0a0a0a;
+  --bg-surface:     #141414;
+  --bg-elevated:    #1a1a1a;
+  --bg-card:        #1a1a1a;
+  --bg-border:      #2a2a2e;
+  --bg-hover:       #252528;
+  --text-primary:   #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-muted:     #8e8e93;
+  --accent:         var(--finedge-accent);
+  --accent-hover:   #7dd3fc;
+  --success:        #9ecf9e;
+  --warning:        #e8c995;
+  --danger:         #e8a8a8;
+}
+
+/* Light mode — premium warm cream / charcoal (no pure #fff / #000) */
+[data-theme="light"] {
+  --bg-base:        #F8F7F3;
+  --bg-surface:     #F1EFE9;
+  --bg-elevated:    #F1EFE9;
+  --bg-card:        #F1EFE9;
+  --bg-border:      #e7e5e4;
+  --bg-hover:       #ebe8e0;
+  --text-primary:   #1C1917;
+  --text-secondary: #44403C;
+  --text-muted:     #78716c;
+  --accent:         var(--finedge-accent);
+  --accent-hover:   color-mix(in srgb, var(--finedge-accent) 85%, #1c1917);
+  --success:        #166534;
+  --warning:        #92400e;
+  --danger:         #b91c1c;
+
+  /* shadcn tokens — warm paper shell */
+  --background:       #F8F7F3;
+  --foreground:       #1C1917;
+  --card:             #F1EFE9;
+  --card-foreground:  #1C1917;
+  --popover:          #F5F4F0;
+  --popover-foreground: #1C1917;
+  --primary:          #292524;
+  --primary-foreground: #F8F7F3;
+  --secondary:        #ebe8e0;
+  --secondary-foreground: #1C1917;
+  --muted:            #ebe8e0;
+  --muted-foreground: #57534e;
+  --accent-foreground: #1C1917;
+  --destructive:      #b91c1c;
+  --border:           #e7e5e4;
+  --input:            #d6d3d1;
+  --ring:             #44403C;
+  --sidebar:          #F1EFE9;
+  --sidebar-foreground: #1C1917;
+  --sidebar-primary:  #292524;
+  --sidebar-primary-foreground: #F8F7F3;
+  --sidebar-accent:   #ebe8e0;
+  --sidebar-accent-foreground: #1C1917;
+  --sidebar-border:   #e7e5e4;
+  --sidebar-ring:     #44403C;
+
+  --bg-primary:     #F8F7F3;
+  --bg-secondary:   #F1EFE9;
+  --bg-sidebar:     #F1EFE9;
+  --border-color:   #e7e5e4;
+}
+
+/* ── Light mode: comprehensive overrides for all hardcoded Tailwind colors ── */
+[data-theme="light"] body,
+[data-theme="light"] #__next { background-color: var(--bg-base); color: var(--text-primary); }
+
+/* Tasks / Notes legacy panels — force light surfaces & dark type */
+[data-theme="light"] .bg-\[\#16181c\] { background-color: var(--bg-base) !important; }
+[data-theme="light"] .bg-\[\#1e2026\] { background-color: var(--bg-card) !important; }
+[data-theme="light"] .bg-\[\#22252a\] { background-color: var(--bg-hover) !important; }
+[data-theme="light"] .text-\[\#e8eaed\] { color: var(--text-primary) !important; }
+[data-theme="light"] .text-\[\#9ba3af\] { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-\[\#6b7280\] { color: var(--text-muted) !important; }
+[data-theme="light"] .border-\[\#2e3138\] { border-color: var(--bg-border) !important; }
+
+/* Backgrounds — map dark UI hex → warm cream layers */
+[data-theme="light"] .bg-\[\#0a0e1a\]  { background-color: #F1EFE9 !important; }
+[data-theme="light"] .bg-\[\#0d1117\]  { background-color: #F8F7F3 !important; }
+[data-theme="light"] .bg-\[\#0f1419\]  { background-color: #F1EFE9 !important; }
+[data-theme="light"] .bg-\[\#141b26\]  { background-color: #F5F4F0 !important; }
+[data-theme="light"] .bg-\[\#161b22\]  { background-color: #F1EFE9 !important; }
+[data-theme="light"] .bg-\[\#1a2030\]  { background-color: #ebe8e0 !important; }
+[data-theme="light"] .bg-\[\#1a1a1a\]  { background-color: #F8F7F3 !important; }
+[data-theme="light"] .bg-\[\#141414\]  { background-color: #F1EFE9 !important; }
+[data-theme="light"] .bg-\[\#1e2836\]  { background-color: #ebe8e0 !important; }
+[data-theme="light"] .bg-\[\#23262e\]  { background-color: #ebe8e0 !important; }
+
+/* Borders — stone-200 family */
+[data-theme="light"] .border-\[\#1e2836\]  { border-color: #e7e5e4 !important; }
+[data-theme="light"] .border-\[\#30363d\]  { border-color: #d6d3d1 !important; }
+[data-theme="light"] .border-\[\#0d1117\]  { border-color: #e7e5e4 !important; }
+
+/* Text — charcoal on cream */
+[data-theme="light"] .text-\[\#e6edf3\]  { color: #1C1917 !important; }
+[data-theme="light"] .text-\[\#8b949e\]  { color: #44403C !important; }
+[data-theme="light"] .text-\[\#ececec\]  { color: #1C1917 !important; }
+[data-theme="light"] .text-\[\#9b9b9b\]  { color: #57534e !important; }
+[data-theme="light"] .text-\[\#d4d4d4\]  { color: #44403C !important; }
+[data-theme="light"] .text-\[\#6e7681\]  { color: #57534e !important; }
+[data-theme="light"] .text-\[\#6e7781\]  { color: #57534e !important; }
+
+/* Placeholder */
+[data-theme="light"] ::placeholder { color: #78716c !important; }
+
+/* Sidebar */
+[data-theme="light"] aside  { background-color: var(--bg-surface) !important; border-color: var(--bg-border) !important; }
+
+/* Scrollbar */
+[data-theme="light"] ::-webkit-scrollbar-track { background: #F1EFE9; }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: #d6d3d1; }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+
+/* Inputs — warm paper (no pure white) */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: #F5F4F0 !important;
+  color: #1C1917 !important;
+  border-color: #d6d3d1 !important;
+}
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+/* ─── Finedge Dark Theme (shadcn bridge — keep aligned with vars above) ─────── */
+:root {
+  --background: #0a0a0a;
+  --foreground: #f5f5f7;
+  --card: #1a1a1a;
+  --card-foreground: #f5f5f7;
+  --popover: #1a1a1a;
+  --popover-foreground: #f5f5f7;
+  --primary: var(--finedge-accent);
+  --primary-foreground: #0a0a0a;
+  --secondary: #252528;
+  --secondary-foreground: #f5f5f7;
+  --muted: #1a1a1a;
+  --muted-foreground: #a1a1a6;
+  --accent: #c5d8f0;
+  --accent-foreground: #0a0a0a;
+  --destructive: #d4a0a0;
+  --border: #2a2a2e;
+  --input: #2a2a2e;
+  --ring: var(--finedge-accent);
+  --radius: 0.75rem;
+  --sidebar: #141414;
+  --sidebar-foreground: #f5f5f7;
+  --sidebar-primary: var(--finedge-accent);
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #252528;
+  --sidebar-accent-foreground: #f5f5f7;
+  --sidebar-border: #2a2a2e;
+  --sidebar-ring: var(--finedge-accent);
+
+  /* Finedge custom tokens */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --bg-card: #1a1a1a;
+  --bg-sidebar: #141414;
+  --border-color: #2a2a2e;
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --accent-blue: var(--finedge-accent);
+  --accent-cyan: #22d3ee;
+  --success: #9ecf9e;
+  --warning: #e8c995;
+  --danger: #e8a8a8;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1;
+  }
+  body {
+    background-color: var(--bg-base, #141416);
+    color: var(--text-primary, #f5f5f7);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: -0.011em;
+  }
+  [data-theme="light"] body {
+    letter-spacing: -0.011em;
+    line-height: 1.55;
+  }
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--bg-border) 55%, var(--text-primary) 45%);
+}
+
+/* ─── Glassmorphism ─────────────────────────────────────────────────────────── */
+.glass {
+  backdrop-filter: blur(20px);
+  background: rgba(20, 27, 38, 0.8);
+  border: 1px solid rgba(30, 40, 54, 0.8);
+}
+
+/* ─── Glow effects ──────────────────────────────────────────────────────────── */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+/* ─── Gradient text ─────────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--finedge-accent), #c5d8f0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Card hover lift ───────────────────────────────────────────────────────── */
+.card-hover {
+  transition: all 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+}
+
+/* ─── Radial glow background (monochrome — subtle depth, no blue wash) ─────── */
+.radial-glow {
+  background:
+    radial-gradient(ellipse 120% 80% at 100% 0%, rgba(255, 255, 255, 0.045), transparent 55%),
+    radial-gradient(ellipse 90% 70% at 0% 100%, rgba(255, 255, 255, 0.03), transparent 50%);
+}
+
+[data-theme="light"] .radial-glow {
+  background:
+    radial-gradient(ellipse 120% 80% at 100% 0%, rgba(28, 25, 23, 0.04), transparent 55%),
+    var(--bg-base);
+}
+
+/* Subtle corner aura for cards / composer (API keys–style, very soft) */
+.fe-soft-aura {
+  position: relative;
+  isolation: isolate;
+}
+.fe-soft-aura::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse 140% 100% at 0% 0%, rgba(200, 195, 255, 0.14), transparent 52%),
+    radial-gradient(ellipse 120% 100% at 100% 100%, rgba(255, 210, 180, 0.1), transparent 48%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+[data-theme="light"] .fe-soft-aura::before {
+  opacity: 0.35;
+  background:
+    radial-gradient(ellipse 140% 100% at 0% 0%, rgba(120, 115, 200, 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 100% at 100% 100%, rgba(200, 140, 100, 0.08), transparent 48%);
+}

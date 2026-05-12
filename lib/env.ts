@@ -1,0 +1,113 @@
+import { z } from 'zod';
+
+/**
+ * Server-side environment variable validation.
+ * This file MUST only be imported in server-side code (API routes, Server Components).
+ * It will throw at startup if any required variable is missing.
+ */
+
+const serverEnvSchema = z.object({
+  // Clerk
+  CLERK_SECRET_KEY: z
+    .string()
+    .min(1, 'CLERK_SECRET_KEY is required')
+    .startsWith('sk_', 'CLERK_SECRET_KEY must start with sk_'),
+
+  // Supabase (service role — never expose to client)
+  NEXT_PUBLIC_SUPABASE_URL: z
+    .string()
+    .url('NEXT_PUBLIC_SUPABASE_URL must be a valid URL'),
+  SUPABASE_SERVICE_ROLE_KEY: z
+    .string()
+    .min(1, 'SUPABASE_SERVICE_ROLE_KEY is required'),
+
+  // AI providers (optional at deploy — users supply keys in vault)
+  ANTHROPIC_API_KEY: z.string().optional(),
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
+
+  /** Optional: dedicated secret for OAuth `state` signing (defaults to CLERK_SECRET_KEY). */
+  OAUTH_STATE_SECRET: z.string().min(16).optional(),
+
+  // Stripe (optional — users connect own account)
+  STRIPE_SECRET_KEY: z.string().optional(),
+
+  // Tavily (optional — users add key in settings)
+  TAVILY_API_KEY: z.string().optional(),
+
+  /**
+   * 32-byte AES key as 64 hex chars. Preferred name: ENCRYPTION_SECRET.
+   * ENCRYPTION_KEY is accepted for backward compatibility. Required when persisting user API keys.
+   */
+  ENCRYPTION_SECRET: z.string().min(1).optional(),
+  ENCRYPTION_KEY: z.string().min(1).optional(),
+
+  // Google OAuth (optional — app works without it, but Google integrations won't load)
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  NEXT_PUBLIC_GOOGLE_REDIRECT_URI: z.string().url().optional(),
+
+  /** Upstash Redis (rate limits). Set both URL and token, or omit both (not recommended for production). */
+  UPSTASH_REDIS_REST_URL: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().url().optional(),
+  ),
+  UPSTASH_REDIS_REST_TOKEN: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().min(1).optional(),
+  ),
+
+  /** Bearer token for POST /api/internal/security-log (middleware → server logging). */
+  INTERNAL_SECURITY_LOG_SECRET: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().min(16).optional(),
+  ),
+
+  // Node environment
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
+}).superRefine((data, ctx) => {
+  const hasUrl = Boolean(data.UPSTASH_REDIS_REST_URL);
+  const hasTok = Boolean(data.UPSTASH_REDIS_REST_TOKEN);
+  if (hasUrl !== hasTok) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Set both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN, or omit both.',
+      path: ['UPSTASH_REDIS_REST_URL'],
+    });
+  }
+});
+
+
+function validateEnv() {
+  const serverResult = serverEnvSchema.safeParse(process.env);
+
+  if (!serverResult.success) {
+    const issues = serverResult.error.issues;
+    const missing = issues
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((e: any) => `  ✗ ${(e.path as unknown[]).join('.')}: ${e.message}`)
+      .join('\n');
+
+    throw new Error(
+      `\n\n🔴 Missing or invalid environment variables:\n${missing}\n\nCheck your .env.local file.\n`
+    );
+  }
+
+  return serverResult.data;
+}
+
+// Validate once at module load — fails fast at startup
+export const env = validateEnv();
+
+// Safe client-side env (only NEXT_PUBLIC_ vars)
+export const clientEnv = {
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL ?? '',
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '',
+  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+  NEXT_PUBLIC_SUPABASE_ANON_KEY:
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '',
+};
