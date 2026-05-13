@@ -2,13 +2,14 @@ import type { NextConfig } from 'next';
 
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.accounts.dev https://*.clerk.accounts.dev https://js.stripe.com;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.accounts.dev https://clerk.quivo.site https://*.clerk.com https://js.stripe.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com;
   img-src 'self' blob: data: https://img.clerk.com https://*.clerk.com;
   connect-src 'self'
     https://*.clerk.accounts.dev
-    https://clerk.accounts.dev
+    https://clerk.quivo.site
+    https://*.clerk.com
     https://api.anthropic.com
     https://generativelanguage.googleapis.com
     https://api.stripe.com
