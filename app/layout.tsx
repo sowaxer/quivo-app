@@ -14,7 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      afterSignOutUrl="/sign-in"
+    >
       <html lang="en" data-theme="dark" className="h-full antialiased">
         <body className="min-h-full flex flex-col bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors">
           <ThemeProvider>{children}</ThemeProvider>
