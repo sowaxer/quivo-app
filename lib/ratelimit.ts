@@ -20,6 +20,6 @@ export const aiRatelimit = new Ratelimit({
 /** OAuth starts, Stripe operations, webhooks. */
 export const strictRatelimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(3, '60 s'),
+  limiter: Ratelimit.slidingWindow(10, '60 s'),
   analytics: true,
 });

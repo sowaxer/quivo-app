@@ -15,7 +15,7 @@ import { exchangeCodeForTokens } from '@/lib/google';
 import { verifySignedOAuthState } from '@/lib/oauth-state';
 
 export async function GET(req: NextRequest) {
-  const rlDenied = await rateLimitExceededResponse('strict', await rateLimitKey('google-oauth-callback'));
+  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('google-oauth-callback'));
   if (rlDenied) return rlDenied;
 
   const { searchParams } = req.nextUrl;
@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
   if (!clerkUserId) {
     const url = new URL('/dashboard', req.url);
     url.searchParams.set('google_error', 'invalid_state');
+    url.searchParams.set('google_detail', 'OAuth state token expired or signature mismatch. Try connecting again.');
     return NextResponse.redirect(url);
   }
 
@@ -47,6 +48,7 @@ export async function GET(req: NextRequest) {
   if (!sessionUserId || sessionUserId !== clerkUserId) {
     const url = new URL('/dashboard', req.url);
     url.searchParams.set('google_error', 'session_mismatch');
+    url.searchParams.set('google_detail', `session=${sessionUserId ?? 'none'} state=${clerkUserId}`);
     return NextResponse.redirect(url);
   }
 
@@ -60,6 +62,7 @@ export async function GET(req: NextRequest) {
     console.error('[Google OAuth callback] token exchange failed:', msg);
     const url = new URL('/dashboard', req.url);
     url.searchParams.set('google_error', 'exchange_failed');
+    url.searchParams.set('google_detail', msg.slice(0, 200));
     return NextResponse.redirect(url);
   }
 }
