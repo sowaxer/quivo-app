@@ -32,15 +32,17 @@ function getSupabase() {
 
 // ─── Build an OAuth2Client (no credentials yet) ───────────────────────────────
 export function createOAuthClient(): OAuth2Client {
-  // Use NEXT_PUBLIC_APP_URL as the canonical base so the redirect URI
-  // always matches exactly what is registered in Google Cloud Console.
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    throw new Error(
+      'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set. ' +
+      'Add them in .env.local (local) or Vercel Environment Variables (production).',
+    );
+  }
   const base = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
   const redirectUri = `${base}/api/google/auth/callback`;
-  return new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID!,
-    process.env.GOOGLE_CLIENT_SECRET!,
-    redirectUri,
-  );
+  return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 }
 
 // ─── Generate the Google consent URL ─────────────────────────────────────────
