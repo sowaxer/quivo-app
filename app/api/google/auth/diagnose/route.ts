@@ -17,8 +17,12 @@ export async function GET() {
   const checks: { label: string; ok: boolean; note?: string }[] = [];
 
   // 1. Client ID set
-  const hasClientId = !!process.env.GOOGLE_CLIENT_ID;
-  checks.push({ label: 'GOOGLE_CLIENT_ID in .env.local', ok: hasClientId, note: hasClientId ? process.env.GOOGLE_CLIENT_ID!.slice(0, 20) + '…' : 'Missing' });
+  const hasClientId = !!process.env.GOOGLE_CLIENT_ID?.trim();
+  checks.push({
+    label: 'GOOGLE_CLIENT_ID',
+    ok: hasClientId,
+    note: hasClientId ? 'set (value hidden)' : 'Missing',
+  });
 
   // 2. Client secret set
   checks.push({ label: 'GOOGLE_CLIENT_SECRET in .env.local', ok: !!process.env.GOOGLE_CLIENT_SECRET, note: process.env.GOOGLE_CLIENT_SECRET ? '✓ set' : 'Missing' });

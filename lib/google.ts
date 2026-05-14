@@ -10,6 +10,7 @@
 import { google } from 'googleapis';
 import type { OAuth2Client, Credentials } from 'google-auth-library';
 import { createSignedOAuthState } from '@/lib/oauth-state';
+import { logErrorChain } from '@/lib/log-error-chain';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -76,9 +77,9 @@ export async function exchangeCodeForTokens(
     const res = await client.getToken(code);
     tokens = res.tokens;
   } catch (err) {
+    logErrorChain('[Google OAuth] getToken() FAILED — full chain:', err);
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('[Google OAuth] getToken() FAILED:', msg);
-    throw new Error(`Token exchange failed: ${msg}`);
+    throw new Error(`Token exchange failed: ${msg}`, { cause: err });
   }
 
   console.log('[Google OAuth] tokens received:', {
@@ -118,7 +119,9 @@ export async function saveTokens(userId: string, tokens: Credentials) {
       details: error.details,
       hint: error.hint,
     });
-    throw new Error(`Supabase save failed: ${error.message} (${error.code})`);
+    throw new Error(`Supabase save failed: ${error.message} (${error.code})`, {
+      cause: error,
+    });
   }
 
   console.log('[Google OAuth] tokens saved successfully for', userId);
