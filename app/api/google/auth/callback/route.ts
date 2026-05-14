@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { exchangeCodeForTokens } from '@/lib/google';
+import { logErrorChain } from '@/lib/log-error-chain';
 import { verifySignedOAuthState } from '@/lib/oauth-state';
 
 export async function GET(req: NextRequest) {
@@ -80,10 +81,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(url);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'exchange_failed';
-    console.error('[Google OAuth callback] FAILED at Step 3:', msg);
-    if (err instanceof Error && err.stack) {
-      console.error('[Google OAuth callback] Stack:', err.stack);
-    }
+    logErrorChain('[Google OAuth callback] FAILED at Step 3 — full chain:', err);
     const url = new URL('/dashboard', req.url);
     url.searchParams.set('google_error', 'exchange_failed');
     url.searchParams.set('google_detail', msg.slice(0, 200));
