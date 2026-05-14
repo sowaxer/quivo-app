@@ -63,7 +63,31 @@ export async function exchangeCodeForTokens(
   userId: string,
 ): Promise<Credentials> {
   const client = createOAuthClient();
-  const { tokens } = await client.getToken(code);
+
+  const base = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+  console.log('[Google OAuth] exchanging code for tokens…', {
+    userId,
+    redirectUri: `${base}/api/google/auth/callback`,
+    codeLength: code.length,
+  });
+
+  let tokens: Credentials;
+  try {
+    const res = await client.getToken(code);
+    tokens = res.tokens;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[Google OAuth] getToken() FAILED:', msg);
+    throw new Error(`Token exchange failed: ${msg}`);
+  }
+
+  console.log('[Google OAuth] tokens received:', {
+    hasAccessToken: !!tokens.access_token,
+    hasRefreshToken: !!tokens.refresh_token,
+    expiryDate: tokens.expiry_date,
+    scope: tokens.scope,
+  });
+
   await saveTokens(userId, tokens);
   return tokens;
 }
@@ -71,18 +95,33 @@ export async function exchangeCodeForTokens(
 // ─── Persist tokens ───────────────────────────────────────────────────────────
 export async function saveTokens(userId: string, tokens: Credentials) {
   const supabase = getSupabase();
-  await supabase.from('google_tokens').upsert(
-    {
-      user_id: userId,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      expiry_date: tokens.expiry_date,
-      token_type: tokens.token_type,
-      scope: tokens.scope,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id' },
-  );
+  const row = {
+    user_id: userId,
+    access_token: tokens.access_token,
+    refresh_token: tokens.refresh_token,
+    expiry_date: tokens.expiry_date,
+    token_type: tokens.token_type,
+    scope: tokens.scope,
+    updated_at: new Date().toISOString(),
+  };
+
+  console.log('[Google OAuth] saving tokens to Supabase…', { userId });
+
+  const { error } = await supabase
+    .from('google_tokens')
+    .upsert(row, { onConflict: 'user_id' });
+
+  if (error) {
+    console.error('[Google OAuth] Supabase upsert FAILED:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+    throw new Error(`Supabase save failed: ${error.message} (${error.code})`);
+  }
+
+  console.log('[Google OAuth] tokens saved successfully for', userId);
 }
 
 // ─── Load tokens from Supabase ────────────────────────────────────────────────
