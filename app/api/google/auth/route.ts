@@ -30,8 +30,15 @@ export async function GET(req: NextRequest) {
   }
 
   // ── Initiate OAuth flow — signed state binds tokens to this Clerk session
-  const consentUrl = getAuthUrl(userId);
-  return NextResponse.redirect(consentUrl);
+  try {
+    const consentUrl = getAuthUrl(userId);
+    return NextResponse.redirect(consentUrl);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'OAuth config error';
+    const url = new URL('/dashboard', req.url);
+    url.searchParams.set('google_error', msg);
+    return NextResponse.redirect(url);
+  }
 }
 
 export async function DELETE() {
