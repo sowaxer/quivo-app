@@ -18,10 +18,9 @@ import AnalyticsPanel from '@/components/analytics-panel';
 import AppearanceSettings from '@/components/appearance-settings';
 import DocsPanel from '@/components/docs-panel';
 import ApiKeysPanel from '@/components/api-keys-panel';
-import PerplexityFocusBar from '@/components/perplexity-focus-bar';
 import { ViewChrome } from '@/components/view-chrome';
+import HomeHub from '@/components/home-hub';
 import PlannerPanel from '@/components/planner-panel';
-import AttioOverview from '@/components/attio-overview';
 import { SidebarUserMenu } from '@/components/sidebar-user-menu';
 import { usePlannerReminders } from '@/hooks/use-planner-reminders';
 import { loadPlannerItems } from '@/lib/planner-storage';
@@ -38,7 +37,7 @@ import {
 
 type View = 'overview' | 'chat' | 'agents' | 'kb' | 'planner' | 'notes' | 'tasks' | 'gmail' | 'stripe' | 'calendar' | 'plugins' | 'models' | 'prompts' | 'analytics' | 'drive' | 'settings' | 'appearance' | 'docs' | 'apikeys';
 
-const HOME_VIEW: View = 'chat';
+const HOME_VIEW: View = 'overview';
 
 const navStartHere = [
   { id: 'chat'     as View, label: 'Chat',          icon: IconMessageCircle },
@@ -67,7 +66,7 @@ const navTools = [
 ];
 
 const viewTitles: Record<View, { title: string; subtitle: string }> = {
-  overview:    { title: 'Home',             subtitle: 'Your financial overview at a glance' },
+  overview:    { title: 'Home',             subtitle: 'Finance, markets, and news at a glance' },
   chat:        { title: 'AI Chat',          subtitle: 'Powered by Claude & Gemini — your API key, your cost' },
   agents:      { title: 'AI Agents',        subtitle: 'Finance specialists: tax, audit, bookkeeping, CFO, and more' },
   kb:          { title: 'Knowledge Base',   subtitle: 'Upload documents for AI agents to reference' },
@@ -333,15 +332,17 @@ function DashboardInner() {
 
       {/* ── MAIN AREA ─────────────────────────────────────────────────────── */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {isHome && <PerplexityFocusBar />}
-
         {!isHome && (
           <ViewChrome title={title} subtitle={subtitle} showBack onBack={goBack} showSearch={false} />
         )}
 
         {/* Content */}
         <main className="flex-1 overflow-hidden bg-[var(--bg-base)]">
-          {activeView === 'overview'  && <div className="h-full overflow-hidden"><AttioOverview onNavigate={(v) => goToView(v as View)} /></div>}
+          {activeView === 'overview'  && (
+            <div className="h-full overflow-hidden">
+              <HomeHub onNavigate={(v) => goToView(v as View)} />
+            </div>
+          )}
           {activeView === 'chat'      && (
             <ChatInterface
               onGoToSettings={() => goToView('settings')}

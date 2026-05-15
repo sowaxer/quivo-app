@@ -306,7 +306,7 @@ function KeyRow({
           <div className="flex flex-wrap items-center gap-2 mb-0.5">
             <p className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{prov.name}</p>
             {prov.id === 'anthropic' && prov.badge ? (
-              <span className="rounded-full border border-white/10 bg-gradient-to-r from-sky-500/85 via-violet-500/85 to-fuchsia-500/80 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-[0_4px_16px_-4px_rgba(139,92,246,0.5)]">
+              <span className="rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[var(--text-secondary)]">
                 {prov.badge}
               </span>
             ) : (
@@ -360,7 +360,7 @@ function KeyRow({
 
           {/* Save */}
           <button onClick={onSave} disabled={state.saving || !state.input.trim()}
-            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 px-4 py-2.5 text-[12px] font-semibold text-zinc-950 shadow-[0_6px_22px_-6px_rgba(167,139,250,0.55)] transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+            className="quivo-btn-green-glass flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[12px] font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
             {state.saving ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconCheck className="h-3.5 w-3.5" />}
             Save
           </button>

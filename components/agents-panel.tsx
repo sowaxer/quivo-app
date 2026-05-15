@@ -574,7 +574,7 @@ export default function AgentsPanel({ onChatWithAgent }: Props) {
               <h3 className="mb-2 text-lg font-bold text-[#e6edf3]">No agents found</h3>
               <p className="mb-4 text-sm text-[#8b949e]">Create your first AI agent using the + button on the left</p>
               <button onClick={() => setShowCreate(true)}
-                className="flex items-center gap-2 rounded-xl bg-[var(--text-primary)] px-5 py-2.5 text-sm font-semibold text-[var(--bg-base)] transition-all hover:opacity-90">
+                className="quivo-btn-primary flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold">
                 <IconPlus className="h-4 w-4" /> Create Agent
               </button>
             </div>
