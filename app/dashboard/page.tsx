@@ -26,12 +26,13 @@ import TasksPanel from '@/components/tasks-panel';
 import AttioNotesPanel from '@/components/attio-notes-panel';
 import AttioOverview from '@/components/attio-overview';
 import { NotificationsDropdown } from '@/components/notifications-dropdown';
+import { BankStatementSidePanel } from '@/components/bank-statement-side-panel';
 import {
   IconLayoutDashboard, IconRobot, IconNotes, IconMail, IconCreditCard,
   IconCalendar, IconPlug, IconChartBar, IconSettings, IconSparkles,
   IconSearch, IconCloud, IconCheck,
   IconBrain, IconBook, IconMessageCircle, IconDatabase, IconPalette,
-  IconFileText, IconKey, IconLayoutList, IconHelp,
+  IconFileText, IconKey, IconLayoutList, IconHelp, IconFileInvoice,
 } from '@tabler/icons-react';
 
 type View = 'overview' | 'chat' | 'agents' | 'kb' | 'notes' | 'tasks' | 'gmail' | 'stripe' | 'calendar' | 'plugins' | 'models' | 'prompts' | 'analytics' | 'drive' | 'settings' | 'appearance' | 'docs' | 'apikeys';
@@ -96,6 +97,7 @@ function DashboardInner() {
   const [dropboxToast, setDropboxToast] = useState<'connected' | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [pendingNotesCount, setPendingNotesCount] = useState(0);
+  const [statementPanelOpen, setStatementPanelOpen] = useState(false);
 
   // Show onboarding on first visit if no API keys are saved
   useEffect(() => {
@@ -208,6 +210,7 @@ function DashboardInner() {
     <div className="flex h-screen overflow-hidden bg-[var(--bg-base)]">
       {showBriefing && <DailyBriefing onClose={() => setShowBriefing(false)} />}
       {showOnboarding && <OnboardingModal onClose={closeOnboarding} />}
+      <BankStatementSidePanel open={statementPanelOpen} onClose={() => setStatementPanelOpen(false)} />
 
       {/* OAuth toasts */}
       {dropboxToast && (
