@@ -113,7 +113,7 @@ export async function verifySecretBeforeSave(
   const v = plaintext.trim();
   switch (provider) {
     case 'anthropic':
-      if (!/^sk-ant-api/.test(v)) return { ok: false, message: 'Anthropic keys should start with sk-ant-api…' };
+      if (!/^sk-ant-/.test(v)) return { ok: false, message: 'Anthropic keys should start with sk-ant-…' };
       return verifyAnthropicKey(v);
     case 'openai':
       if (!/^sk-/.test(v)) return { ok: false, message: 'OpenAI keys should start with sk-…' };

@@ -15,7 +15,7 @@ interface Note {
   tags: string[];
 }
 
-const LS_NOTES = 'finedge_attio_notes';
+const LS_NOTES = 'quivo_attio_notes';
 const COLORS = ['#1c1c1f', '#222226', '#26262b', '#1a1a1e', '#242428', '#202024'];
 
 function load(): Note[] {
@@ -271,7 +271,7 @@ export default function AttioNotesPanel() {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <button className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] text-[#9ba3af] hover:bg-[#22252a] hover:text-[#e8eaed] transition-all">Help</button>
-          <button className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] text-[#9ba3af] hover:bg-[#22252a] hover:text-[#e8eaed] transition-all">Ask Finedge AI</button>
+          <button className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] text-[#9ba3af] hover:bg-[#22252a] hover:text-[#e8eaed] transition-all">Ask Quivo AI</button>
         </div>
       </div>
 

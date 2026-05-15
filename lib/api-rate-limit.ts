@@ -1,13 +1,23 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { aiRatelimit, ratelimit, strictRatelimit } from '@/lib/ratelimit';
+import {
+  aiRatelimit,
+  chatRatelimit,
+  googleIntegrationRatelimit,
+  keysHourlyRatelimit,
+  ratelimit,
+  strictRatelimit,
+} from '@/lib/ratelimit';
 
-export type ApiRateLimitProfile = 'default' | 'ai' | 'strict';
+export type ApiRateLimitProfile = 'default' | 'ai' | 'strict' | 'chat' | 'keysHourly' | 'google';
 
 const byProfile = {
   default: ratelimit,
   ai: aiRatelimit,
   strict: strictRatelimit,
+  chat: chatRatelimit,
+  keysHourly: keysHourlyRatelimit,
+  google: googleIntegrationRatelimit,
 } as const;
 
 export async function clientIp(): Promise<string> {

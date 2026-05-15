@@ -130,7 +130,7 @@ export default function CalendarView() {
         </div>
         <div>
           <h3 className="text-lg font-bold text-[#e6edf3]">Connect Google Calendar</h3>
-          <p className="mt-1 max-w-sm text-sm text-[#8b949e]">See your real schedule and create events directly from Finedge.</p>
+          <p className="mt-1 max-w-sm text-sm text-[#8b949e]">See your real schedule and create events directly from Quivo.</p>
         </div>
         <button
           onClick={() => { window.location.href = '/api/google/auth'; }}

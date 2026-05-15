@@ -74,9 +74,9 @@ export default function OnboardingModal({ onClose }: Props) {
               <IconSparkles className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#e6edf3]">Welcome to Finedge</h2>
+              <h2 className="text-2xl font-bold text-[#e6edf3]">Welcome to Quivo</h2>
               <p className="mt-2 text-sm text-[#8b949e] max-w-sm">
-                Finedge connects your favorite AI models, Gmail, Calendar, and Stripe in one dashboard.
+                Quivo connects your favorite AI models, Gmail, Calendar, and Stripe in one dashboard.
                 <span className="block mt-1 font-semibold text-[#3b82f6]">You use your own API keys — we're just the bridge.</span>
               </p>
             </div>
@@ -142,7 +142,7 @@ export default function OnboardingModal({ onClose }: Props) {
             </div>
 
             <div className="rounded-xl border border-[#f59e0b]/20 bg-[#f59e0b]/5 px-4 py-3">
-              <p className="text-xs text-[#f59e0b]">🔒 Keys are stored encrypted server-side. You pay AI providers directly — Finedge charges nothing for AI usage.</p>
+              <p className="text-xs text-[#f59e0b]">🔒 Keys are stored encrypted server-side. You pay AI providers directly — Quivo charges nothing for AI usage.</p>
             </div>
 
             <div className="flex gap-3">

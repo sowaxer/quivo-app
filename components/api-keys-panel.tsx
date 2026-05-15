@@ -5,7 +5,7 @@ import { IconEye, IconEyeOff, IconCheck, IconX, IconLoader2, IconExternalLink, I
 import { ProviderBrandMark } from '@/components/provider-brand-icons';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const LS_EXTRA = 'finedge_extra_keys';
+const LS_EXTRA = 'quivo_extra_keys';
 
 function loadExtra(): Record<string, string> {
   try { return JSON.parse(localStorage.getItem(LS_EXTRA) ?? '{}'); } catch { return {}; }
@@ -219,7 +219,7 @@ const INTEGRATION_PROVIDERS = [
     prefix: 'secret_',
     url: 'https://www.notion.so/my-integrations',
     testable: false,
-    how: `1. Go to notion.so/my-integrations\n2. Click New integration\n3. Name it "Finedge" and select your workspace\n4. Copy the Internal Integration Token starting with secret_\n5. Paste it here`,
+    how: `1. Go to notion.so/my-integrations\n2. Click New integration\n3. Name it "Quivo" and select your workspace\n4. Copy the Internal Integration Token starting with secret_\n5. Paste it here`,
   },
   {
     id: 'github', field: 'github_token', storage: 'local',
@@ -250,7 +250,7 @@ type ProviderDef =
 function ProviderAvatar({ id, size = 40 }: { id: string; size?: number }) {
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+      className="flex shrink-0 items-center justify-center rounded-2xl border border-white/[0.1] bg-gradient-to-br from-white/[0.07] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
       style={{ width: size, height: size }}
     >
       <ProviderBrandMark id={id} size={Math.round(size * 0.58)} />
@@ -295,7 +295,7 @@ function KeyRow({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-y border-r border-white/[0.08] border-l-4 bg-[var(--bg-card)] overflow-hidden transition-all hover:border-white/[0.12] ${leftAccentClass(prov.id)}`}
+      className={`rounded-2xl border border-y border-r border-[var(--bg-border)] border-l-4 bg-[var(--bg-card)] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all hover:opacity-[0.98] ${leftAccentClass(prov.id)}`}
     >
       {/* Header row */}
       <div className="flex items-center gap-4 px-5 py-4">
@@ -304,7 +304,7 @@ function KeyRow({
           <div className="flex flex-wrap items-center gap-2 mb-0.5">
             <p className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{prov.name}</p>
             {prov.id === 'anthropic' && prov.badge ? (
-              <span className="rounded-md border border-transparent bg-gradient-to-r from-blue-600/90 to-violet-600/85 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-md shadow-violet-900/25">
+              <span className="rounded-full border border-white/10 bg-gradient-to-r from-sky-500/85 via-violet-500/85 to-fuchsia-500/80 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-[0_4px_16px_-4px_rgba(139,92,246,0.5)]">
                 {prov.badge}
               </span>
             ) : (
@@ -329,7 +329,7 @@ function KeyRow({
           <p className="mt-0.5 text-[12px] leading-snug text-[var(--text-muted)]">{prov.desc}</p>
         </div>
         <a href={prov.url} target="_blank" rel="noopener noreferrer"
-          className="flex shrink-0 items-center gap-1 rounded-full border border-white/[0.12] bg-white/[0.06] px-3 py-2 text-[12px] font-medium text-[var(--text-primary)] hover:bg-white/[0.1] transition-all">
+          className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--bg-border)] bg-gradient-to-r from-sky-500/12 via-violet-500/10 to-fuchsia-500/12 px-3 py-2 text-[12px] font-medium text-[var(--text-primary)] transition-all hover:from-sky-500/20 hover:via-violet-500/18 hover:to-fuchsia-500/20 dark:text-zinc-200 dark:hover:text-white">
           Get API key <IconExternalLink className="h-3 w-3 opacity-70" />
         </a>
       </div>
@@ -348,17 +348,17 @@ function KeyRow({
               value={state.has && !state.input ? (state.masked ?? '') : state.input}
               onChange={e => onChange(e.target.value)}
               placeholder={state.has ? `${prov.prefix}••••••••••••••••••••` : `Paste your ${prov.name} API key here…`}
-              className={`w-full rounded-xl border border-white/[0.08] bg-[var(--bg-surface)] py-2.5 pr-10 text-[13px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[color-mix(in_srgb,var(--finedge-accent)_45%,transparent)] focus:outline-none focus:ring-1 focus:ring-[color-mix(in_srgb,var(--finedge-accent)_35%,transparent)] transition-all ${state.has ? 'pl-10' : 'pl-4'}`}
+              className={`w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-surface)] py-2.5 pr-10 text-[13px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-violet-400/35 focus:outline-none focus:ring-1 focus:ring-violet-500/25 transition-all ${state.has ? 'pl-10' : 'pl-4'}`}
             />
             <button onClick={onToggleShow}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]">
               {state.show ? <IconEyeOff className="h-3.5 w-3.5" /> : <IconEye className="h-3.5 w-3.5" />}
             </button>
           </div>
 
           {/* Save */}
           <button onClick={onSave} disabled={state.saving || !state.input.trim()}
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 px-4 py-2.5 text-[12px] font-semibold text-white shadow-sm transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-fuchsia-400 px-4 py-2.5 text-[12px] font-semibold text-zinc-950 shadow-[0_6px_22px_-6px_rgba(167,139,250,0.55)] transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
             {state.saving ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconCheck className="h-3.5 w-3.5" />}
             Save
           </button>
@@ -366,7 +366,7 @@ function KeyRow({
           {/* Test */}
           {prov.testable && state.has && (
             <button onClick={onTest} disabled={state.testing}
-              className="flex items-center gap-1.5 rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-[12px] font-medium text-[var(--text-secondary)] hover:bg-white/[0.08] hover:text-[var(--text-primary)] transition-all disabled:opacity-40">
+              className="flex items-center gap-1.5 rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-3 py-2.5 text-[12px] font-medium text-[var(--text-secondary)] transition-all hover:border-violet-400/25 hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] disabled:opacity-40">
               {state.testing ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconRefresh className="h-3.5 w-3.5" />}
               Test
             </button>
@@ -395,12 +395,12 @@ function KeyRow({
 
         {/* How to get */}
         <button onClick={onToggleHow}
-          className="mt-2 flex items-center gap-1 text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
+          className="mt-2 flex items-center gap-1 text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all">
           {state.howOpen ? <IconChevronUp className="h-3 w-3" /> : <IconChevronDown className="h-3 w-3" />}
           How to get this key
         </button>
         {state.howOpen && (
-          <pre className="mt-2 whitespace-pre-wrap rounded-xl border border-white/[0.08] bg-[var(--bg-surface)] p-3 text-[12px] leading-relaxed text-[var(--text-secondary)]">
+          <pre className="mt-2 whitespace-pre-wrap rounded-xl border border-[var(--bg-border)] bg-[var(--bg-surface)] p-3 text-[12px] leading-relaxed text-[var(--text-secondary)]">
             {prov.how}
           </pre>
         )}
@@ -413,13 +413,13 @@ function KeyRow({
 function SectionHeader({ icon, title, desc }: { icon: ReactNode; title: string; desc: string }) {
   return (
     <div className="mb-4 flex items-start gap-3">
-      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[var(--text-secondary)]">
+      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--bg-border)] bg-gradient-to-br from-sky-500/15 via-violet-500/12 to-emerald-500/15 text-[var(--text-muted)]">
         {icon}
       </div>
       <div>
         <h2 className="relative inline-block text-[17px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
           {title}
-          <span className="absolute -bottom-1 left-0 h-0.5 w-14 rounded-full bg-gradient-to-r from-sky-500 to-violet-500 opacity-90" aria-hidden />
+          <span className="absolute -bottom-1 left-0 h-0.5 w-16 rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-emerald-400 opacity-90" aria-hidden />
         </h2>
         <p className="mt-0.5 text-[13px] leading-snug text-[var(--text-secondary)]">{desc}</p>
       </div>
@@ -547,35 +547,28 @@ export default function ApiKeysPanel() {
         <div className="mb-10">
           <h1 className="text-[28px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">API Keys</h1>
           <p className="mt-2 text-[15px] leading-relaxed text-[var(--text-secondary)]">
-            Finedge connects your tools. We <strong className="font-semibold text-[var(--text-primary)]">never charge for AI usage</strong> — you pay each provider directly, at their price.
+            Quivo connects your tools. We <strong className="font-semibold text-[var(--text-primary)]">never charge for AI usage</strong> — you pay each provider directly, at their price.
           </p>
 
-          {/* How it works cards */}
+          {/* How it works — flat panels (same canvas as rest of app) */}
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
               {
                 title: 'You add keys',
                 desc: 'From Claude, Google, OpenAI, DeepSeek, and more.',
-                from: '#1a2744',
-                to: '#243454',
               },
               {
                 title: 'We connect them',
                 desc: 'Chat, agents, and automations use your keys.',
-                from: '#2d1b4e',
-                to: '#3d2560',
               },
               {
                 title: 'You pay providers',
-                desc: 'Only the services you use — not Finedge.',
-                from: '#0d3320',
-                to: '#144a32',
+                desc: 'Only the services you use — not Quivo.',
               },
             ].map(c => (
               <div
                 key={c.title}
-                className="rounded-2xl border border-white/[0.08] p-4"
-                style={{ background: `linear-gradient(145deg, ${c.from}, ${c.to})` }}
+                className="rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-base)] p-4 shadow-none"
               >
                 <p className="text-[14px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{c.title}</p>
                 <p className="mt-1 text-[12px] leading-snug text-[var(--text-secondary)]">{c.desc}</p>
@@ -584,16 +577,18 @@ export default function ApiKeysPanel() {
           </div>
 
           {/* Stats bar */}
-          <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-[var(--bg-card)] px-4 py-3">
+          <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-base)] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-300/80 shadow-[0_0_10px_rgba(52,211,153,0.45)]" />
+                <div className="h-2 w-2 rounded-full bg-emerald-400/90 shadow-[0_0_12px_rgba(52,211,153,0.55)]" />
                 <p className="text-[13px] text-[var(--text-secondary)]">
                   <strong className="font-semibold text-[var(--text-primary)]">{loading ? '…' : connectedCount}</strong>{' '}
                   of {totalCount} providers connected
                 </p>
               </div>
-              <p className="text-[12px] text-emerald-200/80">Keys are encrypted. You can remove them anytime.</p>
+              <p className="text-[12px] bg-gradient-to-r from-emerald-300/90 via-sky-300/85 to-violet-300/90 bg-clip-text font-medium text-transparent">
+                Keys are encrypted. You can remove them anytime.
+              </p>
             </div>
             {!loading && totalCount > 0 && (
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
@@ -692,7 +687,7 @@ export default function ApiKeysPanel() {
         </div>
 
         {/* ── Footer note ────────────────────────────────────────────────── */}
-        <div className="rounded-2xl border border-white/[0.08] bg-emerald-500/[0.06] p-4 text-center">
+        <div className="rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-card)] p-4 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
           <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
             Server keys use <strong className="font-medium text-[var(--text-primary)]">encrypted storage</strong>. Local keys stay in this browser. You can delete any key whenever you like.
           </p>

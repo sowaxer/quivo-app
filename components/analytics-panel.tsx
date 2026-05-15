@@ -14,7 +14,7 @@ interface ChatSession {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function loadSessions(): ChatSession[] {
-  try { return JSON.parse(localStorage.getItem('finedge_chat_sessions') ?? '[]'); } catch { return []; }
+  try { return JSON.parse(localStorage.getItem('quivo_chat_sessions') ?? '[]'); } catch { return []; }
 }
 
 function countWords(text: string) {
@@ -283,7 +283,7 @@ export default function AnalyticsPanel() {
   }, [sessions, usageMonth]);
 
   function share() {
-    const text = `I've sent ${stats.messages} messages and used ${stats.agents} AI agents on Finedge! 🚀`;
+    const text = `I've sent ${stats.messages} messages and used ${stats.agents} AI agents on Quivo! 🚀`;
     navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
   }
 
@@ -296,14 +296,14 @@ export default function AnalyticsPanel() {
   // KB file size estimate
   const kbSizeKB = useMemo(() => {
     try {
-      const docs = JSON.parse(localStorage.getItem('finedge_kb_docs') ?? '[]') as { content?: string }[];
+      const docs = JSON.parse(localStorage.getItem('quivo_kb_docs') ?? '[]') as { content?: string }[];
       const chars = docs.reduce((s, d) => s + (d.content?.length ?? 0), 0);
       return Math.round(chars / 1024);
     } catch { return 0; }
   }, []);
 
   const agentCount = useMemo(() => {
-    try { return (JSON.parse(localStorage.getItem('finedge_user_agents') ?? '[]') as unknown[]).length; }
+    try { return (JSON.parse(localStorage.getItem('quivo_user_agents') ?? '[]') as unknown[]).length; }
     catch { return 0; }
   }, []);
 
@@ -350,7 +350,7 @@ export default function AnalyticsPanel() {
                 {user?.fullName ?? user?.firstName ?? 'Welcome'}, this is your{' '}
                 <span className="font-bold text-[var(--text-primary)]">{stats.dayCount}
                   <sup className="text-[10px]">{stats.dayCount === 1 ? 'st' : stats.dayCount === 2 ? 'nd' : stats.dayCount === 3 ? 'rd' : 'th'}</sup>
-                </span> day with Finedge
+                </span> day with Quivo
               </p>
               <div className="mt-0.5 flex items-center gap-4">
                 <span className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
@@ -570,7 +570,7 @@ export default function AnalyticsPanel() {
           <h3 className="mb-4 text-sm font-semibold text-[var(--text-primary)]">Platform Overview</h3>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { label: 'API Cost to You', value: '$0.00', sub: 'Finedge charges nothing', icon: '💰', green: true },
+              { label: 'API Cost to You', value: '$0.00', sub: 'Quivo charges nothing', icon: '💰', green: true },
               { label: 'Chat Sessions', value: stats.topics.toLocaleString(), sub: 'All time', icon: '💬', green: false },
               { label: 'AI Agents Used', value: stats.agents.toLocaleString(), sub: 'Unique agents', icon: '🤖', green: false },
               { label: 'Words Processed', value: stats.words > 1000 ? `${(stats.words / 1000).toFixed(1)}k` : stats.words.toString(), sub: 'By you this session', icon: '📝', green: false },

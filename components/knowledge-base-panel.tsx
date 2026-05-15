@@ -25,7 +25,7 @@ interface KBDocument {
   url?: string;
 }
 
-const LS_KB = 'finedge_kb_docs';
+const LS_KB = 'quivo_kb_docs';
 const MAX_DOC_SIZE = 500_000;
 
 function loadDocs(): KBDocument[] {

@@ -29,7 +29,7 @@ const ALL_PLUGINS = [
   { id: 'azure-ai-search',  name: 'Azure AI Search',    category: 'Enterprise',  installed: false, featured: false, icon: '☁️', desc: 'Connect TypingMind to your Azure AI Search training data.' },
   { id: 'web-search-serp',  name: 'Web Search (SERP)',  category: 'Research',    installed: false, featured: false, icon: '🔎', desc: 'Search the web using SerpAPI for real-time results.' },
   { id: 'image-search',     name: 'Image Search',       category: 'Media',       installed: false, featured: false, icon: '🖼️', desc: 'Search for images on the web using Google Image Search.' },
-  { id: 'slack-notifier',   name: 'Slack Notifier',     category: 'Productivity',installed: false, featured: false, icon: '💬', desc: 'Send messages from Finedge AI to a Slack channel.' },
+  { id: 'slack-notifier',   name: 'Slack Notifier',     category: 'Productivity',installed: false, featured: false, icon: '💬', desc: 'Send messages from Quivo AI to a Slack channel.' },
   { id: 'google-calendar',  name: 'Google Calendar',    category: 'Productivity',installed: false, featured: false, icon: '📅', desc: 'Give AI read-only access to your Google Calendar events.' },
   { id: 'google-drive-ai',  name: 'Drive Search (AI)',  category: 'Productivity',installed: false, featured: false, icon: '💾', desc: 'AI-powered search through your Google Drive documents.' },
   { id: 'generate-grok',    name: 'Generate Image Grok',category: 'Media',       installed: false, featured: false, icon: '🤖', desc: 'High quality image generation using xAI\'s Grok model.' },

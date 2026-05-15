@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('kb-extract', userId));
+  const rlDenied = await rateLimitExceededResponse('ai', await rateLimitKey('kb-extract', userId));
   if (rlDenied) return rlDenied;
 
   try {

@@ -5,7 +5,7 @@ import { useTheme } from '@/components/theme-provider';
 import { IconCheck, IconChevronDown, IconDeviceFloppy, IconLoader2 } from '@tabler/icons-react';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const LS_APPEARANCE = 'finedge_appearance_v2';
+const LS_APPEARANCE = 'quivo_appearance_v2';
 
 interface AppearanceState {
   accentColor: string;
@@ -31,15 +31,23 @@ const DEFAULT: AppearanceState = {
   transitionAnimation: 'fade',
   autoScroll: true,
   fontSize: 14,
-  codeTheme: 'Finedge Theme',
-  mermaidTheme: 'Finedge Theme',
+  codeTheme: 'Quivo Theme',
+  mermaidTheme: 'Quivo Theme',
 };
+
+function normalizeThemes(s: AppearanceState): AppearanceState {
+  const next = { ...s };
+  if (next.codeTheme === 'Finedge Theme') next.codeTheme = 'Quivo Theme';
+  if (next.mermaidTheme === 'Finedge Theme') next.mermaidTheme = 'Quivo Theme';
+  return next;
+}
 
 function loadState(): AppearanceState {
   try {
     const v2 = localStorage.getItem(LS_APPEARANCE);
-    if (v2) return { ...DEFAULT, ...JSON.parse(v2) };
-    const legacy = localStorage.getItem('finedge_appearance');
+    if (v2) return normalizeThemes({ ...DEFAULT, ...JSON.parse(v2) });
+    const legacy =
+      localStorage.getItem('finedge_appearance') ?? localStorage.getItem('quivo_appearance');
     if (legacy) {
       const parsed = JSON.parse(legacy) as Partial<AppearanceState>;
       const next: AppearanceState = {
@@ -50,8 +58,9 @@ function loadState(): AppearanceState {
         transitionAnimation: DEFAULT.transitionAnimation,
         autoScroll: DEFAULT.autoScroll,
       };
-      localStorage.setItem(LS_APPEARANCE, JSON.stringify(next));
-      return next;
+      const normalized = normalizeThemes(next);
+      localStorage.setItem(LS_APPEARANCE, JSON.stringify(normalized));
+      return normalized;
     }
   } catch {
     /* ignore */
@@ -74,17 +83,17 @@ function lightenHex(hex: string, amount = 30): string {
 // Apply accent color — sets CSS variables AND injects a live style tag
 function applyAccent(color: string) {
   const root = document.documentElement;
-  root.style.setProperty('--finedge-accent', color);
+  root.style.setProperty('--quivo-accent', color);
   root.style.setProperty('--accent', color);
   root.style.setProperty('--primary', color);
   root.style.setProperty('--ring', color);
 
   const lighter = lightenHex(color, 25);
 
-  let tag = document.getElementById('finedge-accent-override') as HTMLStyleElement | null;
+  let tag = document.getElementById('quivo-accent-override') as HTMLStyleElement | null;
   if (!tag) {
     tag = document.createElement('style');
-    tag.id = 'finedge-accent-override';
+    tag.id = 'quivo-accent-override';
     document.head.appendChild(tag);
   }
   tag.textContent = `
@@ -147,7 +156,7 @@ const NEUTRAL_COLORS = [
 
 // ─── Code highlight themes ────────────────────────────────────────────────────
 const CODE_THEMES = [
-  'Finedge Theme', 'Andromeda', 'Aurora X', 'Ayu Dark', 'Ayu Light',
+  'Quivo Theme', 'Andromeda', 'Aurora X', 'Ayu Dark', 'Ayu Light',
   'Ayu Mirage', 'Catppuccin Frappé', 'Catppuccin Latte', 'Catppuccin Macchiato',
   'Catppuccin Mocha', 'Dark Plus', 'Dracula Theme', 'Dracula Theme Soft',
   'GitHub Dark', 'GitHub Light', 'Gruvbox Dark', 'Material Dark', 'Material Light',
@@ -156,7 +165,7 @@ const CODE_THEMES = [
 ];
 
 const CODE_THEME_STYLES: Record<string, { bg: string; comment: string; keyword: string; string: string; type: string; variable: string }> = {
-  'Finedge Theme':      { bg: '#0d1117', comment: '#8b949e', keyword: '#ff7b72', string: '#a5d6ff', type: '#ffa657', variable: '#79c0ff' },
+  'Quivo Theme':      { bg: '#0d1117', comment: '#8b949e', keyword: '#ff7b72', string: '#a5d6ff', type: '#ffa657', variable: '#79c0ff' },
   'Andromeda':          { bg: '#23262e', comment: '#858585', keyword: '#e9fdac', string: '#ffe799', type: '#00e8c6', variable: '#ee5d43' },
   'Aurora X':           { bg: '#0a0e14', comment: '#4d5566', keyword: '#ffae57', string: '#bae67e', type: '#5ccfe6', variable: '#cbccc6' },
   'Ayu Dark':           { bg: '#0d1017', comment: '#626a73', keyword: '#ff8f40', string: '#aad94c', type: '#39bae6', variable: '#cccac2' },
@@ -173,14 +182,14 @@ const CODE_THEME_STYLES: Record<string, { bg: string; comment: string; keyword: 
 };
 
 function getCodeStyle(theme: string) {
-  return CODE_THEME_STYLES[theme] ?? CODE_THEME_STYLES['Finedge Theme'];
+  return CODE_THEME_STYLES[theme] ?? CODE_THEME_STYLES['Quivo Theme'];
 }
 
 // ─── Mermaid themes ───────────────────────────────────────────────────────────
-const MERMAID_THEMES = ['Finedge Theme', 'Mermaid Default', 'Mermaid Base', 'Mermaid Dark', 'Mermaid Forest', 'Mermaid Neutral'];
+const MERMAID_THEMES = ['Quivo Theme', 'Mermaid Default', 'Mermaid Base', 'Mermaid Dark', 'Mermaid Forest', 'Mermaid Neutral'];
 
 const MERMAID_STYLES: Record<string, { bg: string; border: string; text: string; line: string; boxBg: string }> = {
-  'Finedge Theme':  { bg: '#0d1117', border: '#3b82f6', text: '#e6edf3', line: '#3b82f6',  boxBg: '#1e2836' },
+  'Quivo Theme':  { bg: '#0d1117', border: '#3b82f6', text: '#e6edf3', line: '#3b82f6',  boxBg: '#1e2836' },
   'Mermaid Default':{ bg: '#ffffff', border: '#999',    text: '#333',    line: '#333',     boxBg: '#ececff' },
   'Mermaid Base':   { bg: '#f4f4f4', border: '#aaa',    text: '#333',    line: '#aaa',     boxBg: '#fff' },
   'Mermaid Dark':   { bg: '#1f2020', border: '#ccc',    text: '#ccc',    line: '#ccc',     boxBg: '#3d3d3d' },
@@ -192,11 +201,11 @@ const MERMAID_STYLES: Record<string, { bg: string; border: string; text: string;
 function MiniUIPreview({ accentColor, neutralColor, resolvedTheme }: { accentColor: string; neutralColor: string; resolvedTheme: 'dark' | 'light' }) {
   const neutral = neutralColor || '#78716c';
   const isDark = resolvedTheme === 'dark';
-  const bgMain   = isDark ? '#0d1117' : '#F8F7F3';
-  const bgSide   = isDark ? '#0a0e1a' : '#F1EFE9';
-  const bgBorder = isDark ? '#1e2836' : '#e7e5e4';
-  const bgRow    = isDark ? '#1e2836' : '#ebe8e0';
-  const bgInput  = isDark ? '#141b26' : '#F5F4F0';
+  const bgMain   = isDark ? '#0d1117' : '#ffffff';
+  const bgSide   = isDark ? '#0a0e1a' : '#fafafa';
+  const bgBorder = isDark ? '#1e2836' : '#e4e4e7';
+  const bgRow    = isDark ? '#1e2836' : '#f4f4f5';
+  const bgInput  = isDark ? '#141b26' : '#fafafa';
   return (
     <div className="relative h-[120px] w-full rounded-xl overflow-hidden border"
       style={{ background: bgMain, borderColor: bgBorder }}>
@@ -213,9 +222,9 @@ function MiniUIPreview({ accentColor, neutralColor, resolvedTheme }: { accentCol
       </div>
       {/* Main area */}
       <div className="absolute left-[28%] right-0 top-0 bottom-0 p-2 flex flex-col gap-1.5">
-        <div className="h-2 w-[60%] rounded" style={{ background: isDark ? '#e6edf320' : '#1C191714' }} />
-        <div className="h-1.5 w-[80%] rounded" style={{ background: isDark ? '#8b949e20' : '#44403C22' }} />
-        <div className="h-1.5 w-[50%] rounded" style={{ background: isDark ? '#8b949e15' : '#44403C18' }} />
+        <div className="h-2 w-[60%] rounded" style={{ background: isDark ? '#e6edf320' : '#18181b18' }} />
+        <div className="h-1.5 w-[80%] rounded" style={{ background: isDark ? '#8b949e20' : '#52525b28' }} />
+        <div className="h-1.5 w-[50%] rounded" style={{ background: isDark ? '#8b949e15' : '#52525b20' }} />
         <div className="flex-1" />
         {/* Input bar */}
         <div className="h-6 rounded-lg border flex items-center px-2 gap-1"
@@ -282,8 +291,10 @@ function ButtonGroup<T extends string>({ options, value, onChange }: {
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <button type="button" onClick={() => onChange(!checked)}
-      className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] ${checked ? 'bg-stone-800' : 'bg-[var(--bg-border)]'}`}>
-      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-[#F8F7F3] shadow-sm transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
+      className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--quivo-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] ${
+        checked ? 'bg-[var(--text-primary)] dark:bg-stone-800' : 'bg-[var(--bg-border)]'
+      }`}>
+      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-[var(--bg-base)] shadow-sm transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
     </button>
   );
 }
@@ -327,7 +338,7 @@ function ThemeCard({ themeValue, label, active, onClick }: {
     <button type="button" onClick={onClick}
       className={`flex flex-col items-center gap-1.5 rounded-xl p-2 transition-all ${
         active
-          ? 'ring-2 ring-[#44403C] ring-offset-2 ring-offset-[var(--bg-base)] opacity-100'
+          ? 'ring-2 ring-[var(--quivo-accent)] ring-offset-2 ring-offset-[var(--bg-base)] opacity-100'
           : 'opacity-75 hover:opacity-100'
       }`}>
       <div className="w-24 overflow-hidden rounded-lg border border-[var(--bg-border)] shadow-[0_1px_2px_rgba(28,25,23,0.06)]">
@@ -355,7 +366,7 @@ function ThemeCard({ themeValue, label, active, onClick }: {
       <div className="flex items-center gap-1 text-[11px] font-medium tracking-tight text-[var(--text-primary)]">
         {themeValue === 'light' ? '☀️' : themeValue === 'dark' ? '🌙' : '💻'} {label}
       </div>
-      {active && <div className="h-1 w-1 rounded-full bg-[#44403C]" />}
+      {active && <div className="h-1 w-1 rounded-full bg-[var(--quivo-accent)]" />}
     </button>
   );
 }
@@ -377,7 +388,7 @@ function CodePreview({ codeTheme }: { codeTheme: string }) {
 
 // ─── Mermaid preview ──────────────────────────────────────────────────────────
 function MermaidPreview({ mermaidTheme }: { mermaidTheme: string }) {
-  const s = MERMAID_STYLES[mermaidTheme] ?? MERMAID_STYLES['Finedge Theme'];
+  const s = MERMAID_STYLES[mermaidTheme] ?? MERMAID_STYLES['Quivo Theme'];
   return (
     <div className="rounded-xl overflow-hidden border border-[var(--bg-border)] flex items-center justify-center py-6"
       style={{ background: s.bg }}>
@@ -458,13 +469,13 @@ export default function AppearanceSettings() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-lg font-semibold tracking-tight text-[var(--text-primary)]">Appearance</h1>
-            <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-muted)]">Customize how Finedge looks and feels</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-muted)]">Customize how Quivo looks and feels</p>
           </div>
           <button type="button" onClick={handleSave} disabled={saving}
             className={`flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium tracking-tight transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
               saved
-                ? 'border-emerald-600/25 bg-emerald-500/10 text-emerald-800'
-                : 'border-transparent bg-stone-800 text-[#F8F7F3] hover:bg-stone-700'
+                ? 'border-emerald-600/25 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200'
+                : 'border-[var(--bg-border)] bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90 dark:bg-stone-800 dark:text-[#F8F7F3] dark:hover:bg-stone-700'
             }`}>
             {saving ? <IconLoader2 className="h-4 w-4 animate-spin" />
               : saved ? <IconCheck className="h-4 w-4" strokeWidth={2.5} />
@@ -639,7 +650,7 @@ export default function AppearanceSettings() {
                 { icon: '🧠', text: 'AI Agents: 16+ finance & accounting specialists' },
                 { icon: '🔧', text: 'Tools: Stripe, Gmail, Calendar, Web Search' },
                 { icon: '📚', text: 'Knowledge Base: RAG with your documents' },
-                { icon: '🔒', text: 'Your API key, your cost — Finedge charges nothing for AI' },
+                { icon: '🔒', text: 'Your API key, your cost — Quivo charges nothing for AI' },
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-2 text-xs leading-relaxed text-[var(--text-muted)]">
                   <span>{item.icon}</span>
@@ -679,7 +690,7 @@ export default function AppearanceSettings() {
             {/* Preview */}
             <div className="rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] px-4 py-3">
               <p style={{ fontSize: state.fontSize }} className="leading-relaxed text-[var(--text-primary)]">
-                Welcome to Finedge. One sentence is enough — just state your goal.
+                Welcome to Quivo. One sentence is enough — just state your goal.
               </p>
             </div>
           </div>

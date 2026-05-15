@@ -20,7 +20,7 @@ interface Note {
 
 type Filter = 'all' | 'pending' | 'done';
 
-const LS_KEY = 'finedge_notes';
+const LS_KEY = 'quivo_notes';
 
 function loadLocal(): Note[] {
   try {
@@ -205,7 +205,7 @@ export default function NotesPanel() {
           if (new Date(note.reminder_at).getTime() <= now) {
             changed = true;
             if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('Finedge Reminder', { body: note.content, icon: '/favicon.ico' });
+              new Notification('Quivo Reminder', { body: note.content, icon: '/favicon.ico' });
             }
             // Mark reminded in API if available
             if (dbAvailable) {
