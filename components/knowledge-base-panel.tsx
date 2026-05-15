@@ -7,7 +7,7 @@ import {
   IconTrash, IconSearch, IconTag, IconX, IconCheck, IconLoader2,
   IconInfoCircle, IconFile, IconRefresh, IconBrandGithub,
   IconBrandNotion, IconBrandGoogleFilled, IconWorld, IconEdit,
-  IconChevronDown, IconFilter, IconSelector, IconMessageCircle,
+  IconChevronDown, IconFilter, IconSelector, IconMessageCircle, IconDatabase,
 } from '@tabler/icons-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -41,16 +41,18 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const MONO_ICON = 'h-4 w-4 text-[var(--text-muted)]';
+
 function fileIcon(type: string, sourceType: string) {
-  if (sourceType === 'github')  return <IconBrandGithub className="h-4 w-4 text-[#e6edf3]" />;
-  if (sourceType === 'notion')  return <span className="text-sm font-bold text-[#e6edf3]">N</span>;
-  if (sourceType === 'drive')   return <IconBrandGoogleFilled className="h-4 w-4 text-[#4285f4]" />;
-  if (sourceType === 'web')     return <IconWorld className="h-4 w-4 text-[#22c55e]" />;
-  if (type.includes('pdf'))     return <IconFileText className="h-4 w-4 text-[#ef4444]" />;
-  if (type.includes('csv'))     return <IconFileCv className="h-4 w-4 text-[#22c55e]" />;
+  if (sourceType === 'github')  return <IconBrandGithub className={MONO_ICON} stroke={1.5} />;
+  if (sourceType === 'notion')  return <span className="text-sm font-bold text-[var(--text-muted)]">N</span>;
+  if (sourceType === 'drive')   return <IconBrandGoogleFilled className={MONO_ICON} stroke={1.5} />;
+  if (sourceType === 'web')     return <IconWorld className={MONO_ICON} stroke={1.5} />;
+  if (type.includes('pdf'))     return <IconFileText className={MONO_ICON} stroke={1.5} />;
+  if (type.includes('csv'))     return <IconFileCv className={MONO_ICON} stroke={1.5} />;
   if (type.includes('sheet') || type.includes('excel') || type.includes('xlsx'))
-                                return <IconFileSpreadsheet className="h-4 w-4 text-[#22c55e]" />;
-  return <IconFile className="h-4 w-4 text-[#8b949e]" />;
+                                return <IconFileSpreadsheet className={MONO_ICON} stroke={1.5} />;
+  return <IconFile className={MONO_ICON} stroke={1.5} />;
 }
 
 // ─── Read file helper ────────────────────────────────────────────────────────
@@ -551,13 +553,25 @@ export default function KnowledgeBasePanel({ onChatWithKb }: { onChatWithKb?: ()
       {/* Empty state */}
       {docs.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center text-center py-16">
-          <div className="mb-6 grid grid-cols-4 gap-2 opacity-40">
-            {['🏛️','📧','📁','🎵','☁️','💬','🔵','🟡','🔴','🟢','📦','🎯','🐙','🔗','🌐','💡'].map((e, i) => (
-              <div key={i} className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#1e2836] bg-[#141b26] text-xl">{e}</div>
+          <div className="mb-6 grid grid-cols-4 gap-2">
+            {[
+              IconDatabase, IconFile, IconBrandGithub, IconBrandGoogleFilled,
+              IconWorld, IconFileText, IconFileSpreadsheet, IconUpload,
+              IconTag, IconSearch, IconMessageCircle, IconEdit,
+              IconRefresh, IconFilter, IconFileCv, IconInfoCircle,
+            ].map((Icon, i) => (
+              <motion.div
+                key={i}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)]"
+              >
+                <Icon className="h-4 w-4 text-[var(--text-muted)]" stroke={1.5} />
+              </motion.div>
             ))}
           </div>
-          <h3 className="mb-1.5 text-sm font-bold text-[#e6edf3]">Upload or connect your data</h3>
-          <p className="mb-1 text-xs text-[#8b949e] max-w-xs">AI agents can look up documents from your knowledge base when they need more information to answer questions.</p>
+          <h3 className="mb-1.5 text-sm font-semibold text-[var(--text-primary)]">Upload or connect your data</h3>
+          <p className="mb-1 max-w-xs text-xs text-[var(--text-muted)]">
+            AI agents can look up documents from your knowledge base when they need more information to answer questions.
+          </p>
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
@@ -570,10 +584,10 @@ export default function KnowledgeBasePanel({ onChatWithKb }: { onChatWithKb?: ()
         <div className="flex-1 overflow-y-auto">
           {/* Connected Sources section */}
           <div className="px-6 pt-4 pb-2">
-            <div className="flex items-center gap-2 text-xs text-[#8b949e] font-semibold mb-3">
-              <span className="h-2 w-2 rounded-full bg-[#22c55e]" />
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--text-muted)]">
+              <span className="h-2 w-2 rounded-full bg-[var(--text-muted)]" />
               Connected Sources
-              <span className="ml-1 text-[#8b949e] font-normal">({filtered.length})</span>
+              <span className="ml-1 font-normal text-[var(--text-muted)]">({filtered.length})</span>
             </div>
           </div>
 

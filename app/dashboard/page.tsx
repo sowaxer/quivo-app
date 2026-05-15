@@ -216,7 +216,7 @@ function DashboardInner() {
         }
         className={`group flex w-full items-center gap-3 rounded-full px-3 py-2 text-[13px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
           active
-            ? 'bg-[color-mix(in_srgb,var(--quivo-accent)_14%,transparent)] text-[var(--text-primary)]'
+            ? 'bg-[var(--bg-hover)] text-[var(--text-primary)]'
             : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
         }`}
       >
@@ -263,12 +263,12 @@ function DashboardInner() {
       )}
 
       {/* ── SIDEBAR ──────────────────────────────────────────────────────── */}
-      <aside className="flex w-[260px] shrink-0 flex-col border-r border-[var(--bg-border)] bg-[var(--bg-base)]">
+      <aside className="quivo-sidebar flex w-[260px] shrink-0 flex-col border-r border-[var(--bg-border)] bg-[var(--bg-base)]">
 
         {/* Logo */}
         <div className="flex h-[52px] items-center gap-3 border-b border-[var(--bg-border)] px-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] shadow-[inset_0_1px_0_rgba(28,25,23,0.06)]">
-            <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--quivo-accent)' }}>Q</span>
+            <span className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">Q</span>
           </div>
           <span className="text-[15px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">Quivo</span>
         </div>
@@ -320,7 +320,7 @@ function DashboardInner() {
             className="flex w-full items-center gap-3 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2.5 text-left shadow-[0_1px_2px_rgba(28,25,23,0.05)] transition hover:bg-[var(--bg-hover)]"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-base)]">
-              <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--quivo-accent)' }}>Q</span>
+              <span className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">Q</span>
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[13px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">Quivo Pro</span>
@@ -392,7 +392,7 @@ function DashboardInner() {
 
 export default function Dashboard() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[var(--bg-base)]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--bg-border)] border-t-[color-mix(in_srgb,var(--quivo-accent)_70%,transparent)]" /></div>}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[var(--bg-base)]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--bg-border)] border-t-[var(--text-muted)]" /></div>}>
       <DashboardInner />
     </Suspense>
   );
