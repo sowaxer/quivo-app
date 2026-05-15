@@ -1,17 +1,18 @@
 /** Shared accent color — used by Settings, Appearance, and global button styles. */
 
 export const LS_APPEARANCE = 'quivo_appearance_v2';
-export const DEFAULT_ACCENT = '#f97316';
+export const DEFAULT_ACCENT = '#2563eb';
 
 export const ACCENT_PRESETS = [
+  '#2563eb',
+  '#3b82f6',
+  '#38bdf8',
+  '#22c55e',
   '#f97316',
   '#ea580c',
   '#f59e0b',
   '#fb7185',
   '#ef4444',
-  '#22c55e',
-  '#38bdf8',
-  '#2563eb',
   '#a855f7',
   '#e879f9',
 ] as const;

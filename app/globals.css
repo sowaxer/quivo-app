@@ -2,8 +2,8 @@
 
 /* ── Quivo accent (overridden dynamically by appearance-settings) ──── */
 :root {
-  --quivo-accent: #f97316;
-  --quivo-accent-light: #fb923c;
+  --quivo-accent: #2563eb;
+  --quivo-accent-light: #3b82f6;
 }
 
 /* ── Quivo Theme — Perplexity-style: sidebar rail lighter than main canvas ─ */
@@ -486,4 +486,45 @@
 }
 .quivo-finance-row:last-child {
   border-bottom: none;
+}
+
+/* Clerk sign-in / sign-up — readable dark card, blue primary */
+.quivo-sign-in .cl-headerTitle,
+.quivo-sign-in .cl-headerSubtitle,
+.quivo-sign-in .cl-socialButtonsBlockButton,
+.quivo-sign-in .cl-socialButtonsBlockButtonText,
+.quivo-sign-in .cl-dividerText,
+.quivo-sign-in .cl-formFieldLabel,
+.quivo-sign-in .cl-footerActionText,
+.quivo-sign-in .cl-identityPreviewText,
+.quivo-sign-in .cl-alternativeMethodsBlockButton {
+  color: #f4f4f5 !important;
+}
+.quivo-sign-in .cl-headerSubtitle,
+.quivo-sign-in .cl-dividerText,
+.quivo-sign-in .cl-footerActionText {
+  color: #d4d4d8 !important;
+}
+.quivo-sign-in .cl-card {
+  background: #1c1c1c !important;
+  border: 1px solid #52525b !important;
+}
+.quivo-sign-in .cl-socialButtonsBlockButton {
+  background: #27272a !important;
+  border: 1px solid #52525b !important;
+}
+.quivo-sign-in .cl-formButtonPrimary {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+.quivo-sign-in .cl-formButtonPrimary:hover {
+  background: #1d4ed8 !important;
+}
+.quivo-sign-in .cl-footerActionLink {
+  color: #60a5fa !important;
+}
+.quivo-sign-in .cl-formFieldInput {
+  background: #27272a !important;
+  border-color: #52525b !important;
+  color: #fff !important;
 }
