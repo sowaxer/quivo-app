@@ -5,11 +5,23 @@ import {
   chatRatelimit,
   googleIntegrationRatelimit,
   keysHourlyRatelimit,
+  publicKeyMinuteRatelimit,
   ratelimit,
+  stripeVaultMinuteRatelimit,
   strictRatelimit,
+  vaultReadRatelimit,
 } from '@/lib/ratelimit';
 
-export type ApiRateLimitProfile = 'default' | 'ai' | 'strict' | 'chat' | 'keysHourly' | 'google';
+export type ApiRateLimitProfile =
+  | 'default'
+  | 'ai'
+  | 'strict'
+  | 'chat'
+  | 'keysHourly'
+  | 'stripeMinute'
+  | 'publicKeyMinute'
+  | 'vaultRead'
+  | 'google';
 
 const byProfile = {
   default: ratelimit,
@@ -17,6 +29,9 @@ const byProfile = {
   strict: strictRatelimit,
   chat: chatRatelimit,
   keysHourly: keysHourlyRatelimit,
+  stripeMinute: stripeVaultMinuteRatelimit,
+  publicKeyMinute: publicKeyMinuteRatelimit,
+  vaultRead: vaultReadRatelimit,
   google: googleIntegrationRatelimit,
 } as const;
 

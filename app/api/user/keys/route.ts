@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { vaultWriteRateProfile, vaultWriteRateProfileFromProvider } from '@/lib/vault-write-rate-profile';
 import {
   fieldToProvider,
   getSecretPresence,
@@ -29,7 +30,7 @@ export async function GET() {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('user-keys-v2-get', userId));
+  const rlDenied = await rateLimitExceededResponse('vaultRead', await rateLimitKey('user-keys-v2-get', userId));
   if (rlDenied) return rlDenied;
 
   const { has, preferences } = await getSecretPresence(userId);
@@ -52,17 +53,23 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('keysHourly', await rateLimitKey('vault-save', userId));
-  if (rlDenied) return rlDenied;
-
-  const body = await req.json();
+  let body: Record<string, unknown>;
+  try {
+    body = (await req.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
 
   if (body.provider && typeof body.key === 'string') {
     const p = body.provider as string;
     if (!ALLOWED_PROVIDERS.has(p)) {
       return NextResponse.json({ error: 'Invalid provider' }, { status: 400 });
     }
-    const val = body.key.trim();
+    const writeProfile = vaultWriteRateProfileFromProvider(p);
+    const rlDenied = await rateLimitExceededResponse(writeProfile, await rateLimitKey('vault-save', userId));
+    if (rlDenied) return rlDenied;
+
+    const val = (body.key as string).trim();
     const check = await verifySecretBeforeSave(p, val);
     if (!check.ok) {
       return NextResponse.json({ error: check.message }, { status: 400 });
@@ -73,7 +80,31 @@ export async function POST(req: NextRequest) {
       const msg = e instanceof Error ? e.message : 'Encrypt failed';
       return NextResponse.json({ error: msg }, { status: 500 });
     }
-    return NextResponse.json({ success: true });
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('[api/user/keys POST]', { userId, mode: 'provider', provider: p, writeProfile });
+    }
+    const { has, preferences } = await getSecretPresence(userId);
+    const providers = [
+      { provider: 'anthropic', hasKey: has.anthropic },
+      { provider: 'openai', hasKey: has.openai },
+      { provider: 'google_ai', hasKey: has.google_ai },
+      { provider: 'deepseek', hasKey: has.deepseek },
+      { provider: 'stripe_secret', hasKey: has.stripe },
+      { provider: 'stripe_publishable', hasKey: has.stripe_publishable },
+      { provider: 'tavily', hasKey: has.tavily },
+      { provider: 'notion', hasKey: has.notion },
+    ];
+    return NextResponse.json({ success: true, providers, preferences });
+  }
+
+  const writeProfile = vaultWriteRateProfile(body);
+  const rlDenied = await rateLimitExceededResponse(writeProfile, await rateLimitKey('vault-save', userId));
+  if (rlDenied) return rlDenied;
+
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.log('[api/user/keys POST]', { userId, mode: 'legacy', writeProfile });
   }
 
   const allowedFields = [
@@ -131,5 +162,16 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true });
+  const { has, preferences } = await getSecretPresence(userId);
+  const providers = [
+    { provider: 'anthropic', hasKey: has.anthropic },
+    { provider: 'openai', hasKey: has.openai },
+    { provider: 'google_ai', hasKey: has.google_ai },
+    { provider: 'deepseek', hasKey: has.deepseek },
+    { provider: 'stripe_secret', hasKey: has.stripe },
+    { provider: 'stripe_publishable', hasKey: has.stripe_publishable },
+    { provider: 'tavily', hasKey: has.tavily },
+    { provider: 'notion', hasKey: has.notion },
+  ];
+  return NextResponse.json({ success: true, providers, preferences });
 }

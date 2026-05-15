@@ -67,7 +67,11 @@ export async function verifyStripeSecretKey(key: string): Promise<VerifyResult> 
       return { ok: true, message: `Connected · ${label}` };
     }
     const err = await res.json().catch(() => ({}));
-    const msg = (err as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}`;
+    const raw = (err as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}`;
+    const msg =
+      res.status === 401 || res.status === 403
+        ? 'Invalid Stripe key'
+        : raw;
     return { ok: false, message: msg };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : String(e) };
@@ -75,10 +79,11 @@ export async function verifyStripeSecretKey(key: string): Promise<VerifyResult> 
 }
 
 export function verifyStripePublishableKey(key: string): VerifyResult {
-  if (/^pk_(live|test)_[a-zA-Z0-9]+$/.test(key.trim())) {
+  const v = key.trim();
+  if (/^pk_(live|test)_[A-Za-z0-9_-]+$/.test(v)) {
     return { ok: true, message: 'Publishable key format OK' };
   }
-  return { ok: false, message: 'Expected pk_live_… or pk_test_…' };
+  return { ok: false, message: 'Invalid Stripe key — use pk_live_… or pk_test_…' };
 }
 
 export async function verifyDeepSeekKey(key: string): Promise<VerifyResult> {

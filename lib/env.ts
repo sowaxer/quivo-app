@@ -54,6 +54,10 @@ const serverEnvSchema = z.object({
   GOOGLE_OAUTH_REDIRECT_URI: z.preprocess((v) => (v === '' ? undefined : v), z.string().url().optional()),
   NEXT_PUBLIC_GOOGLE_REDIRECT_URI: z.string().url().optional(),
 
+  /** Dropbox OAuth (optional — Settings → Dropbox “Connect” uses these). */
+  DROPBOX_CLIENT_ID: z.preprocess((v) => (v === '' ? undefined : v), z.string().min(1).optional()),
+  DROPBOX_CLIENT_SECRET: z.preprocess((v) => (v === '' ? undefined : v), z.string().min(1).optional()),
+
   /** Upstash Redis (rate limits). Set both URL and token, or omit both (not recommended for production). */
   UPSTASH_REDIS_REST_URL: z.preprocess(
     (v) => (v === '' ? undefined : v),

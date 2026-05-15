@@ -12,11 +12,11 @@ import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { UserKeysDeleteFieldSchema } from '@/lib/db-safe';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { verifySecretBeforeSave } from '@/lib/provider-key-verify';
+import { buildUserKeysPublicPayload } from '@/lib/user-keys-payload';
+import { vaultWriteRateProfile } from '@/lib/vault-write-rate-profile';
 import {
   deleteSecretByField,
   fieldToProvider,
-  getSecretKeyPreviews,
-  getSecretPresence,
   setEncryptedSecret,
 } from '@/lib/user-secret-store';
 
@@ -24,47 +24,27 @@ export async function GET() {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('user-keys-get', userId));
+  const rlDenied = await rateLimitExceededResponse('vaultRead', await rateLimitKey('user-keys-get', userId));
   if (rlDenied) return rlDenied;
 
-  const { has, preferences } = await getSecretPresence(userId);
-  const previews = await getSecretKeyPreviews(userId);
-
-  return NextResponse.json({
-    preferences,
-    has: {
-      anthropic: has.anthropic,
-      openai: has.openai,
-      google_ai: has.google_ai,
-      deepseek: has.deepseek,
-      stripe: has.stripe,
-      stripe_pub: has.stripe_publishable,
-      tavily: has.tavily,
-      notion: has.notion,
-    },
-    previews,
-    dropbox_oauth_configured: Boolean(
-      process.env.DROPBOX_CLIENT_ID?.trim() && process.env.DROPBOX_CLIENT_SECRET?.trim(),
-    ),
-    anthropic_key: null,
-    openai_key: null,
-    google_ai_key: null,
-    deepseek_key: null,
-    stripe_secret: null,
-    stripe_pub: null,
-    tavily_key: null,
-    notion_token: null,
-  });
+  return NextResponse.json(await buildUserKeysPublicPayload(userId));
 }
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('keysHourly', await rateLimitKey('vault-save', userId));
+  let body: Record<string, unknown>;
+  try {
+    body = (await req.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  const writeProfile = vaultWriteRateProfile(body);
+  const rlDenied = await rateLimitExceededResponse(writeProfile, await rateLimitKey('vault-save', userId));
   if (rlDenied) return rlDenied;
 
-  const body = await req.json();
   const supabase = getSupabaseAdmin();
 
   const secretFields = [
@@ -88,6 +68,15 @@ export async function POST(req: NextRequest) {
     const val = (body[field] as string).trim();
     if (!val) continue;
     pending.push({ field, val, provider });
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.log('[api/user-keys POST]', {
+      userId,
+      writeProfile,
+      providers: pending.map((p) => p.provider),
+    });
   }
 
   for (const { val, provider } of pending) {
@@ -131,7 +120,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true });
+  const payload = await buildUserKeysPublicPayload(userId);
+  return NextResponse.json({ success: true, ...payload });
 }
 
 export async function DELETE(req: NextRequest) {

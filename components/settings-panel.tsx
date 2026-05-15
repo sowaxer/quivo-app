@@ -209,6 +209,7 @@ export default function SettingsPanel() {
   // Integration status
   const [googleConnected, setGoogleConnected]   = useState<boolean | null>(null);
   const [dropboxConnected, setDropboxConnected] = useState<boolean | null>(null);
+  const [dropboxLabel, setDropboxLabel] = useState<string | null>(null);
   const [loadingKeys, setLoadingKeys] = useState(true);
 
   // Preferences
@@ -278,10 +279,22 @@ export default function SettingsPanel() {
       }
 
       if (dropboxRes.status === 'fulfilled' && dropboxRes.value.ok) {
-        const d = await dropboxRes.value.json();
-        setDropboxConnected(d.connected);
+        const d = (await dropboxRes.value.json()) as {
+          connected?: boolean;
+          email?: string | null;
+          name?: string | null;
+        };
+        setDropboxConnected(!!d.connected);
+        const label =
+          typeof d.email === 'string' && d.email
+            ? d.email
+            : typeof d.name === 'string' && d.name
+              ? d.name
+              : null;
+        setDropboxLabel(label);
       } else {
         setDropboxConnected(false);
+        setDropboxLabel(null);
       }
     } finally {
       setLoadingKeys(false);
@@ -635,13 +648,22 @@ export default function SettingsPanel() {
                     <p className="text-sm font-semibold text-[var(--text-primary)]">Dropbox OAuth 2.0</p>
                     <p className="text-xs text-[var(--text-muted)]">Browse and search your Dropbox files</p>
                     <div className="mt-1">
-                      <StatusBadge ok={dropboxConnected} msg={dropboxConnected ? 'Dropbox connected' : 'Not connected'} />
+                      <StatusBadge
+                        ok={dropboxConnected}
+                        msg={
+                          dropboxConnected
+                            ? dropboxLabel
+                              ? `Connected — ${dropboxLabel}`
+                              : 'Connected'
+                            : 'Not connected'
+                        }
+                      />
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
                   {dropboxConnected ? (
-                    <button onClick={async () => { await fetch('/api/dropbox/auth', { method: 'DELETE', credentials: 'include' }); setDropboxConnected(false); }}
+                    <button onClick={async () => { await fetch('/api/dropbox/auth', { method: 'DELETE', credentials: 'include' }); setDropboxConnected(false); setDropboxLabel(null); }}
                       className="flex items-center gap-1.5 rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/5 px-3 py-2 text-xs text-[#ef4444] hover:bg-[#ef4444]/10 transition-all">
                       <IconX className="h-3.5 w-3.5" /> Disconnect
                     </button>
