@@ -114,7 +114,7 @@ export default function DriveBrowser() {
         </div>
         <div>
           <h3 className="text-lg font-bold text-[#e6edf3]">Connect Google Drive</h3>
-          <p className="mt-1 max-w-sm text-sm text-[#8b949e]">Browse, search, and download your documents directly from Finedge.</p>
+          <p className="mt-1 max-w-sm text-sm text-[#8b949e]">Browse, search, and download your documents directly from Quivo.</p>
         </div>
         <button
           onClick={() => { window.location.href = '/api/google/auth'; }}

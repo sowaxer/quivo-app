@@ -227,7 +227,7 @@ export default function OverviewContent() {
           <div className="space-y-2">
             {[
               { icon: '📧', label: 'Check Email',    desc: 'Open Gmail monitor' },
-              { icon: '💬', label: 'New AI Chat',    desc: 'Ask Finedge AI' },
+              { icon: '💬', label: 'New AI Chat',    desc: 'Ask Quivo AI' },
               { icon: '📅', label: 'Add Event',      desc: 'Create calendar event' },
               { icon: '💳', label: 'New Invoice',    desc: 'Create Stripe invoice' },
             ].map(a => (

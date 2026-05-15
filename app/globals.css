@@ -1,76 +1,76 @@
 @import "tailwindcss";
 
-/* ── Finedge accent (overridden dynamically by appearance-settings) ──── */
+/* ── Quivo accent (overridden dynamically by appearance-settings) ──── */
 :root {
-  --finedge-accent: #38bdf8;
+  --quivo-accent: #38bdf8;
 }
 
-/* ── Finedge Theme Variables — soft “Apple studio” dark ─────────────────── */
+/* ── Quivo Theme Variables — dark: single Claude-style canvas (no layered blacks) ─ */
 :root, [data-theme="dark"] {
-  --bg-base:        #0a0a0a;
-  --bg-surface:     #141414;
-  --bg-elevated:    #1a1a1a;
-  --bg-card:        #1a1a1a;
-  --bg-border:      #2a2a2e;
-  --bg-hover:       #252528;
+  --bg-base:        #262626;
+  --bg-surface:     #262626;
+  --bg-elevated:    #262626;
+  --bg-card:        #262626;
+  --bg-border:      #3f3f46;
+  --bg-hover:       #323232;
   --text-primary:   #f5f5f7;
   --text-secondary: #a1a1a6;
   --text-muted:     #8e8e93;
-  --accent:         var(--finedge-accent);
+  --accent:         var(--quivo-accent);
   --accent-hover:   #7dd3fc;
   --success:        #9ecf9e;
   --warning:        #e8c995;
   --danger:         #e8a8a8;
 }
 
-/* Light mode — premium warm cream / charcoal (no pure #fff / #000) */
+/* Light mode — cool neutral (Perplexity-style): white shell, zinc borders */
 [data-theme="light"] {
-  --bg-base:        #F8F7F3;
-  --bg-surface:     #F1EFE9;
-  --bg-elevated:    #F1EFE9;
-  --bg-card:        #F1EFE9;
-  --bg-border:      #e7e5e4;
-  --bg-hover:       #ebe8e0;
-  --text-primary:   #1C1917;
-  --text-secondary: #44403C;
-  --text-muted:     #78716c;
-  --accent:         var(--finedge-accent);
-  --accent-hover:   color-mix(in srgb, var(--finedge-accent) 85%, #1c1917);
+  --bg-base:        #ffffff;
+  --bg-surface:     #fafafa;
+  --bg-elevated:    #f4f4f5;
+  --bg-card:        #ffffff;
+  --bg-border:      #e4e4e7;
+  --bg-hover:       #f4f4f5;
+  --text-primary:   #18181b;
+  --text-secondary: #52525b;
+  --text-muted:     #71717a;
+  --accent:         var(--quivo-accent);
+  --accent-hover:   color-mix(in srgb, var(--quivo-accent) 85%, #18181b);
   --success:        #166534;
   --warning:        #92400e;
   --danger:         #b91c1c;
 
-  /* shadcn tokens — warm paper shell */
-  --background:       #F8F7F3;
-  --foreground:       #1C1917;
-  --card:             #F1EFE9;
-  --card-foreground:  #1C1917;
-  --popover:          #F5F4F0;
-  --popover-foreground: #1C1917;
-  --primary:          #292524;
-  --primary-foreground: #F8F7F3;
-  --secondary:        #ebe8e0;
-  --secondary-foreground: #1C1917;
-  --muted:            #ebe8e0;
-  --muted-foreground: #57534e;
-  --accent-foreground: #1C1917;
+  /* shadcn tokens — zinc on white */
+  --background:       #ffffff;
+  --foreground:       #18181b;
+  --card:             #ffffff;
+  --card-foreground:  #18181b;
+  --popover:          #ffffff;
+  --popover-foreground: #18181b;
+  --primary:          #18181b;
+  --primary-foreground: #fafafa;
+  --secondary:        #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted:            #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent-foreground: #18181b;
   --destructive:      #b91c1c;
-  --border:           #e7e5e4;
-  --input:            #d6d3d1;
-  --ring:             #44403C;
-  --sidebar:          #F1EFE9;
-  --sidebar-foreground: #1C1917;
-  --sidebar-primary:  #292524;
-  --sidebar-primary-foreground: #F8F7F3;
-  --sidebar-accent:   #ebe8e0;
-  --sidebar-accent-foreground: #1C1917;
-  --sidebar-border:   #e7e5e4;
-  --sidebar-ring:     #44403C;
+  --border:           #e4e4e7;
+  --input:            #e4e4e7;
+  --ring:             #52525b;
+  --sidebar:          #fafafa;
+  --sidebar-foreground: #18181b;
+  --sidebar-primary:  #18181b;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent:   #f4f4f5;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border:   #e4e4e7;
+  --sidebar-ring:     #52525b;
 
-  --bg-primary:     #F8F7F3;
-  --bg-secondary:   #F1EFE9;
-  --bg-sidebar:     #F1EFE9;
-  --border-color:   #e7e5e4;
+  --bg-primary:     #ffffff;
+  --bg-secondary:   #fafafa;
+  --bg-sidebar:     #fafafa;
+  --border-color:   #e4e4e7;
 }
 
 /* ── Light mode: comprehensive overrides for all hardcoded Tailwind colors ── */
@@ -86,55 +86,55 @@
 [data-theme="light"] .text-\[\#6b7280\] { color: var(--text-muted) !important; }
 [data-theme="light"] .border-\[\#2e3138\] { border-color: var(--bg-border) !important; }
 
-/* Backgrounds — map dark UI hex → warm cream layers */
-[data-theme="light"] .bg-\[\#0a0e1a\]  { background-color: #F1EFE9 !important; }
-[data-theme="light"] .bg-\[\#0d1117\]  { background-color: #F8F7F3 !important; }
-[data-theme="light"] .bg-\[\#0f1419\]  { background-color: #F1EFE9 !important; }
-[data-theme="light"] .bg-\[\#141b26\]  { background-color: #F5F4F0 !important; }
-[data-theme="light"] .bg-\[\#161b22\]  { background-color: #F1EFE9 !important; }
-[data-theme="light"] .bg-\[\#1a2030\]  { background-color: #ebe8e0 !important; }
-[data-theme="light"] .bg-\[\#1a1a1a\]  { background-color: #F8F7F3 !important; }
-[data-theme="light"] .bg-\[\#141414\]  { background-color: #F1EFE9 !important; }
-[data-theme="light"] .bg-\[\#1e2836\]  { background-color: #ebe8e0 !important; }
-[data-theme="light"] .bg-\[\#23262e\]  { background-color: #ebe8e0 !important; }
+/* Backgrounds — map dark UI hex → light zinc layers */
+[data-theme="light"] .bg-\[\#0a0e1a\]  { background-color: #fafafa !important; }
+[data-theme="light"] .bg-\[\#0d1117\]  { background-color: #ffffff !important; }
+[data-theme="light"] .bg-\[\#0f1419\]  { background-color: #fafafa !important; }
+[data-theme="light"] .bg-\[\#141b26\]  { background-color: #f4f4f5 !important; }
+[data-theme="light"] .bg-\[\#161b22\]  { background-color: #fafafa !important; }
+[data-theme="light"] .bg-\[\#1a2030\]  { background-color: #f4f4f5 !important; }
+[data-theme="light"] .bg-\[\#1a1a1a\]  { background-color: #ffffff !important; }
+[data-theme="light"] .bg-\[\#141414\]  { background-color: #fafafa !important; }
+[data-theme="light"] .bg-\[\#1e2836\]  { background-color: #f4f4f5 !important; }
+[data-theme="light"] .bg-\[\#23262e\]  { background-color: #f4f4f5 !important; }
 
-/* Borders — stone-200 family */
-[data-theme="light"] .border-\[\#1e2836\]  { border-color: #e7e5e4 !important; }
-[data-theme="light"] .border-\[\#30363d\]  { border-color: #d6d3d1 !important; }
-[data-theme="light"] .border-\[\#0d1117\]  { border-color: #e7e5e4 !important; }
+/* Borders — zinc-200 */
+[data-theme="light"] .border-\[\#1e2836\]  { border-color: #e4e4e7 !important; }
+[data-theme="light"] .border-\[\#30363d\]  { border-color: #d4d4d8 !important; }
+[data-theme="light"] .border-\[\#0d1117\]  { border-color: #e4e4e7 !important; }
 
-/* Text — charcoal on cream */
-[data-theme="light"] .text-\[\#e6edf3\]  { color: #1C1917 !important; }
-[data-theme="light"] .text-\[\#8b949e\]  { color: #44403C !important; }
-[data-theme="light"] .text-\[\#ececec\]  { color: #1C1917 !important; }
-[data-theme="light"] .text-\[\#9b9b9b\]  { color: #57534e !important; }
-[data-theme="light"] .text-\[\#d4d4d4\]  { color: #44403C !important; }
-[data-theme="light"] .text-\[\#6e7681\]  { color: #57534e !important; }
-[data-theme="light"] .text-\[\#6e7781\]  { color: #57534e !important; }
+/* Text — zinc on white */
+[data-theme="light"] .text-\[\#e6edf3\]  { color: #18181b !important; }
+[data-theme="light"] .text-\[\#8b949e\]  { color: #52525b !important; }
+[data-theme="light"] .text-\[\#ececec\]  { color: #18181b !important; }
+[data-theme="light"] .text-\[\#9b9b9b\]  { color: #71717a !important; }
+[data-theme="light"] .text-\[\#d4d4d4\]  { color: #52525b !important; }
+[data-theme="light"] .text-\[\#6e7681\]  { color: #71717a !important; }
+[data-theme="light"] .text-\[\#6e7781\]  { color: #71717a !important; }
 
 /* Placeholder */
-[data-theme="light"] ::placeholder { color: #78716c !important; }
+[data-theme="light"] ::placeholder { color: #71717a !important; }
 
 /* Sidebar */
 [data-theme="light"] aside  { background-color: var(--bg-surface) !important; border-color: var(--bg-border) !important; }
 
 /* Scrollbar */
-[data-theme="light"] ::-webkit-scrollbar-track { background: #F1EFE9; }
-[data-theme="light"] ::-webkit-scrollbar-thumb { background: #d6d3d1; }
-[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+[data-theme="light"] ::-webkit-scrollbar-track { background: #fafafa; }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: #d4d4d8; }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
 
-/* Inputs — warm paper (no pure white) */
+/* Inputs — align with zinc shell */
 [data-theme="light"] input,
 [data-theme="light"] textarea,
 [data-theme="light"] select {
-  background-color: #F5F4F0 !important;
-  color: #1C1917 !important;
-  border-color: #d6d3d1 !important;
+  background-color: #ffffff !important;
+  color: #18181b !important;
+  border-color: #e4e4e7 !important;
 }
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme inline {
   --color-background: var(--background);
@@ -172,45 +172,45 @@
   --radius-xl: calc(var(--radius) * 1.4);
 }
 
-/* ─── Finedge Dark Theme (shadcn bridge — keep aligned with vars above) ─────── */
+/* ─── Quivo Dark Theme (shadcn bridge — keep aligned with vars above) ─────── */
 :root {
-  --background: #0a0a0a;
+  --background: #262626;
   --foreground: #f5f5f7;
-  --card: #1a1a1a;
+  --card: #262626;
   --card-foreground: #f5f5f7;
-  --popover: #1a1a1a;
+  --popover: #262626;
   --popover-foreground: #f5f5f7;
-  --primary: var(--finedge-accent);
-  --primary-foreground: #0a0a0a;
-  --secondary: #252528;
+  --primary: var(--quivo-accent);
+  --primary-foreground: #262626;
+  --secondary: #323232;
   --secondary-foreground: #f5f5f7;
-  --muted: #1a1a1a;
+  --muted: #262626;
   --muted-foreground: #a1a1a6;
   --accent: #c5d8f0;
-  --accent-foreground: #0a0a0a;
+  --accent-foreground: #262626;
   --destructive: #d4a0a0;
-  --border: #2a2a2e;
-  --input: #2a2a2e;
-  --ring: var(--finedge-accent);
+  --border: #3f3f46;
+  --input: #3f3f46;
+  --ring: var(--quivo-accent);
   --radius: 0.75rem;
-  --sidebar: #141414;
+  --sidebar: #262626;
   --sidebar-foreground: #f5f5f7;
-  --sidebar-primary: var(--finedge-accent);
-  --sidebar-primary-foreground: #0a0a0a;
-  --sidebar-accent: #252528;
+  --sidebar-primary: var(--quivo-accent);
+  --sidebar-primary-foreground: #262626;
+  --sidebar-accent: #323232;
   --sidebar-accent-foreground: #f5f5f7;
-  --sidebar-border: #2a2a2e;
-  --sidebar-ring: var(--finedge-accent);
+  --sidebar-border: #3f3f46;
+  --sidebar-ring: var(--quivo-accent);
 
-  /* Finedge custom tokens */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #141414;
-  --bg-card: #1a1a1a;
-  --bg-sidebar: #141414;
-  --border-color: #2a2a2e;
+  /* Quivo custom tokens */
+  --bg-primary: #262626;
+  --bg-secondary: #262626;
+  --bg-card: #262626;
+  --bg-sidebar: #262626;
+  --border-color: #3f3f46;
   --text-primary: #f5f5f7;
   --text-secondary: #a1a1a6;
-  --accent-blue: var(--finedge-accent);
+  --accent-blue: var(--quivo-accent);
   --accent-cyan: #22d3ee;
   --success: #9ecf9e;
   --warning: #e8c995;
@@ -228,7 +228,7 @@
     font-feature-settings: "kern" 1;
   }
   body {
-    background-color: var(--bg-base, #141416);
+    background-color: var(--bg-base, #262626);
     color: var(--text-primary, #f5f5f7);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     letter-spacing: -0.011em;
@@ -272,7 +272,7 @@
 
 /* ─── Gradient text ─────────────────────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, var(--finedge-accent), #c5d8f0);
+  background: linear-gradient(135deg, var(--quivo-accent), #c5d8f0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -287,11 +287,9 @@
   box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
 }
 
-/* ─── Radial glow background (monochrome — subtle depth, no blue wash) ─────── */
+/* ─── Main canvas: solid (dark) — no per-tab gradient shift ───────────────── */
 .radial-glow {
-  background:
-    radial-gradient(ellipse 120% 80% at 100% 0%, rgba(255, 255, 255, 0.045), transparent 55%),
-    radial-gradient(ellipse 90% 70% at 0% 100%, rgba(255, 255, 255, 0.03), transparent 50%);
+  background: var(--bg-base);
 }
 
 [data-theme="light"] .radial-glow {
@@ -317,6 +315,10 @@
     radial-gradient(ellipse 120% 100% at 100% 100%, rgba(255, 210, 180, 0.1), transparent 48%);
   filter: blur(18px);
   pointer-events: none;
+}
+[data-theme="dark"] .fe-soft-aura::before {
+  opacity: 0;
+  filter: none;
 }
 [data-theme="light"] .fe-soft-aura::before {
   opacity: 0.35;

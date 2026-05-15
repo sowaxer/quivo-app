@@ -1,5 +1,5 @@
 /**
- * Google OAuth 2.0 helper for Finedge.
+ * Google OAuth 2.0 helper for Quivo.
  *
  * Token lifecycle:
  *  1. /api/google/auth          → build the consent URL (server-side)
@@ -289,15 +289,17 @@ export async function getAuthClient(userId: string): Promise<OAuth2Client | null
   const client = createOAuthClient();
   client.setCredentials(tokens);
 
-  // If access_token is about to expire, refresh proactively
+  // If access_token is about to expire (or we have no expiry), refresh proactively
   const expiresIn = (tokens.expiry_date ?? 0) - Date.now();
-  if (expiresIn < 5 * 60 * 1000) {
+  const expiryUnknownOrStale = !tokens.expiry_date || tokens.expiry_date <= 0 || expiresIn < 5 * 60 * 1000;
+  if (expiryUnknownOrStale) {
     try {
       const { credentials } = await client.refreshAccessToken();
       await saveTokens(userId, credentials);
       client.setCredentials(credentials);
-    } catch {
-      // refresh failed – tokens are revoked
+    } catch (e) {
+      console.error('[Google] refreshAccessToken failed for user', userId, e);
+      // refresh failed – tokens are revoked or invalid_grant
       return null;
     }
   }

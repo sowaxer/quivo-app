@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('ai', await rateLimitKey('chat', userId));
+  const rlDenied = await rateLimitExceededResponse('chat', await rateLimitKey('chat', userId));
   if (rlDenied) return rlDenied;
 
   const body = (await req.json()) as {
@@ -300,7 +300,7 @@ export async function POST(req: NextRequest) {
     const dsModel = model === 'deepseek-reasoner' ? 'deepseek-reasoner' : 'deepseek-chat';
     const systemText = agentInstruction
       ? `${agentInstruction}\n\nToday: ${new Date().toLocaleDateString('en-US')}`
-      : `You are Finedge AI, a financial and business assistant.\nToday: ${new Date().toLocaleDateString('en-US')}`;
+      : `You are Quivo AI, a financial and business assistant.\nToday: ${new Date().toLocaleDateString('en-US')}`;
     const apiMessages = [
       { role: 'system' as const, content: systemText },
       ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
@@ -402,7 +402,7 @@ export async function POST(req: NextRequest) {
     tavilyKey    ? '✓ Web Search (can search internet in real-time)'   : '✗ Web Search (no Tavily key)',
   ].join('\n');
 
-  const baseSystem = `You are Finedge AI, a powerful financial and business assistant with direct access to the user's connected services.
+  const baseSystem = `You are Quivo AI, a powerful financial and business assistant with direct access to the user's connected services.
 
 Today: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
 

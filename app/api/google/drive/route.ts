@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('google-drive', userId));
+  const rlDenied = await rateLimitExceededResponse('google', await rateLimitKey('google-integration', userId));
   if (rlDenied) return rlDenied;
 
   const drive = await getDrive(userId);
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('google-drive', userId));
+  const rlDenied = await rateLimitExceededResponse('google', await rateLimitKey('google-integration', userId));
   if (rlDenied) return rlDenied;
 
   const drive = await getDrive(userId);

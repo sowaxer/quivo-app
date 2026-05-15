@@ -1,6 +1,6 @@
 /**
  * Platform Stripe webhooks (optional).
- * Set STRIPE_WEBHOOK_SECRET + STRIPE_SECRET_KEY for Finedge billing events.
+ * Set STRIPE_WEBHOOK_SECRET + STRIPE_SECRET_KEY for Quivo billing events.
  * User-connected Stripe accounts use their own keys in /api/stripe — not this route.
  */
 import { NextRequest, NextResponse } from 'next/server';

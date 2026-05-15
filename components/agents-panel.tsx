@@ -82,13 +82,15 @@ const PREBUILT_AGENTS: Agent[] = [
 const CATEGORIES = ['All', 'Finance', 'Accounting', 'Tax & IRS', 'Audit', 'Compliance', 'Payroll', 'Consulting', 'M&A', 'Legal', 'Custom'];
 const MODELS = [
   { value: 'claude-sonnet-4-5', label: 'Claude Sonnet 4.5' },
-  { value: 'gemini',            label: 'Gemini 1.5 Pro' },
+  { value: 'gemini', label: 'Gemini 1.5 Pro' },
+  { value: 'deepseek-chat', label: 'DeepSeek Chat' },
+  { value: 'deepseek-reasoner', label: 'DeepSeek R1 (reasoning)' },
 ];
 const AVATARS = ['🤖','🧾','📒','📈','🔍','💰','💼','📄','⚖️','🗂️','🏦','🤝','🏛️','📊','🔬','💡','🎯','🛡️','📬','🏆'];
 
-const LS_AGENTS   = 'finedge_user_agents';
-const LS_MEMORIES = 'finedge_memories';
-const LS_SAVED    = 'finedge_saved_chats';
+const LS_AGENTS   = 'quivo_user_agents';
+const LS_MEMORIES = 'quivo_memories';
+const LS_SAVED    = 'quivo_saved_chats';
 
 function loadUserAgents(): Agent[] { try { return JSON.parse(localStorage.getItem(LS_AGENTS) ?? '[]'); } catch { return []; } }
 function saveUserAgents(a: Agent[]) { localStorage.setItem(LS_AGENTS, JSON.stringify(a)); }

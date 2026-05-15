@@ -118,27 +118,27 @@ const PAGES: DocPage[] = [
   // ── 1. Platform Guide ──────────────────────────────────────────────────────
   {
     id: 'guide',
-    title: 'Finedge Platform Guide',
+    title: 'Quivo Platform Guide',
     sections: [
-      { id: 'what-is', label: 'What is Finedge?' },
+      { id: 'what-is', label: 'What is Quivo?' },
       { id: 'getting-started', label: 'Getting Started' },
       { id: 'resources', label: 'Resources' },
     ],
     content: (
       <div>
         <p className="text-sm text-[#8b949e] mb-6">
-          Welcome to the <strong className="text-[#e6edf3]">Finedge Platform</strong> documentation. Here you&apos;ll find everything you need to configure, deploy, and get the most out of your AI-powered accounting and consulting workspace.
+          Welcome to the <strong className="text-[#e6edf3]">Quivo Platform</strong> documentation. Here you&apos;ll find everything you need to configure, deploy, and get the most out of your AI-powered accounting and consulting workspace.
         </p>
 
-        <h2 id="what-is" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">What is Finedge?</h2>
+        <h2 id="what-is" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">What is Quivo?</h2>
         <p className="text-sm text-[#8b949e] mb-4">
-          Finedge is an AI orchestration platform designed for <strong className="text-[#e6edf3]">accounting firms, CFOs, and financial consultants</strong>. It brings together multiple AI models, a knowledge base, real-time integrations, and specialized finance agents — all under one roof. You supply your own API keys; <strong className="text-[#e6edf3]">Finedge never charges you for AI usage</strong>.
+          Quivo is an AI orchestration platform designed for <strong className="text-[#e6edf3]">accounting firms, CFOs, and financial consultants</strong>. It brings together multiple AI models, a knowledge base, real-time integrations, and specialized finance agents — all under one roof. You supply your own API keys; <strong className="text-[#e6edf3]">Quivo never charges you for AI usage</strong>.
         </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 mb-6">
           {[
             { icon: '🤖', title: 'AI Agents', desc: '16+ prebuilt specialists: tax, audit, bookkeeping, CFO, IRS compliance, and more.' },
             { icon: '📚', title: 'Knowledge Base', desc: 'Upload PDFs, spreadsheets, and docs for RAG-powered contextual answers.' },
-            { icon: '🔑', title: 'Your Keys, Your Cost', desc: 'Connect Anthropic, OpenAI, or Google directly. You pay providers — not Finedge.' },
+            { icon: '🔑', title: 'Your Keys, Your Cost', desc: 'Connect Anthropic, OpenAI, or Google directly. You pay providers — not Quivo.' },
           ].map(card => (
             <div key={card.title} className="rounded-xl border border-[#30363d] bg-[#161b22] p-4">
               <div className="mb-2 text-2xl">{card.icon}</div>
@@ -198,11 +198,11 @@ const PAGES: DocPage[] = [
     content: (
       <div>
         <p className="text-sm text-[#8b949e] mb-6">
-          Finedge is a <strong className="text-[#e6edf3]">bring-your-own-key</strong> platform. You add your API keys once in Settings → API Keys. They are stored securely in Supabase with row-level security tied to your account. Finedge never proxies your keys through its own servers for billing — every AI request goes <strong className="text-[#e6edf3]">directly from your browser to the provider</strong>.
+          Quivo is a <strong className="text-[#e6edf3]">bring-your-own-key</strong> platform. You add your API keys once in Settings → API Keys. They are stored securely in Supabase with row-level security tied to your account. Quivo never proxies your keys through its own servers for billing — every AI request goes <strong className="text-[#e6edf3]">directly from your browser to the provider</strong>.
         </p>
 
         <Callout type="tip" title="Privacy First">
-          Your API keys are stored encrypted in Supabase, scoped to your user account via Row Level Security (RLS). No Finedge employee can read them.
+          Your API keys are stored encrypted in Supabase, scoped to your user account via Row Level Security (RLS). No Quivo employee can read them.
         </Callout>
 
         <h2 id="overview" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">Overview</h2>
@@ -224,8 +224,8 @@ const PAGES: DocPage[] = [
         <Step n={2} title="Generate an API key">
           <p>Go to <strong>API Keys</strong> in the left sidebar and click <strong>Create Key</strong>. Copy the key — it is only shown once.</p>
         </Step>
-        <Step n={3} title="Paste it in Finedge">
-          <p>Open <strong>Settings → API Keys</strong> in Finedge and paste the key into the <IC>Anthropic API Key</IC> field. Click Save.</p>
+        <Step n={3} title="Paste it in Quivo">
+          <p>Open <strong>Settings → API Keys</strong> in Quivo and paste the key into the <IC>Anthropic API Key</IC> field. Click Save.</p>
         </Step>
         <Code lang="text">&lt;your-anthropic-api-key&gt;</Code>
 
@@ -237,7 +237,7 @@ const PAGES: DocPage[] = [
         <Step n={2} title="Get API key">
           <p>Click <strong>Get API key → Create API key in new project</strong>. Copy the key.</p>
         </Step>
-        <Step n={3} title="Add to Finedge">
+        <Step n={3} title="Add to Quivo">
           <p>Paste into <strong>Settings → API Keys → Google AI Key</strong>.</p>
         </Step>
         <Code lang="text">AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</Code>
@@ -249,7 +249,7 @@ const PAGES: DocPage[] = [
         <Step n={2} title="Generate key">
           <p>Go to <strong>API Keys</strong> and click <strong>Create new secret key</strong>.</p>
         </Step>
-        <Step n={3} title="Add to Finedge">
+        <Step n={3} title="Add to Quivo">
           <p>Paste into <strong>Settings → API Keys → OpenAI API Key</strong>.</p>
         </Step>
 
@@ -261,19 +261,19 @@ const PAGES: DocPage[] = [
         <Step n={2} title="Copy your API key">
           <p>In your dashboard, copy the key that starts with <IC>tvly-</IC>.</p>
         </Step>
-        <Step n={3} title="Add to Finedge">
+        <Step n={3} title="Add to Quivo">
           <p>Settings → API Keys → Tavily API Key.</p>
         </Step>
 
         <h2 id="security" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">Security</h2>
         <Callout type="warning" title="Never share your API keys">
-          Your API keys grant full access to your provider accounts. Finedge stores them server-side with RLS. If you suspect a key has leaked, rotate it immediately in the provider console and update it in Finedge Settings.
+          Your API keys grant full access to your provider accounts. Quivo stores them server-side with RLS. If you suspect a key has leaked, rotate it immediately in the provider console and update it in Quivo Settings.
         </Callout>
         <ul className="mt-3 space-y-1.5 text-sm text-[#8b949e]">
           <li className="flex items-start gap-2"><span className="text-[#22c55e] mt-0.5">✓</span> Keys are stored in Supabase with row-level security.</li>
-          <li className="flex items-start gap-2"><span className="text-[#22c55e] mt-0.5">✓</span> Keys are never logged in Finedge server code.</li>
+          <li className="flex items-start gap-2"><span className="text-[#22c55e] mt-0.5">✓</span> Keys are never logged in Quivo server code.</li>
           <li className="flex items-start gap-2"><span className="text-[#22c55e] mt-0.5">✓</span> All provider calls are made over HTTPS.</li>
-          <li className="flex items-start gap-2"><span className="text-[#ef4444] mt-0.5">✗</span> Finedge does not charge for API usage — your provider invoices you directly.</li>
+          <li className="flex items-start gap-2"><span className="text-[#ef4444] mt-0.5">✗</span> Quivo does not charge for API usage — your provider invoices you directly.</li>
         </ul>
       </div>
     ),
@@ -294,7 +294,7 @@ const PAGES: DocPage[] = [
     content: (
       <div>
         <p className="text-sm text-[#8b949e] mb-6">
-          Agents in Finedge are AI personas with a custom system prompt, a selected model, and optional capabilities like web search or file context. You can use the 16+ prebuilt finance agents or create your own from scratch.
+          Agents in Quivo are AI personas with a custom system prompt, a selected model, and optional capabilities like web search or file context. You can use the 16+ prebuilt finance agents or create your own from scratch.
         </p>
 
         <h2 id="open-marketplace" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">Step 1: Open the Agent Marketplace</h2>
@@ -396,7 +396,7 @@ Output format: Use bullet points for action items and bold key deadlines.`}</Cod
         </p>
 
         <h2 id="what-is-kb" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">What is the Knowledge Base?</h2>
-        <p className="text-sm text-[#8b949e] mb-4">When you send a message in chat with KB enabled, Finedge:</p>
+        <p className="text-sm text-[#8b949e] mb-4">When you send a message in chat with KB enabled, Quivo:</p>
         <ol className="space-y-2 text-sm text-[#8b949e]">
           {[
             'Extracts keywords from your message',
@@ -485,7 +485,7 @@ Output format: Use bullet points for action items and bold key deadlines.`}</Cod
     content: (
       <div>
         <p className="text-sm text-[#8b949e] mb-6">
-          The Finedge chat interface is modeled after modern AI tools like LobeHub and ChatGPT, with a collapsible history sidebar, model selector, and a <IC>+</IC> capabilities menu for power users.
+          The Quivo chat interface is modeled after modern AI tools like LobeHub and ChatGPT, with a collapsible history sidebar, model selector, and a <IC>+</IC> capabilities menu for power users.
         </p>
 
         <h2 id="overview" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">Overview</h2>
@@ -545,7 +545,7 @@ Output format: Use bullet points for action items and bold key deadlines.`}</Cod
         </ul>
 
         <h2 id="history" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">Chat History</h2>
-        <p className="text-sm text-[#8b949e] mb-3">All sessions are stored in <IC>localStorage</IC> with the key <IC>finedge_chat_sessions</IC>. Each session stores:</p>
+        <p className="text-sm text-[#8b949e] mb-3">All sessions are stored in <IC>localStorage</IC> with the key <IC>quivo_chat_sessions</IC>. Each session stores:</p>
         <Code lang="json">{`{
   "id": "sess_1714857600000",
   "title": "IRS Penalty Abatement Options",
@@ -590,22 +590,22 @@ data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"The IRS
     content: (
       <div>
         <p className="text-sm text-[#8b949e] mb-6">
-          Finedge integrates with your existing business tools via <strong className="text-[#e6edf3]">OAuth 2.0</strong>. Tokens are stored securely in Supabase with RLS. No integration is required to use AI chat — these are optional enhancements.
+          Quivo integrates with your existing business tools via <strong className="text-[#e6edf3]">OAuth 2.0</strong>. Tokens are stored securely in Supabase with RLS. No integration is required to use AI chat — these are optional enhancements.
         </p>
 
         <h2 id="gmail" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">Gmail Monitor</h2>
-        <p className="text-sm text-[#8b949e] mb-3">Connect your Google account to analyze, summarize, and draft replies to emails from within Finedge.</p>
+        <p className="text-sm text-[#8b949e] mb-3">Connect your Google account to analyze, summarize, and draft replies to emails from within Quivo.</p>
         <Step n={1} title="Connect Google Workspace">
           <p>Go to <strong className="text-[#e6edf3]">Settings → Integrations → Google Workspace</strong> and click <strong className="text-[#e6edf3]">Connect</strong>. You will be redirected to Google OAuth.</p>
         </Step>
         <Step n={2} title="Grant permissions">
-          <p>Finedge requests <IC>gmail.readonly</IC> and <IC>gmail.send</IC> scopes. These allow reading and sending emails on your behalf.</p>
+          <p>Quivo requests <IC>gmail.readonly</IC> and <IC>gmail.send</IC> scopes. These allow reading and sending emails on your behalf.</p>
         </Step>
         <Step n={3} title="Use Gmail Monitor">
           <p>Click <strong className="text-[#e6edf3]">Gmail Monitor</strong> in the sidebar to view flagged emails, run AI analysis, and compose replies.</p>
         </Step>
         <Callout type="warning" title="Scope reminder">
-          Finedge only reads emails if you explicitly trigger analysis. It does not background-sync your inbox.
+          Quivo only reads emails if you explicitly trigger analysis. It does not background-sync your inbox.
         </Callout>
 
         <h2 id="stripe" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">Billing (Stripe)</h2>
@@ -657,7 +657,7 @@ data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"The IRS
     content: (
       <div>
         <p className="text-sm text-[#8b949e] mb-6">
-          Finedge exposes a set of internal Next.js API routes. These are used by the frontend and can also be called from external scripts if you are self-hosting.
+          Quivo exposes a set of internal Next.js API routes. These are used by the frontend and can also be called from external scripts if you are self-hosting.
         </p>
 
         <Callout type="info" title="Authentication">
@@ -697,7 +697,7 @@ data: {"type":"message_stop"}`}</Code>
 
         <h2 id="kb-extract" className="mb-3 mt-8 text-lg font-bold text-[#e6edf3]">POST /api/kb/extract</h2>
         <p className="text-sm text-[#8b949e] mb-3">Extracts text from an uploaded file. Accepts <IC>multipart/form-data</IC> with a <IC>file</IC> field.</p>
-        <Code lang="bash">{`curl -X POST https://your-finedge.vercel.app/api/kb/extract \\
+        <Code lang="bash">{`curl -X POST https://your-quivo.vercel.app/api/kb/extract \\
   -H "Cookie: __session=<clerk_session>" \\
   -F "file=@tax_report_2024.pdf"
 
@@ -806,28 +806,28 @@ export default function DocsPanel() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-[#0d1117]">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-[var(--bg-base)]">
 
       {/* ── Left sidebar ──────────────────────────────────────────────────── */}
       <aside className={`
-        fixed inset-y-0 left-60 z-20 w-56 shrink-0 overflow-y-auto border-r border-[#1e2836] bg-[#0d1117] transition-transform duration-200
+        fixed inset-y-0 left-60 z-20 w-56 shrink-0 overflow-y-auto border-r border-[var(--bg-border)] bg-[var(--bg-base)] transition-transform duration-200
         md:relative md:left-0 md:translate-x-0
         ${showNav ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         <div className="px-3 py-5">
           <div className="mb-4 flex items-center justify-between px-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#8b949e]">Documentation</span>
-            <button onClick={() => setShowNav(false)} className="md:hidden text-[#8b949e] hover:text-[#e6edf3]">
+            <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">Documentation</span>
+            <button onClick={() => setShowNav(false)} className="md:hidden text-[var(--text-muted)] hover:text-[var(--text-primary)]">
               <IconX className="h-4 w-4" />
             </button>
           </div>
           {NAV_GROUPS.map(g => (
             <div key={g.label} className="mb-4">
-              <p className="mb-1 px-2 text-[9px] font-bold uppercase tracking-widest text-[#6e7681]">{g.label}</p>
+              <p className="mb-1 px-2 text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)]">{g.label}</p>
               {g.pages.map(pid => (
                 <button key={pid} onClick={() => goTo(pid)}
-                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs transition-all ${activePage === pid ? 'bg-[#1e2836] font-semibold text-[#e6edf3]' : 'text-[#8b949e] hover:bg-[#161b22] hover:text-[#e6edf3]'}`}>
-                  {activePage === pid && <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#3b82f6]" />}
+                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs transition-all ${activePage === pid ? 'bg-[var(--bg-hover)] font-semibold text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'}`}>
+                  {activePage === pid && <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--quivo-accent)]" />}
                   {PAGE_LABELS[pid]}
                 </button>
               ))}
@@ -842,9 +842,9 @@ export default function DocsPanel() {
       {/* ── Main content ──────────────────────────────────────────────────── */}
       <div ref={contentRef} className="flex-1 overflow-y-auto">
         {/* Top bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#1e2836] bg-[#0d1117]/95 px-6 py-3 backdrop-blur">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--bg-border)] bg-[var(--bg-base)]/95 px-6 py-3 backdrop-blur">
           <div className="flex items-center gap-3">
-            <button onClick={() => setShowNav(v => !v)} className="md:hidden text-[#8b949e] hover:text-[#e6edf3]">
+            <button onClick={() => setShowNav(v => !v)} className="md:hidden text-[var(--text-muted)] hover:text-[var(--text-primary)]">
               <IconMenu2 className="h-4 w-4" />
             </button>
             <h2 className="text-sm font-bold text-[#e6edf3]">{page.title}</h2>

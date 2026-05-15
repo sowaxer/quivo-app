@@ -21,6 +21,12 @@ const serverEnvSchema = z.object({
     .string()
     .min(1, 'SUPABASE_SERVICE_ROLE_KEY is required'),
 
+  /** Public anon key — optional; only needed if you add a browser Supabase client. Never use service_role in the browser. */
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().min(20, 'NEXT_PUBLIC_SUPABASE_ANON_KEY looks invalid').optional(),
+  ),
+
   // AI providers (optional at deploy — users supply keys in vault)
   ANTHROPIC_API_KEY: z.string().optional(),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
@@ -77,6 +83,28 @@ const serverEnvSchema = z.object({
       message: 'Set both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN, or omit both.',
       path: ['UPSTASH_REDIS_REST_URL'],
     });
+  }
+
+  const onVercel = process.env.VERCEL === '1';
+  const enforceProdSecrets = data.NODE_ENV === 'production' && (onVercel || process.env.ENFORCE_VAULT_ENV === '1');
+
+  if (enforceProdSecrets) {
+    if (!data.ENCRYPTION_KEY?.trim() && !data.ENCRYPTION_SECRET?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'ENCRYPTION_KEY (64 hex chars) or ENCRYPTION_SECRET is required for production deploys. On non-Vercel hosts set ENFORCE_VAULT_ENV=1 to fail builds without vault keys.',
+        path: ['ENCRYPTION_KEY'],
+      });
+    }
+    if (!hasUrl || !hasTok) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required for production deploys (API rate limits).',
+        path: ['UPSTASH_REDIS_REST_URL'],
+      });
+    }
   }
 });
 

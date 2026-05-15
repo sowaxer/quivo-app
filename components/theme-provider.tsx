@@ -21,7 +21,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [resolved, setResolved] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
-    const stored = (localStorage.getItem('finedge_theme') ?? 'dark') as Theme;
+    const stored = (localStorage.getItem('quivo_theme') ??
+      localStorage.getItem('finedge_theme') ??
+      'dark') as Theme;
     setThemeState(stored);
     applyTheme(stored);
   }, []);
@@ -40,7 +42,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   function setTheme(t: Theme) {
     setThemeState(t);
-    localStorage.setItem('finedge_theme', t);
+    localStorage.setItem('quivo_theme', t);
+    try {
+      localStorage.removeItem('finedge_theme');
+    } catch {
+      /* ignore */
+    }
     applyTheme(t);
   }
 

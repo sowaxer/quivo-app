@@ -10,8 +10,8 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const rlDenied = await rateLimitExceededResponse(
-    'strict',
-    await rateLimitKey('keys-save', userId),
+    'keysHourly',
+    await rateLimitKey('vault-save', userId),
   );
   if (rlDenied) return rlDenied;
 

@@ -15,7 +15,7 @@ interface Task {
 
 type SortKey = 'dueDate' | 'createdAt' | 'title';
 
-const LS_TASKS = 'finedge_tasks';
+const LS_TASKS = 'quivo_tasks';
 
 function loadTasks(): Task[] {
   try { return JSON.parse(localStorage.getItem(LS_TASKS) ?? '[]'); } catch { return []; }
@@ -317,7 +317,7 @@ export default function TasksPanel() {
           </button>
           <button className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] text-[#9ba3af] hover:bg-[#22252a] hover:text-[#e8eaed] transition-all">
             <svg className="h-3 w-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.5}><circle cx="8" cy="8" r="3" /><path d="M8 1v2M8 13v2M1 8h2M13 8h2" /></svg>
-            Ask Finedge AI
+            Ask Quivo AI
           </button>
         </div>
       </div>
