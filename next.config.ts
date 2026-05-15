@@ -1,14 +1,24 @@
 import type { NextConfig } from 'next';
+import { clerkCustomOrigins } from './lib/clerk-csp';
 
 /** Tight baseline CSP; extend connect-src when adding new third-party APIs. */
 function contentSecurityPolicy(): string {
+  const clerkHosts = [
+    'https://*.clerk.com',
+    'https://*.clerk.accounts.dev',
+    'https://*.clerk.dev',
+    'wss://*.clerk.com',
+    'wss://*.clerk.accounts.dev',
+    ...clerkCustomOrigins(),
+  ].join(' ');
+
   const directives = [
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' data: https://fonts.gstatic.com",
+    `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${clerkHosts} https://challenges.cloudflare.com`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com ${clerkHosts}`,
+    `font-src 'self' data: https://fonts.gstatic.com ${clerkHosts}`,
     "img-src 'self' data: https: blob:",
     [
       "connect-src 'self'",
@@ -19,11 +29,9 @@ function contentSecurityPolicy(): string {
       'https://api.stripe.com',
       'https://api.deepseek.com',
       'https://generativelanguage.googleapis.com',
-      'https://*.clerk.com',
-      'wss://*.clerk.com',
-      'https://*.clerk.accounts.dev',
-      'wss://*.clerk.accounts.dev',
+      clerkHosts,
       'https://clerk-telemetry.com',
+      'https://*.clerk-telemetry.com',
       'https://www.googleapis.com',
       'https://gmail.googleapis.com',
       'https://oauth2.googleapis.com',
@@ -32,7 +40,7 @@ function contentSecurityPolicy(): string {
       'https://query1.finance.yahoo.com',
       'https://vitals.vercel-insights.com',
     ].join(' '),
-    "frame-src 'self' https://*.clerk.com https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com https://accounts.google.com",
+    `frame-src 'self' ${clerkHosts} https://challenges.cloudflare.com https://accounts.google.com`,
     "worker-src 'self' blob:",
     "form-action 'self' https://checkout.stripe.com",
   ];
