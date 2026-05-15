@@ -12,7 +12,7 @@ import {
   IconCheck, IconX, IconLoader2, IconEye, IconEyeOff,
   IconTrash, IconDownload, IconRefresh, IconExternalLink,
   IconBrandGoogle, IconBrandStripe, IconSparkles,
-  IconAlertTriangle, IconSend, IconUpload, IconKey, IconLock,
+  IconAlertTriangle, IconSend, IconUpload, IconKey,
 } from '@tabler/icons-react';
 import { useTheme } from '@/components/theme-provider';
 import { GeminiMarkIcon, OpenAIMarkIcon, AnthropicMarkIcon, LogoDeepseek } from '@/components/provider-brand-icons';
@@ -27,14 +27,14 @@ function ThemeToggleInline() {
     { value: 'system' as const, label: 'System', icon: '💻' },
   ];
   return (
-    <div className="flex w-fit items-center gap-1 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] p-1">
+    <div className="flex w-fit items-center gap-1 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] p-1">
       {opts.map(o => (
         <button key={o.value} onClick={() => setTheme(o.value)}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
-            theme === o.value ? 'bg-[var(--bg-hover)] text-[var(--text-primary)] shadow-sm ring-1 ring-[var(--bg-border)]' : 'text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-medium transition-colors ${
+            theme === o.value ? 'bg-[var(--bg-nav-active)] text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-secondary)]'
           }`}>
           <span>{o.icon}</span> {o.label}
-          {theme === o.value && <IconCheck className="h-3.5 w-3.5 text-[#22c55e]" />}
+          {theme === o.value && <IconCheck className="h-3.5 w-3.5 text-[var(--text-secondary)]" stroke={1.5} />}
         </button>
       ))}
     </div>
@@ -61,40 +61,62 @@ function mkKey(): KeyState {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 function TabBtn({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: React.ElementType; label: string }) {
   return (
-    <button onClick={onClick}
-      className={`flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${
         active
-          ? 'bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-violet-900/25 dark:shadow-violet-900/35'
-          : 'text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'}`}>
-      <Icon className="h-4 w-4" />
+          ? 'bg-[var(--bg-nav-active)] text-[var(--text-primary)]'
+          : 'text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-secondary)]'
+      }`}
+    >
+      <Icon className="h-4 w-4" stroke={1.5} />
       {label}
     </button>
   );
 }
 
 function StatusBadge({ ok, msg }: { ok: boolean | null; msg?: string }) {
-  if (ok === null) return <span className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]"><IconLoader2 className="h-3 w-3 animate-spin" /> Checking…</span>;
-  if (ok) return <span className="flex items-center gap-1 rounded-md bg-[#22c55e]/10 px-2 py-0.5 text-[11px] font-semibold text-[#22c55e]"><IconCheck className="h-3 w-3" strokeWidth={2.5} /> {msg ?? 'Connected'}</span>;
-  return <span className="flex items-center gap-1 rounded-md bg-[#ef4444]/10 px-2 py-0.5 text-[11px] font-semibold text-[#ef4444]"><IconX className="h-3 w-3" strokeWidth={2.5} /> {msg ?? 'Not connected'}</span>;
+  if (ok === null) {
+    return (
+      <span className="quivo-caption flex items-center gap-1">
+        <IconLoader2 className="h-3 w-3 animate-spin" /> Checking…
+      </span>
+    );
+  }
+  if (ok) {
+    return (
+      <span className="quivo-caption flex items-center gap-1 text-[var(--text-secondary)]">
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--finance-up)]" />
+        {msg ?? 'Connected'}
+      </span>
+    );
+  }
+  return <span className="quivo-caption text-[var(--text-faint)]">{msg ?? 'Not connected'}</span>;
 }
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <button onClick={() => onChange(!checked)}
-      className={`relative h-6 w-11 rounded-full transition-colors ${checked ? 'bg-gradient-to-r from-blue-600 to-cyan-600' : 'bg-[var(--bg-border)]'}`}>
-      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`relative h-6 w-11 rounded-full transition-colors ${checked ? 'bg-[var(--text-muted)]' : 'bg-[var(--bg-border)]'}`}
+    >
+      <span
+        className={`absolute top-0.5 h-5 w-5 rounded-full bg-[var(--text-primary)] shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`}
+      />
     </button>
   );
 }
 
 function SectionCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-card)] p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-none">
-      <div className="mb-5">
-        <h3 className="text-sm font-bold text-[var(--text-primary)]">{title}</h3>
-        {subtitle && <p className="mt-0.5 text-xs text-[var(--text-muted)]">{subtitle}</p>}
+    <div className="overflow-hidden rounded-xl border border-[var(--bg-border)] bg-[var(--bg-elevated)]">
+      <div className="border-b border-[var(--bg-border)] px-4 py-3">
+        <h3 className="quivo-section-title text-[14px]">{title}</h3>
+        {subtitle && <p className="quivo-caption mt-0.5">{subtitle}</p>}
       </div>
-      {children}
+      <div className="p-4">{children}</div>
     </div>
   );
 }
@@ -114,23 +136,28 @@ function ProviderKeyEditor({
   onToggleShow: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] p-4">
-      <div className="flex items-center justify-between mb-3">
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <div className={`flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--bg-border)] ${iconColor}`}>
+          <div className={`flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--bg-border)] bg-[var(--bg-canvas)] ${iconColor}`}>
             <Icon className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-[var(--text-primary)]">{name}</p>
-            {keyPrefix && <p className="text-[10px] text-[var(--text-muted)]">Key starts with: <code className="text-[var(--quivo-accent)]">{keyPrefix}</code></p>}
+            <p className="text-[14px] font-medium text-[var(--text-primary)]">{name}</p>
+            {keyPrefix && (
+              <p className="quivo-caption">
+                Prefix: <code className="text-[var(--text-muted)]">{keyPrefix}</code>
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {state.has && <StatusBadge ok={state.testResult ? state.testResult.success : true} msg={state.testResult?.message} />}
-          {!state.has && <StatusBadge ok={false} msg="Not connected" />}
-          <a href={docUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[11px] text-[var(--quivo-accent)] hover:opacity-90">
-            Get API key <IconExternalLink className="h-2.5 w-2.5" />
+          <StatusBadge
+            ok={state.has ? (state.testResult ? state.testResult.success : true) : false}
+            msg={state.has ? state.testResult?.message : 'Not connected'}
+          />
+          <a href={docUrl} target="_blank" rel="noopener noreferrer" className="quivo-btn-ghost rounded-full px-2.5 py-1.5 text-[11px]">
+            Get key <IconExternalLink className="h-2.5 w-2.5 opacity-60" stroke={1.5} />
           </a>
         </div>
       </div>
@@ -138,17 +165,12 @@ function ProviderKeyEditor({
       {/* Key input */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          {state.has && (
-            <span className="pointer-events-none absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-emerald-400/90">
-              <IconLock className="h-3.5 w-3.5" aria-hidden />
-            </span>
-          )}
           <input
             type={state.show ? 'text' : 'password'}
             value={state.input || (state.has ? (state.masked ?? '••••••••••••••••••••••••') : '')}
             onChange={e => onChange(e.target.value)}
             placeholder={placeholder}
-            className={`w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] py-2.5 pr-10 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--quivo-accent)]/50 focus:outline-none font-mono ${state.has ? 'pl-10' : 'pl-4'}`}
+            className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] py-2.5 pl-4 pr-10 font-mono text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:border-[var(--text-muted)] focus:outline-none"
           />
           <button
             type="button"
@@ -158,9 +180,13 @@ function ProviderKeyEditor({
             {state.show ? <IconEyeOff className="h-3.5 w-3.5" /> : <IconEye className="h-3.5 w-3.5" />}
           </button>
         </div>
-        <button onClick={onSave} disabled={!state.input || state.saving}
-          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-40 hover:shadow-lg hover:shadow-blue-900/30 transition-all">
-          {state.saving ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconKey className="h-3.5 w-3.5" />}
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={!state.input || state.saving}
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-4 py-2.5 text-[12px] font-medium text-[var(--bg-canvas)] disabled:opacity-40"
+        >
+          {state.saving ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconKey className="h-3.5 w-3.5" stroke={1.75} />}
           Save
         </button>
       </div>
@@ -168,25 +194,27 @@ function ProviderKeyEditor({
       {/* How to get key — collapsible guide */}
       {!state.has && howToGet && (
         <details className="mt-2">
-          <summary className="cursor-pointer text-[11px] text-[var(--text-muted)] hover:text-[var(--quivo-accent)]">How to get this key?</summary>
-          <div className="mt-2 rounded-lg border border-[var(--bg-border)] bg-[var(--bg-base)] px-3 py-2 text-[11px] text-[var(--text-muted)] leading-relaxed whitespace-pre-line">{howToGet}</div>
+          <summary className="quivo-caption cursor-pointer hover:text-[var(--text-secondary)]">How to get this key?</summary>
+          <p className="quivo-body mt-2 whitespace-pre-line rounded-lg border border-[var(--bg-border)] bg-[var(--bg-canvas)] p-3 text-[12px]">{howToGet}</p>
         </details>
       )}
 
       {/* Actions */}
       {state.has && (
-        <div className="mt-3 flex items-center gap-3">
-          <button onClick={onTest} disabled={state.testing}
-            className="flex items-center gap-1.5 rounded-lg border border-[var(--bg-border)] bg-[var(--bg-hover)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:border-[var(--quivo-accent)]/40 hover:text-[var(--quivo-accent)] transition-all">
-            {state.testing ? <IconLoader2 className="h-3 w-3 animate-spin" /> : <IconSend className="h-3 w-3" />}
-            Test Connection
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={onTest} disabled={state.testing} className="quivo-btn-ghost rounded-full px-3 py-1.5 text-[12px]">
+            {state.testing ? <IconLoader2 className="h-3 w-3 animate-spin" /> : <IconSend className="h-3 w-3" stroke={1.5} />}
+            Test
           </button>
-          <button onClick={onRemove}
-            className="flex items-center gap-1.5 rounded-lg border border-[#ef4444]/20 bg-[#ef4444]/5 px-3 py-1.5 text-xs text-[#ef4444] hover:bg-[#ef4444]/10 transition-all">
-            <IconTrash className="h-3 w-3" /> Remove
+          <button
+            type="button"
+            onClick={onRemove}
+            className="rounded-full px-3 py-1.5 text-[12px] text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+          >
+            <IconTrash className="mr-1 inline h-3 w-3" stroke={1.5} /> Remove
           </button>
           {state.testResult && (
-            <span className={`ml-auto text-[11px] ${state.testResult.success ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
+            <span className={`quivo-caption ml-auto ${state.testResult.success ? 'text-[var(--text-secondary)]' : 'text-[var(--finance-down)]'}`}>
               {state.testResult.message}
             </span>
           )}
@@ -420,14 +448,14 @@ export default function SettingsPanel() {
   // ─────────────────────────────────────────────────────────────────────────
   if (loadingKeys) {
     return (
-      <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-[var(--bg-base)]">
+      <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-[var(--bg-canvas)]">
         <IconLoader2 className="h-6 w-6 animate-spin text-[var(--text-muted)]" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col overflow-hidden bg-[var(--bg-base)]">
+    <div className="flex h-[calc(100vh-64px)] flex-col overflow-hidden bg-[var(--bg-canvas)]">
       {/* Single top bar: category tabs (no second sidebar — avoids “two bars” next to main nav) */}
       <div className="shrink-0 border-b border-[var(--bg-border)] bg-[var(--bg-surface)] px-4 py-3 md:px-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -440,16 +468,13 @@ export default function SettingsPanel() {
               <TabBtn active={tab === 'data'} onClick={() => setTab('data')} icon={IconDatabase} label="Data & Export" />
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2">
+          <div className="flex shrink-0 items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-3 py-2">
             <UserAvatar size={32} />
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold text-[var(--text-primary)]">{getUserDisplayName(user)}</p>
               <p className="truncate text-[10px] text-[var(--text-muted)]">{user?.primaryEmailAddress?.emailAddress}</p>
             </div>
-            <div className="flex items-center gap-1.5 rounded-full border border-[var(--bg-border)] px-2 py-0.5">
-              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              <span className="text-[10px] font-medium text-emerald-700 dark:text-emerald-400">Pro</span>
-            </div>
+            <span className="rounded-full border border-[var(--bg-border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">Pro</span>
           </div>
         </div>
       </div>
@@ -471,16 +496,17 @@ export default function SettingsPanel() {
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">How it works</p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {[
-                  { title: 'You add keys', desc: 'From Claude, Stripe, Google, etc.' },
-                  { title: 'Quivo connects', desc: 'We orchestrate everything together.' },
-                  { title: 'You pay providers', desc: 'Directly at their rate — not us.' },
+                  { title: 'You add keys', desc: 'From Claude, Stripe, Google, etc.', tint: 'from-emerald-500/12', dot: 'bg-emerald-400/80' },
+                  { title: 'Quivo connects', desc: 'We orchestrate everything together.', tint: 'from-sky-500/12', dot: 'bg-sky-400/80' },
+                  { title: 'You pay providers', desc: 'Directly at their rate — not us.', tint: 'from-violet-500/12', dot: 'bg-violet-400/70' },
                 ].map(c => (
                   <div
                     key={c.title}
-                    className="rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] p-3 text-center shadow-none"
+                    className={`rounded-xl border border-[var(--bg-border)] bg-gradient-to-br p-4 ${c.tint} to-transparent`}
                   >
-                    <p className="text-[11px] font-bold text-[var(--text-primary)]">{c.title}</p>
-                    <p className="mt-1 text-[10px] leading-snug text-[var(--text-secondary)]">{c.desc}</p>
+                    <span className={`mb-2 inline-block h-1.5 w-1.5 rounded-full ${c.dot}`} />
+                    <p className="text-[14px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{c.title}</p>
+                    <p className="mt-1 text-[12px] leading-snug text-[var(--text-muted)]">{c.desc}</p>
                   </div>
                 ))}
               </div>
@@ -547,7 +573,7 @@ export default function SettingsPanel() {
 
             <SectionCard title="Tavily Search" subtitle="Real-time web search · Give your AI internet access">
               <ProviderKeyEditor
-                name="Tavily" icon={IconSparkles} iconColor="bg-[#06b6d4]/10 text-[#06b6d4]"
+                name="Tavily" icon={IconSparkles} iconColor="text-[var(--text-secondary)]"
                 keyPrefix="tvly-" placeholder="tvly-..."
                 docUrl="https://app.tavily.com"
                 howToGet={`1. Go to app.tavily.com and create a free account\n2. Go to API Keys in your dashboard\n3. Your key starts with tvly-\n4. Free plan: 1,000 searches/month\n5. Paste it above and click Save\n\nOnce added, your AI agents can search the web in real-time.`}
@@ -601,14 +627,14 @@ export default function SettingsPanel() {
                         setGoogleConnected(false);
                         setGoogleEmail(null);
                       }}
-                      className="flex items-center gap-1.5 rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/5 px-3 py-2 text-xs text-[#ef4444] hover:bg-[#ef4444]/10 transition-all">
-                      <IconX className="h-3.5 w-3.5" /> Disconnect
+                      className="quivo-btn-ghost rounded-full px-3 py-2 text-[12px]">
+                      <IconX className="h-3.5 w-3.5" stroke={1.5} /> Disconnect
                     </button>
                   ) : (
                     <button
                       onClick={() => { window.location.href = '/api/google/auth'; }}
-                      className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-900/40 hover:shadow-blue-900/60 transition-all">
-                      <IconBrandGoogle className="h-3.5 w-3.5" /> Connect Google
+                      className="flex items-center gap-1.5 rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-4 py-2 text-[12px] font-medium text-[var(--bg-canvas)] transition-opacity hover:opacity-90">
+                      <IconBrandGoogle className="h-3.5 w-3.5" stroke={1.5} /> Connect Google
                     </button>
                   )}
                   <button onClick={loadKeys} className="flex items-center gap-1 text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)]">
@@ -620,30 +646,30 @@ export default function SettingsPanel() {
               {/* Redirect URI setup guide — only shown when not connected */}
               {!googleConnected && (
                 <details className="mt-4">
-                  <summary className="cursor-pointer text-[11px] font-semibold text-[#f59e0b] hover:text-[#fbbf24]">
+                  <summary className="quivo-caption cursor-pointer hover:text-[var(--text-secondary)]">
                     Getting redirect_uri_mismatch error? Click here to fix it
                   </summary>
-                  <div className="mt-3 space-y-3 rounded-xl border border-[#f59e0b]/20 bg-[#f59e0b]/5 p-4 text-[11px] text-[var(--text-muted)]">
-                    <p className="font-semibold text-[#f59e0b]">In Google Cloud Console you must add this exact Authorized Redirect URI:</p>
-                    <code className="block select-all rounded-lg border border-[var(--bg-border)] bg-zinc-900 px-3 py-2 font-mono text-xs text-emerald-400 dark:text-[#22c55e]">
+                  <div className="mt-3 space-y-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] p-4 text-[11px] text-[var(--text-muted)]">
+                    <p className="font-medium text-[var(--text-primary)]">In Google Cloud Console you must add this exact Authorized Redirect URI:</p>
+                    <code className="block select-all rounded-lg border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-3 py-2 font-mono text-xs text-[var(--text-secondary)]">
                       {oauthRedirectBase || '(your app origin)'}/api/google/auth/callback
                     </code>
                     <ol className="space-y-1.5 list-decimal list-inside">
-                      <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-[var(--quivo-accent)] underline">console.cloud.google.com/apis/credentials</a></li>
+                      <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline hover:text-[var(--text-primary)]">console.cloud.google.com/apis/credentials</a></li>
                       <li>Click your OAuth 2.0 Client ID (Quivo Dashboard)</li>
                       <li>Under <strong className="text-[var(--text-primary)]">Authorized redirect URIs</strong>, click <strong className="text-[var(--text-primary)]">+ ADD URI</strong></li>
                       <li>
                         Paste:{' '}
-                        <code className="text-[#22c55e]">
+                        <code className="text-[var(--text-secondary)]">
                           {oauthRedirectBase || 'https://YOUR_DOMAIN'}/api/google/auth/callback
                         </code>
                       </li>
                       <li>Click <strong className="text-[var(--text-primary)]">SAVE</strong>, wait 30 seconds, then try connecting again</li>
                     </ol>
                     <p className="text-[10px] text-[var(--text-muted)] opacity-70">
-                      Production tip: set server env <code className="text-[#fcd34d]">GOOGLE_OAUTH_REDIRECT_URI</code> to the
+                      Production tip: set server env <code className="text-[var(--text-secondary)]">GOOGLE_OAUTH_REDIRECT_URI</code> to the
                       exact URI registered in Google (e.g. https://app.quivo.site/api/google/auth/callback) so token exchange
-                      matches the authorize step even if <code className="text-[#fcd34d]">NEXT_PUBLIC_APP_URL</code> differs.
+                      matches the authorize step even if <code className="text-[var(--text-secondary)]">NEXT_PUBLIC_APP_URL</code> differs.
                     </p>
                   </div>
                 </details>
@@ -656,7 +682,7 @@ export default function SettingsPanel() {
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-[var(--text-muted)]">Secret Key (sk_live_ or sk_test_)</label>
                   <ProviderKeyEditor
-                    name="Stripe Secret" icon={IconBrandStripe} iconColor="bg-[#6366f1]/10 text-[#6366f1]"
+                    name="Stripe Secret" icon={IconBrandStripe} iconColor="text-[var(--text-secondary)]"
                     keyPrefix="sk_live_ / sk_test_" placeholder="sk_live_..."
                     docUrl="https://dashboard.stripe.com/apikeys"
                     state={stripeSecret} onChange={v => setStripeSecret(p => ({ ...p, input: v }))}
@@ -669,7 +695,7 @@ export default function SettingsPanel() {
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold text-[var(--text-muted)]">Publishable Key (pk_live_ or pk_test_)</label>
                   <ProviderKeyEditor
-                    name="Stripe Publishable" icon={IconBrandStripe} iconColor="bg-[#6366f1]/10 text-[#6366f1]"
+                    name="Stripe Publishable" icon={IconBrandStripe} iconColor="text-[var(--text-secondary)]"
                     keyPrefix="pk_live_ / pk_test_" placeholder="pk_live_..."
                     docUrl="https://dashboard.stripe.com/apikeys"
                     state={stripePub} onChange={v => setStripePub(p => ({ ...p, input: v }))}
@@ -707,26 +733,26 @@ export default function SettingsPanel() {
                 <div className="flex flex-col gap-2">
                   {dropboxConnected ? (
                     <button onClick={async () => { await fetch('/api/dropbox/auth', { method: 'DELETE', credentials: 'include' }); setDropboxConnected(false); setDropboxLabel(null); }}
-                      className="flex items-center gap-1.5 rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/5 px-3 py-2 text-xs text-[#ef4444] hover:bg-[#ef4444]/10 transition-all">
-                      <IconX className="h-3.5 w-3.5" /> Disconnect
+                      className="quivo-btn-ghost rounded-full px-3 py-2 text-[12px]">
+                      <IconX className="h-3.5 w-3.5" stroke={1.5} /> Disconnect
                     </button>
                   ) : (
                     <button onClick={() => { window.location.href = '/api/dropbox/auth'; }}
-                      className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2 text-xs font-semibold text-white shadow-md hover:shadow-blue-900/40 transition-all">
-                      📦 Connect Dropbox
+                      className="flex items-center gap-1.5 rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-4 py-2 text-[12px] font-medium text-[var(--bg-canvas)] transition-opacity hover:opacity-90">
+                      Connect Dropbox
                     </button>
                   )}
                 </div>
               </div>
               {!dropboxOauthReady && !dropboxConnected && (
-                <div className="mt-3 rounded-lg border border-[#f59e0b]/20 bg-[#f59e0b]/5 px-3 py-2 text-[11px] text-[#f59e0b]">
-                  Set <code className="text-[#fcd34d]">DROPBOX_CLIENT_ID</code> and{' '}
-                  <code className="text-[#fcd34d]">DROPBOX_CLIENT_SECRET</code> in Vercel Environment Variables (or{' '}
-                  <code className="text-[#fcd34d]">.env.local</code> for dev). Create an app at{' '}
+                <div className="mt-3 rounded-lg border border-[var(--bg-border)] bg-[var(--bg-canvas)] px-3 py-2 text-[11px] text-[var(--text-muted)]">
+                  Set <code className="text-[var(--text-secondary)]">DROPBOX_CLIENT_ID</code> and{' '}
+                  <code className="text-[var(--text-secondary)]">DROPBOX_CLIENT_SECRET</code> in Vercel Environment Variables (or{' '}
+                  <code className="text-[var(--text-secondary)]">.env.local</code> for dev). Create an app at{' '}
                   <a href="https://www.dropbox.com/developers/apps" target="_blank" rel="noopener noreferrer" className="underline">
                     dropbox.com/developers
                   </a>
-                  , add redirect URI <code className="text-[#fcd34d]">{oauthRedirectBase || 'http://localhost:3000'}/api/dropbox/auth/callback</code>
+                  , add redirect URI <code className="text-[var(--text-secondary)]">{oauthRedirectBase || 'http://localhost:3000'}/api/dropbox/auth/callback</code>
                   , then redeploy.
                 </div>
               )}
@@ -740,7 +766,7 @@ export default function SettingsPanel() {
                   <p className="text-sm font-semibold text-[var(--text-primary)]">Notion OAuth 2.0</p>
                   <p className="text-xs text-[var(--text-muted)]">Connect your Notion workspace</p>
                 </div>
-                <span className="ml-auto rounded-md bg-[#f59e0b]/10 px-2 py-0.5 text-[10px] font-bold text-[#f59e0b]">Coming Soon</span>
+                <span className="ml-auto rounded-full border border-[var(--bg-border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">Coming soon</span>
               </div>
             </SectionCard>
           </div>
@@ -786,7 +812,7 @@ export default function SettingsPanel() {
                 <div>
                   <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Font size</label>
                   <select value={prefs.fontSize} onChange={e => setPrefs(p => ({ ...p, fontSize: e.target.value }))}
-                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--quivo-accent)]/50 focus:outline-none">
+                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--text-muted)] focus:outline-none">
                     <option value="small">Small</option>
                     <option value="medium">Medium (default)</option>
                     <option value="large">Large</option>
@@ -795,7 +821,7 @@ export default function SettingsPanel() {
                 <div>
                   <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Chat content width</label>
                   <select value={prefs.chatWidth} onChange={e => setPrefs(p => ({ ...p, chatWidth: e.target.value }))}
-                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--quivo-accent)]/50 focus:outline-none">
+                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--text-muted)] focus:outline-none">
                     <option value="narrow">Narrow</option>
                     <option value="standard">Standard (default)</option>
                     <option value="wide">Wide</option>
@@ -805,7 +831,7 @@ export default function SettingsPanel() {
                 <div>
                   <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Language</label>
                   <select value={prefs.language} onChange={e => setPrefs(p => ({ ...p, language: e.target.value }))}
-                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--quivo-accent)]/50 focus:outline-none">
+                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--text-muted)] focus:outline-none">
                     <option value="en">English</option>
                     <option value="es">Español</option>
                     <option value="pt">Português</option>
@@ -820,7 +846,7 @@ export default function SettingsPanel() {
                 <div>
                   <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Default AI Model</label>
                   <select value={prefs.defaultModel} onChange={e => setPrefs(p => ({ ...p, defaultModel: e.target.value }))}
-                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--quivo-accent)]/50 focus:outline-none">
+                    className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] px-4 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--text-muted)] focus:outline-none">
                     <optgroup label="Anthropic">
                       <option value="claude-opus-4">Claude Opus 4</option>
                       <option value="claude-sonnet-4-5">Claude Sonnet 4.5 ✓</option>
@@ -862,7 +888,7 @@ export default function SettingsPanel() {
             </SectionCard>
 
             <button onClick={savePrefs}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-md hover:shadow-blue-900/40 transition-all">
+              className="flex items-center gap-2 rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-6 py-3 text-[13px] font-medium text-[var(--bg-canvas)] transition-opacity hover:opacity-90">
               {prefSaved ? <><IconCheck className="h-4 w-4" /> Saved!</> : 'Save Preferences'}
             </button>
           </div>
@@ -879,9 +905,9 @@ export default function SettingsPanel() {
             <SectionCard title="Export Data" subtitle="Download your Quivo data at any time">
               <div className="flex flex-col gap-3">
                 <button onClick={exportChats}
-                  className="flex items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] p-4 text-left hover:border-[#3b82f6]/40 hover:bg-[var(--bg-hover)] transition-all">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#3b82f6]/10">
-                    <IconDownload className="h-4 w-4 text-[#3b82f6]" />
+                  className="flex w-full items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] p-4 text-left transition-colors hover:bg-[var(--bg-hover)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--bg-border)] bg-[var(--bg-elevated)]">
+                    <IconDownload className="h-4 w-4 text-[var(--text-secondary)]" stroke={1.5} />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">Export Notes & Chat History</p>
@@ -889,9 +915,9 @@ export default function SettingsPanel() {
                   </div>
                 </button>
 
-                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] p-4 text-left hover:border-[#3b82f6]/40 hover:bg-[var(--bg-hover)] transition-all">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#22c55e]/10">
-                    <IconUpload className="h-4 w-4 text-[#22c55e]" />
+                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] p-4 text-left transition-colors hover:bg-[var(--bg-hover)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--bg-border)] bg-[var(--bg-elevated)]">
+                    <IconUpload className="h-4 w-4 text-[var(--text-secondary)]" stroke={1.5} />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">Import Data</p>
@@ -910,7 +936,7 @@ export default function SettingsPanel() {
                     <span className="text-[var(--text-primary)]">~2 MB</span>
                   </div>
                   <div className="h-2 rounded-full bg-[var(--bg-border)]">
-                    <div className="h-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-600" style={{ width: '15%' }} />
+                    <div className="h-2 rounded-full bg-[var(--text-muted)]" style={{ width: '15%' }} />
                   </div>
                 </div>
                 <div>
@@ -919,7 +945,7 @@ export default function SettingsPanel() {
                     <span className="text-[var(--text-primary)]">~0.5 MB</span>
                   </div>
                   <div className="h-2 rounded-full bg-[var(--bg-border)]">
-                    <div className="h-2 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600" style={{ width: '5%' }} />
+                    <div className="h-2 rounded-full bg-[var(--text-muted)]" style={{ width: '5%' }} />
                   </div>
                 </div>
               </div>
@@ -931,10 +957,10 @@ export default function SettingsPanel() {
                   type="button"
                   disabled={accountBusy !== null}
                   onClick={() => void clearAllChatHistory()}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#ef4444]/20 bg-[#ef4444]/5 p-4 text-left hover:bg-[#ef4444]/10 transition-all disabled:opacity-50">
-                  <IconTrash className="h-4 w-4 text-[#ef4444]" />
+                  className="flex w-full items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] p-4 text-left transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-50">
+                  <IconTrash className="h-4 w-4 text-[var(--text-muted)]" stroke={1.5} />
                   <div>
-                    <p className="text-sm font-semibold text-[#ef4444]">Clear All Chat History</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">Clear All Chat History</p>
                     <p className="text-xs text-[var(--text-muted)]">Permanently delete all conversations on this device</p>
                   </div>
                 </button>
@@ -942,10 +968,10 @@ export default function SettingsPanel() {
                   type="button"
                   disabled={accountBusy !== null}
                   onClick={() => void deleteAccount()}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/5 p-4 text-left hover:bg-[#ef4444]/10 transition-all disabled:opacity-50">
-                  <IconX className="h-4 w-4 text-[#ef4444]" />
+                  className="flex w-full items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] p-4 text-left transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-50">
+                  <IconX className="h-4 w-4 text-[var(--text-muted)]" stroke={1.5} />
                   <div>
-                    <p className="text-sm font-semibold text-[#ef4444]">Delete Account</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">Delete Account</p>
                     <p className="text-xs text-[var(--text-muted)]">Remove all data and close your account permanently</p>
                   </div>
                 </button>

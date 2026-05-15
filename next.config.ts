@@ -6,7 +6,7 @@ function contentSecurityPolicy(): string {
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     "img-src 'self' data: https: blob:",
@@ -32,7 +32,8 @@ function contentSecurityPolicy(): string {
       'https://query1.finance.yahoo.com',
       'https://vitals.vercel-insights.com',
     ].join(' '),
-    "frame-src 'self' https://*.clerk.com https://challenges.cloudflare.com https://accounts.google.com",
+    "frame-src 'self' https://*.clerk.com https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com https://accounts.google.com",
+    "worker-src 'self' blob:",
     "form-action 'self' https://checkout.stripe.com",
   ];
   if (process.env.NODE_ENV === 'production') {
@@ -65,7 +66,9 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       { protocol: 'https', hostname: 'img.clerk.com' },
+      { protocol: 'https', hostname: 'images.clerk.dev' },
       { protocol: 'https', hostname: '*.clerk.com' },
+      { protocol: 'https', hostname: '*.clerk.dev' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: 'api.dicebear.com' },

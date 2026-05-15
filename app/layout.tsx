@@ -23,7 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/dashboard?view=overview"
+      signUpFallbackRedirectUrl="/dashboard?view=overview"
+      afterSignOutUrl="/sign-in"
+    >
       <html lang="en" data-theme="dark" className={`${inter.variable} h-full antialiased`}>
         <body className={`${inter.className} min-h-full flex flex-col bg-[var(--bg-canvas)] text-[var(--text-primary)] transition-colors`}>
           <ThemeProvider>

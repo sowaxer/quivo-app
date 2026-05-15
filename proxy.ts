@@ -68,11 +68,14 @@ function skipGlobalDdos(pathname: string): boolean {
   return false;
 }
 
-function isAuthSurface(pathname: string): boolean {
-  if (pathname.startsWith('/api/auth')) return true;
-  if (pathname.startsWith('/sign-in')) return true;
-  if (pathname.startsWith('/sign-up')) return true;
-  return false;
+/** Clerk session traffic — do not apply sign-in page rate limits here. */
+function isClerkProxyPath(pathname: string): boolean {
+  return pathname === '/__clerk' || pathname.startsWith('/__clerk/');
+}
+
+/** Brute-force guard for Clerk backend routes only (not /sign-in UI). */
+function isAuthApiSurface(pathname: string): boolean {
+  return pathname.startsWith('/api/auth');
 }
 
 function retryAfterSeconds(resetMs: number): string {
@@ -138,8 +141,8 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
     }
   }
 
-  // ── 2) Auth surfaces: /api/auth/*, sign-in, sign-up — 5/min; burst → 15m block + log ──
-  if (isAuthSurface(pathname) && redis) {
+  // ── 2) Clerk API brute-force guard (5/min) — never throttle /sign-in or /__clerk proxy ──
+  if (isAuthApiSurface(pathname) && !isClerkProxyPath(pathname) && redis) {
     const blocked = await redis.get(`auth-ip-block:${ip}`);
     if (blocked) {
       return new NextResponse('Too Many Requests', {
