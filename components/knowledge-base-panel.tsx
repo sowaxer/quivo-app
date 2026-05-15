@@ -497,7 +497,7 @@ export default function KnowledgeBasePanel({ onChatWithKb }: { onChatWithKb?: ()
         <button
           type="button"
           onClick={() => setShowAddModal(true)}
-          className="flex shrink-0 items-center gap-2 rounded-full bg-[var(--text-primary)] px-4 py-2 text-xs font-semibold text-[var(--bg-base)] transition hover:opacity-90"
+          className="quivo-btn-primary flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold"
         >
           + Add Data Source
         </button>
@@ -558,8 +558,11 @@ export default function KnowledgeBasePanel({ onChatWithKb }: { onChatWithKb?: ()
           </div>
           <h3 className="mb-1.5 text-sm font-bold text-[#e6edf3]">Upload or connect your data</h3>
           <p className="mb-1 text-xs text-[#8b949e] max-w-xs">AI agents can look up documents from your knowledge base when they need more information to answer questions.</p>
-          <button onClick={() => setShowAddModal(true)}
-            className="mt-4 flex items-center gap-2 rounded-xl bg-[var(--text-primary)] px-5 py-2.5 text-xs font-semibold text-[var(--bg-base)] shadow-md transition-all hover:opacity-90">
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="quivo-btn-primary mt-6 flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-semibold"
+          >
             + Add Data Source
           </button>
         </div>

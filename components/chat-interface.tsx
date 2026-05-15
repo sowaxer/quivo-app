@@ -155,7 +155,7 @@ function ApiKeyBanner({ onSettings }: { onSettings: () => void }) {
       <button
         type="button"
         onClick={onSettings}
-        className="flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-emerald-400 px-4 py-2 text-xs font-semibold text-zinc-950 shadow-[0_8px_28px_-6px_rgba(167,139,250,0.55)] transition-all hover:brightness-110 active:scale-[0.98]"
+        className="flex shrink-0 items-center justify-center gap-1.5 quivo-btn-primary rounded-full px-4 py-2 text-xs font-semibold transition-all active:scale-[0.98]"
       >
         Add key <IconArrowRight className="h-3.5 w-3.5" stroke={2} />
       </button>
@@ -462,7 +462,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                   onClick={() => connected && setSelectedModel(m.value)}
                   className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                     selectedModel === m.value
-                      ? 'bg-gradient-to-r from-sky-500/25 via-violet-500/25 to-fuchsia-500/20 text-[var(--text-primary)] shadow-[0_0_20px_-8px_rgba(139,92,246,0.25)] ring-1 ring-[var(--bg-border)]'
+                      ? 'bg-[var(--bg-hover)] text-[var(--text-primary)] ring-1 ring-[var(--bg-border)]'
                       : connected
                         ? 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         : 'cursor-not-allowed text-[var(--text-muted)] opacity-50'
@@ -482,7 +482,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                           m.kind === 'claude'
                             ? 'bg-orange-400'
                             : m.kind === 'gemini'
-                              ? 'bg-sky-400'
+                              ? 'bg-[var(--text-muted)]'
                               : 'bg-blue-500'
                         }`}
                       />
@@ -496,9 +496,9 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
 
           {/* Agent badge */}
           {selectedAgent && (
-            <div className="flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 dark:border-[#3b82f6]/25 dark:bg-[#3b82f6]/10">
+            <div className="flex items-center gap-1.5 rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-3 py-1.5">
               <span className="text-sm">{selectedAgent.avatar}</span>
-              <span className="text-xs font-medium text-sky-800 dark:text-[#93c5fd]">{selectedAgent.name}</span>
+              <span className="text-xs font-medium text-[var(--text-secondary)]">{selectedAgent.name}</span>
               <button onClick={() => setSelectedAgent(null)} className="ml-1 text-[var(--text-muted)] hover:text-[#ef4444]">
                 <IconX className="h-3 w-3" />
               </button>
@@ -543,7 +543,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                     <span className="text-4xl leading-none">{selectedAgent.avatar}</span>
                   ) : (
                     <div
-                      className="h-1 w-16 rounded-full bg-gradient-to-r from-sky-400/80 via-violet-400/80 to-emerald-400/80 opacity-90 shadow-[0_0_24px_rgba(139,92,246,0.35)]"
+                      className="h-1 w-16 rounded-full bg-[var(--text-muted)] opacity-90"
                       aria-hidden
                     />
                   )}
@@ -587,7 +587,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                             const labels: Record<string, string> = { query_stripe:'Stripe', query_gmail:'Gmail', query_calendar:'Calendar', web_search:'Web', query_notes:'Notes' };
                             const icons: Record<string, string> = { query_stripe:'💳', query_gmail:'📧', query_calendar:'📅', web_search:'🔍', query_notes:'📝' };
                             return (
-                              <span key={i} className={`flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${tc.status === 'done' ? 'border-emerald-600/30 bg-emerald-500/10 text-emerald-800 dark:border-[#166534]/50 dark:bg-[#14532d]/35 dark:text-[#86efac]' : 'border-sky-500/30 bg-sky-500/10 text-sky-800 dark:border-[#3b82f6]/30 dark:bg-[#1e3a5f]/40 dark:text-[#93c5fd]'}`}>
+                              <span key={i} className="flex items-center gap-1 rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-2.5 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">
                                 {icons[tc.name] ?? '🔧'} {labels[tc.name] ?? tc.name}
                                 {tc.status === 'running' ? <span className="h-2 w-2 animate-spin rounded-full border border-current border-t-transparent" /> : ' ✓'}
                               </span>
@@ -651,7 +651,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
         {/* ── Input area (Claude-style pill composer) ───────────────────── */}
         <div className="shrink-0 border-t border-[var(--bg-border)] bg-[var(--bg-base)] px-4 pb-5 pt-3">
           <div className="mx-auto max-w-[720px]">
-            <div className="relative rounded-[26px] border border-[var(--bg-border)] bg-[var(--bg-card)] text-[var(--text-primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors focus-within:border-violet-500/30 focus-within:shadow-[0_0_0_1px_rgba(139,92,246,0.15),inset_0_1px_0_rgba(255,255,255,0.06)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="relative rounded-[26px] border border-[var(--bg-border)] bg-[var(--bg-card)] text-[var(--text-primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors focus-within:border-[var(--text-muted)]/40 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <textarea ref={textareaRef} value={input}
                 onChange={e => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'; }}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
@@ -741,7 +741,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                   </button>
                 ) : (
                   <button type="button" onClick={() => void sendMessage()} disabled={!input.trim()}
-                    className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 via-violet-400 to-fuchsia-400 text-zinc-950 shadow-[0_6px_20px_-4px_rgba(167,139,250,0.55)] transition-all hover:brightness-110 disabled:opacity-25 disabled:hover:brightness-100">
+                    className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center quivo-btn-primary transition-all disabled:opacity-25 disabled:hover:brightness-100">
                     <IconSend className="h-4 w-4" />
                   </button>
                 )}
@@ -760,7 +760,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                       type="button"
                       disabled={isStreaming}
                       onClick={() => void sendMessage(s.prompt)}
-                      className="inline-flex items-center gap-2 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3.5 py-2 text-[13px] font-normal text-[var(--text-secondary)] transition-all hover:border-violet-400/35 hover:bg-gradient-to-r hover:from-sky-500/10 hover:via-violet-500/10 hover:to-emerald-500/10 disabled:opacity-40"
+                      className="inline-flex items-center gap-2 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3.5 py-2 text-[13px] font-normal text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)] disabled:opacity-40"
                     >
                       <Icon className="h-4 w-4 shrink-0 text-[var(--text-muted)]" stroke={1.5} />
                       {s.label}

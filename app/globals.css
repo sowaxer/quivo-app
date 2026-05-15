@@ -8,18 +8,19 @@
 
 /* ── Quivo Theme Variables — dark: single Claude-style canvas (no layered blacks) ─ */
 :root, [data-theme="dark"] {
-  --bg-base:        #1c1c1e;
-  --bg-surface:     #1c1c1e;
-  --bg-elevated:    #222224;
-  --bg-card:        #252528;
-  --bg-border:      #3a3a40;
-  --bg-hover:       #2a2a2e;
+  /* Claude-style dark canvas */
+  --bg-base:        #212121;
+  --bg-surface:     #212121;
+  --bg-elevated:    #2f2f2f;
+  --bg-card:        #303030;
+  --bg-border:      #3d3d3d;
+  --bg-hover:       #383838;
   --quivo-gradient: linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(251, 146, 60, 0.75) 100%);
-  --text-primary:   #f5f5f7;
-  --text-secondary: #a1a1a6;
-  --text-muted:     #8e8e93;
+  --text-primary:   #ececec;
+  --text-secondary: #b4b4b4;
+  --text-muted:     #8e8e8e;
   --accent:         var(--quivo-accent);
-  --accent-hover:   #7dd3fc;
+  --accent-hover:   color-mix(in srgb, var(--quivo-accent) 80%, white);
   --success:        #9ecf9e;
   --warning:        #e8c995;
   --danger:         #e8a8a8;
@@ -352,6 +353,24 @@
 .quivo-btn-gradient:active,
 .quivo-btn-primary:active {
   transform: scale(0.98);
+}
+
+.quivo-btn-green-glass {
+  color: #ecfdf5;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.85) 0%, rgba(16, 185, 129, 0.55) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, #34d399 45%, transparent);
+  box-shadow:
+    0 4px 24px color-mix(in srgb, #10b981 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.quivo-btn-green-glass:hover {
+  box-shadow:
+    0 6px 28px color-mix(in srgb, #34d399 38%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .quivo-btn-ghost {
