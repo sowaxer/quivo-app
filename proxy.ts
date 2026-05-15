@@ -178,7 +178,7 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
   }
 
   if (userId && (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up'))) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/dashboard?view=overview', request.url));
   }
 
   return NextResponse.next();

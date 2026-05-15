@@ -40,9 +40,9 @@ type View = 'overview' | 'chat' | 'agents' | 'kb' | 'planner' | 'notes' | 'tasks
 const HOME_VIEW: View = 'overview';
 
 const navStartHere = [
-  { id: 'chat'     as View, label: 'Chat',          icon: IconMessageCircle },
-  { id: 'overview' as View, label: 'Home',           icon: IconLayoutDashboard },
-  { id: 'apikeys'  as View, label: 'API keys',      icon: IconKey },
+  { id: 'overview' as View, label: 'Home',          icon: IconLayoutDashboard },
+  { id: 'chat'     as View, label: 'Chat',         icon: IconMessageCircle },
+  { id: 'apikeys'  as View, label: 'API keys',     icon: IconKey },
 ];
 
 const agentNavHref = '/agent';
