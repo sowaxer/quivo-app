@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-export type HomeTopic = 'finance' | 'market' | 'politics';
+export type HomeTopic = 'dashboard' | 'finance' | 'news';
 
 type Quote = { symbol: string; shortName: string; price: number; changePct: number };
 
 const TOPICS: { id: HomeTopic; label: string }[] = [
+  { id: 'dashboard', label: 'Dashboard' },
   { id: 'finance', label: 'Finance' },
-  { id: 'market', label: 'Market' },
-  { id: 'politics', label: 'Politics' },
+  { id: 'news', label: 'News' },
 ];
 
 type Props = {
@@ -81,8 +81,4 @@ export default function HomeFocusBar({ active, onChange }: Props) {
       )}
     </div>
   );
-}
-
-function motion({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={className}>{children}</div>;
 }
