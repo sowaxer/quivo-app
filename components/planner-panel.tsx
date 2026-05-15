@@ -335,7 +335,7 @@ export default function PlannerPanel() {
               <button type="button" onClick={() => setEditing(null)} className="quivo-btn-ghost rounded-full px-4 py-2 text-[13px]">
                 Cancel
               </button>
-              <button type="button" onClick={saveEdit} className="bg-[var(--bg-hover)] text-[var(--text-primary)] ring-1 ring-[var(--bg-border)] rounded-full px-4 py-2 text-[13px]">
+              <button type="button" onClick={saveEdit} className="rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-4 py-2 text-[13px] font-medium text-[var(--bg-canvas)]">
                 Save
               </button>
             </div>
