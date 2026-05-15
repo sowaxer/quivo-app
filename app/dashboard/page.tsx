@@ -312,6 +312,7 @@ function DashboardInner() {
         <div className="p-3 pt-0">
           <button
             type="button"
+            onClick={() => setActiveView('settings')}
             className="flex w-full items-center gap-3 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2.5 text-left shadow-[0_1px_2px_rgba(28,25,23,0.05)] transition hover:bg-[var(--bg-hover)]"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-base)]">

@@ -1,5 +1,7 @@
 'use client';
 
+import { mirrorVaultFieldToAgentStorage } from '@/lib/agent-keys-sync';
+
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { IconEye, IconEyeOff, IconCheck, IconX, IconLoader2, IconExternalLink, IconChevronDown, IconChevronUp, IconTrash, IconRefresh, IconRobot, IconTool, IconLink, IconLock } from '@tabler/icons-react';
 import { ProviderBrandMark } from '@/components/provider-brand-icons';
@@ -509,6 +511,7 @@ export default function ApiKeysPanel() {
         setOne(prov.id, { saving: false, saveError: errMsg });
         return;
       }
+      mirrorVaultFieldToAgentStorage(prov.field, val);
       if (data?.has && data.previews) {
         setOne('anthropic', { has: !!data.has.anthropic, masked: data.previews.anthropic ?? null, saveError: null });
         setOne('google_ai', { has: !!data.has.google_ai, masked: data.previews.google_ai ?? null, saveError: null });

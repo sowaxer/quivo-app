@@ -21,7 +21,9 @@ function fmtTime(d: Date) {
   return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function AgentChat() {
+type Props = { fullWidth?: boolean };
+
+export default function AgentChat({ fullWidth = false }: Props) {
   const { messages, isLoading, sendMessage, clearChat } = useAgent();
   const [input, setInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -58,7 +60,9 @@ export default function AgentChat() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-3xl mx-auto">
+    <div
+      className={`flex h-full w-full flex-col ${fullWidth ? 'max-w-none' : 'mx-auto max-w-3xl'}`}
+    >
 
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--bg-border)]">
@@ -95,8 +99,9 @@ export default function AgentChat() {
             <div className="text-5xl">✦</div>
             <div>
               <p className="font-bold text-xl">Quivo Agent</p>
-              <p className="text-sm text-[var(--text-muted)] mt-1">
-                Tu asistente de contabilidad con IA. Conecta tus herramientas y empieza.
+              <p className="text-sm text-[var(--text-muted)] mt-1 max-w-md">
+                Quivo es un caparazón: tú pones tus API keys. Nosotros conectamos Claude, Stripe y
+                Google con tu cuenta.
               </p>
             </div>
 

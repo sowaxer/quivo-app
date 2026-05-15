@@ -27,18 +27,12 @@ const serverEnvSchema = z.object({
     z.string().min(20, 'NEXT_PUBLIC_SUPABASE_ANON_KEY looks invalid').optional(),
   ),
 
-  // AI providers (optional at deploy — users supply keys in vault)
-  ANTHROPIC_API_KEY: z.string().optional(),
-  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
-
   /** Optional: dedicated secret for OAuth `state` signing (defaults to CLERK_SECRET_KEY). */
   OAUTH_STATE_SECRET: z.string().min(16).optional(),
 
-  // Stripe (optional — users connect own account)
+  /** Optional: platform Stripe webhooks only (not used for user billing views). */
   STRIPE_SECRET_KEY: z.string().optional(),
-
-  // Tavily (optional — users add key in settings)
-  TAVILY_API_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
   /**
    * 32-byte AES key as 64 hex chars. Prefer **ENCRYPTION_KEY**, then ENCRYPTION_SECRET.
@@ -142,6 +136,4 @@ export const clientEnv = {
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
   NEXT_PUBLIC_SUPABASE_ANON_KEY:
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '',
 };

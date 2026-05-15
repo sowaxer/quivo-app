@@ -1,6 +1,6 @@
 /**
  * POST /api/agent
- * Keys via headers (user localStorage) + optional Quivo vault / Google OAuth when signed in.
+ * User keys via headers (localStorage). Google via user's OAuth in Quivo. No platform AI keys.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,7 +9,6 @@ import type Anthropic from '@anthropic-ai/sdk';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { createAnthropicClient } from '@/lib/ai-clients';
 import { loadTokens } from '@/lib/google';
-import { getDecryptedSecret } from '@/lib/user-secret-store';
 import {
   AGENT_SYSTEM_PROMPT,
   AGENT_TOOLS,
@@ -56,17 +55,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const headerStripe = req.headers.get('x-stripe-key')?.trim();
-    const headerQb = req.headers.get('x-quickbooks-token')?.trim();
-
-    const [vaultStripe, googleCreds] = await Promise.all([
-      headerStripe ? Promise.resolve(headerStripe) : getDecryptedSecret(userId, 'stripe_secret'),
-      loadTokens(userId),
-    ]);
-
-    const stripeKey = headerStripe || vaultStripe || null;
+    const stripeKey = req.headers.get('x-stripe-key')?.trim() || null;
+    const quickbooksToken = req.headers.get('x-quickbooks-token')?.trim() || null;
+    const googleCreds = await loadTokens(userId);
     const googleConnected = Boolean(googleCreds?.refresh_token);
-    const quickbooksToken = headerQb || null;
 
     const formData = await req.formData();
     const messagesRaw = formData.get('messages') as string | null;
@@ -139,11 +131,14 @@ export async function POST(req: NextRequest) {
     });
 
     const serviceLines = [
-      '✓ Claude (tu API key)',
-      stripeKey ? '✓ Stripe' : '✗ Stripe — agrega x-stripe-key o conecta en Settings',
-      googleConnected ? '✓ Gmail + Calendar (Quivo Google OAuth)' : '✗ Google — conecta en Settings',
+      '✓ Claude (tu API key en este navegador)',
+      stripeKey ? '✓ Stripe (tu key en modal)' : '✗ Stripe — pégala en API Keys del Agent',
+      googleConnected
+        ? '✓ Gmail + Calendar (conectaste Google en Settings)'
+        : '✗ Google — Connect Google en Settings',
       quickbooksToken ? '✓ QuickBooks (token en modal)' : '✗ QuickBooks — token opcional en modal',
-      '✓ Notas / memoria (tu cuenta Quivo)',
+      '✓ Notas (tu cuenta Quivo)',
+      'Quivo es un caparazón: no usamos keys de IA de la plataforma.',
       'TaxDome: sin API — guía manual cuando aplique',
     ].join('\n');
 

@@ -11,6 +11,7 @@ import {
 } from '@tabler/icons-react';
 import { useTheme } from '@/components/theme-provider';
 import { GeminiMarkIcon, OpenAIMarkIcon, AnthropicMarkIcon, LogoDeepseek } from '@/components/provider-brand-icons';
+import { mirrorVaultFieldToAgentStorage } from '@/lib/agent-keys-sync';
 
 // ─── Inline theme toggle for settings ────────────────────────────────────────
 function ThemeToggleInline() {
@@ -327,6 +328,7 @@ export default function SettingsPanel() {
       setter(p => ({ ...p, saving: false, testResult: { success: false, message: msg } }));
       return;
     }
+    mirrorVaultFieldToAgentStorage(field, input.trim());
     await loadKeys();
     setter(p => ({ ...p, saving: false, input: '' }));
   }
@@ -511,7 +513,7 @@ export default function SettingsPanel() {
                 state={tavily} onChange={v => setTavily(p => ({ ...p, input: v }))}
                 onSave={() => saveKey('tavily_key', tavily.input, setTavily)}
                 onRemove={() => removeKey('tavily_key', setTavily)}
-                onTest={() => {}}
+                onTest={() => testKey('tavily', setTavily)}
                 onToggleShow={() => setTavily(p => ({ ...p, show: !p.show }))}
               />
             </SectionCard>
@@ -632,7 +634,7 @@ export default function SettingsPanel() {
                     state={stripePub} onChange={v => setStripePub(p => ({ ...p, input: v }))}
                     onSave={() => saveKey('stripe_pub', stripePub.input, setStripePub)}
                     onRemove={() => removeKey('stripe_pub', setStripePub)}
-                    onTest={() => {}}
+                    onTest={() => testKey('stripe_pub', setStripePub)}
                     onToggleShow={() => setStripePub(p => ({ ...p, show: !p.show }))}
                   />
                 </div>
