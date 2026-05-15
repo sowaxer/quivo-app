@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { getUserDisplayName } from '@/lib/user-display';
+import { UserAvatar } from '@/components/user-avatar';
 import {
   IconRobot, IconPlug, IconSettings, IconDatabase,
   IconCheck, IconX, IconLoader2, IconEye, IconEyeOff,
@@ -401,8 +403,9 @@ export default function SettingsPanel() {
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-3 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2">
+            <UserAvatar size={32} />
             <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-[var(--text-primary)]">{user?.firstName ?? 'User'}</p>
+              <p className="truncate text-xs font-semibold text-[var(--text-primary)]">{getUserDisplayName(user)}</p>
               <p className="truncate text-[10px] text-[var(--text-muted)]">{user?.primaryEmailAddress?.emailAddress}</p>
             </div>
             <div className="flex items-center gap-1.5 rounded-full border border-[var(--bg-border)] px-2 py-0.5">

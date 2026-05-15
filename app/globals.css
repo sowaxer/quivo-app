@@ -7,12 +7,13 @@
 
 /* ── Quivo Theme Variables — dark: single Claude-style canvas (no layered blacks) ─ */
 :root, [data-theme="dark"] {
-  --bg-base:        #262626;
-  --bg-surface:     #262626;
-  --bg-elevated:    #262626;
-  --bg-card:        #262626;
-  --bg-border:      #3f3f46;
-  --bg-hover:       #323232;
+  --bg-base:        #1c1c1e;
+  --bg-surface:     #1c1c1e;
+  --bg-elevated:    #222224;
+  --bg-card:        #252528;
+  --bg-border:      #3a3a40;
+  --bg-hover:       #2a2a2e;
+  --quivo-gradient: linear-gradient(135deg, #2dd4bf 0%, #22d3ee 40%, #a78bfa 100%);
   --text-primary:   #f5f5f7;
   --text-secondary: #a1a1a6;
   --text-muted:     #8e8e93;
@@ -325,4 +326,30 @@
   background:
     radial-gradient(ellipse 140% 100% at 0% 0%, rgba(120, 115, 200, 0.12), transparent 52%),
     radial-gradient(ellipse 120% 100% at 100% 100%, rgba(200, 140, 100, 0.08), transparent 48%);
+}
+
+.quivo-btn-gradient {
+  color: #0a0a0c;
+  font-weight: 600;
+  background: var(--quivo-gradient);
+  box-shadow: 0 2px 16px color-mix(in srgb, #22d3ee 35%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.quivo-btn-gradient:hover {
+  opacity: 0.95;
+  box-shadow: 0 4px 22px color-mix(in srgb, #a78bfa 30%, transparent);
+}
+.quivo-btn-gradient:active {
+  transform: scale(0.98);
+}
+
+.quivo-btn-ghost {
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--bg-border);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.quivo-btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
