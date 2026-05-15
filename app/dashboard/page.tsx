@@ -6,7 +6,6 @@ import ChatInterface from '@/components/chat-interface';
 import OnboardingModal from '@/components/onboarding-modal';
 import GmailMonitor from '@/components/gmail-monitor';
 import StripePanel from '@/components/stripe-panel';
-import DailyBriefing from '@/components/daily-briefing';
 import CalendarView from '@/components/calendar-view';
 import PluginsPanel from '@/components/plugins-panel';
 import ModelsPanel from '@/components/models-panel';
@@ -20,9 +19,9 @@ import AppearanceSettings from '@/components/appearance-settings';
 import DocsPanel from '@/components/docs-panel';
 import ApiKeysPanel from '@/components/api-keys-panel';
 import PerplexityFocusBar from '@/components/perplexity-focus-bar';
+import { ViewChrome } from '@/components/view-chrome';
 import PlannerPanel from '@/components/planner-panel';
 import AttioOverview from '@/components/attio-overview';
-import { NotificationsDropdown } from '@/components/notifications-dropdown';
 import { SidebarUserMenu } from '@/components/sidebar-user-menu';
 import { usePlannerReminders } from '@/hooks/use-planner-reminders';
 import { loadPlannerItems } from '@/lib/planner-storage';
@@ -39,9 +38,11 @@ import {
 
 type View = 'overview' | 'chat' | 'agents' | 'kb' | 'planner' | 'notes' | 'tasks' | 'gmail' | 'stripe' | 'calendar' | 'plugins' | 'models' | 'prompts' | 'analytics' | 'drive' | 'settings' | 'appearance' | 'docs' | 'apikeys';
 
+const HOME_VIEW: View = 'chat';
+
 const navStartHere = [
-  { id: 'overview' as View, label: 'Home',           icon: IconLayoutDashboard },
   { id: 'chat'     as View, label: 'Chat',          icon: IconMessageCircle },
+  { id: 'overview' as View, label: 'Home',           icon: IconLayoutDashboard },
   { id: 'apikeys'  as View, label: 'API keys',      icon: IconKey },
 ];
 
@@ -90,8 +91,8 @@ const viewTitles: Record<View, { title: string; subtitle: string }> = {
 function DashboardInner() {
   usePlannerReminders();
   const searchParams = useSearchParams();
-  const [activeView, setActiveView] = useState<View>('overview');
-  const [showBriefing, setShowBriefing] = useState(true);
+  const [activeView, setActiveView] = useState<View>(HOME_VIEW);
+  const [navHistory, setNavHistory] = useState<View[]>([HOME_VIEW]);
   const [googleToast, setGoogleToast] = useState<'connected' | 'error' | null>(null);
   const [dropboxToast, setDropboxToast] = useState<'connected' | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -142,10 +143,10 @@ function DashboardInner() {
     const v = searchParams.get('view') as View | null;
     if (!v) return;
     if (v === 'tasks' || v === 'notes') {
-      setActiveView('planner');
+      goToView('planner');
       return;
     }
-    if (viewTitles[v]) setActiveView(v);
+    if (viewTitles[v]) goToView(v);
   }, [searchParams]);
 
   // Handle OAuth redirect params
@@ -168,6 +169,27 @@ function DashboardInner() {
   });
 
   const { title, subtitle } = viewTitles[activeView];
+  const isHome = activeView === HOME_VIEW;
+
+  function goToView(view: View) {
+    setActiveView(view);
+    setNavHistory(prev => {
+      if (prev[prev.length - 1] === view) return prev;
+      return [...prev, view];
+    });
+  }
+
+  function goBack() {
+    setNavHistory(prev => {
+      if (prev.length <= 1) {
+        setActiveView(HOME_VIEW);
+        return [HOME_VIEW];
+      }
+      const next = prev.slice(0, -1);
+      setActiveView(next[next.length - 1] ?? HOME_VIEW);
+      return next;
+    });
+  }
 
   function NavSection({ label, children }: { label: string; children: ReactNode }) {
     return (
@@ -185,7 +207,7 @@ function DashboardInner() {
     return (
       <button
         type="button"
-        onClick={() => setActiveView(item.id)}
+        onClick={() => goToView(item.id)}
         style={
           active
             ? {
@@ -193,9 +215,9 @@ function DashboardInner() {
               }
             : undefined
         }
-        className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
+        className={`group flex w-full items-center gap-3 rounded-full px-3 py-2 text-[13px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
           active
-            ? 'bg-[var(--bg-hover)] text-[var(--text-primary)]'
+            ? 'bg-[color-mix(in_srgb,var(--quivo-accent)_14%,transparent)] text-[var(--text-primary)]'
             : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
         }`}
       >
@@ -216,7 +238,6 @@ function DashboardInner() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-base)]">
-      {showBriefing && <DailyBriefing onClose={() => setShowBriefing(false)} />}
       {showOnboarding && <OnboardingModal onClose={closeOnboarding} />}
       <BankStatementSidePanel open={statementPanelOpen} onClose={() => setStatementPanelOpen(false)} />
 
@@ -284,7 +305,7 @@ function DashboardInner() {
         <div className="flex shrink-0 items-center justify-between border-t border-[var(--bg-border)] px-2 py-2">
           <button
             type="button"
-            onClick={() => setActiveView('docs')}
+            onClick={() => goToView('docs')}
             className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
             aria-label="Help and guides"
           >
@@ -296,7 +317,7 @@ function DashboardInner() {
         <div className="p-3 pt-0">
           <button
             type="button"
-            onClick={() => setActiveView('settings')}
+            onClick={() => goToView('settings')}
             className="flex w-full items-center gap-3 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2.5 text-left shadow-[0_1px_2px_rgba(28,25,23,0.05)] transition hover:bg-[var(--bg-hover)]"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-base)]">
@@ -312,36 +333,20 @@ function DashboardInner() {
 
       {/* ── MAIN AREA ─────────────────────────────────────────────────────── */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <PerplexityFocusBar />
+        {isHome && <PerplexityFocusBar />}
 
-        {/* Top bar — hidden for views that have their own header */}
-        <header className={`flex h-14 shrink-0 items-center justify-between border-b border-[var(--bg-border)] bg-[var(--bg-elevated)] px-6 ${['chat','agents','appearance','docs','apikeys','overview','planner','tasks','notes','kb'].includes(activeView) ? 'hidden' : ''}`}>
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{title}</h1>
-              <p className="text-[13px] text-[var(--text-secondary)]">{subtitle}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
-            >
-              <IconSearch className="h-4 w-4" stroke={1.75} />
-            </button>
-            <NotificationsDropdown />
-          </div>
-        </header>
+        {!isHome && (
+          <ViewChrome title={title} subtitle={subtitle} showBack onBack={goBack} showSearch={false} />
+        )}
 
         {/* Content */}
         <main className="flex-1 overflow-hidden bg-[var(--bg-base)]">
-          {activeView === 'overview'  && <div className="h-full overflow-hidden"><AttioOverview onNavigate={(v) => setActiveView(v as View)} /></div>}
+          {activeView === 'overview'  && <div className="h-full overflow-hidden"><AttioOverview onNavigate={(v) => goToView(v as View)} /></div>}
           {activeView === 'chat'      && (
             <ChatInterface
-              onGoToSettings={() => setActiveView('settings')}
-              onGoToAgents={() => setActiveView('agents')}
-              onGoToKB={() => setActiveView('kb')}
+              onGoToSettings={() => goToView('settings')}
+              onGoToAgents={() => goToView('agents')}
+              onGoToKB={() => goToView('kb')}
             />
           )}
           {activeView === 'agents'    && (
@@ -349,14 +354,14 @@ function DashboardInner() {
               <AgentsPanel
                 onChatWithAgent={(agentId) => {
                   localStorage.setItem('quivo_pending_agent', agentId);
-                  setActiveView('chat');
+                  goToView('chat');
                 }}
               />
             </div>
           )}
           {activeView === 'kb'        && (
             <div className="h-full overflow-y-auto">
-              <KnowledgeBasePanel onChatWithKb={() => setActiveView('chat')} />
+              <KnowledgeBasePanel onChatWithKb={() => goToView('chat')} />
             </div>
           )}
           {(activeView === 'planner' || activeView === 'tasks' || activeView === 'notes') && (
@@ -369,7 +374,7 @@ function DashboardInner() {
           {activeView === 'models'    && <div className="h-full overflow-y-auto"><ModelsPanel /></div>}
           {activeView === 'prompts'   && (
             <div className="h-full overflow-y-auto">
-              <PromptsPanel onUsePrompt={text => { setActiveView('chat'); setTimeout(() => { const ev = new CustomEvent('quivo:use-prompt', { detail: text }); window.dispatchEvent(ev); }, 100); }} />
+              <PromptsPanel onUsePrompt={text => { goToView('chat'); setTimeout(() => { const ev = new CustomEvent('quivo:use-prompt', { detail: text }); window.dispatchEvent(ev); }, 100); }} />
             </div>
           )}
           {activeView === 'drive'     && <div className="h-full overflow-y-auto"><DriveBrowser /></div>}

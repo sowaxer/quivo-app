@@ -133,20 +133,12 @@ export default function PlannerPanel() {
 
   return (
     <div className="flex h-full flex-col bg-[var(--bg-base)] text-[var(--text-primary)]">
-      <header className="border-b border-[var(--bg-border)] px-5 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-[20px] font-semibold tracking-[-0.03em]">Tasks & Notes</h1>
-            <p className="mt-0.5 text-[13px] text-[var(--text-secondary)]">
-              One place for to-dos, ideas, and timed reminders
-            </p>
-          </div>
-          <button type="button" onClick={enableReminders} className="quivo-btn-ghost rounded-full px-3 py-1.5 text-[12px]">
-            <IconBell className="mr-1 inline h-4 w-4" stroke={1.75} />
-            Enable reminders
-          </button>
-        </div>
-      </header>
+      <div className="flex items-center justify-end border-b border-[var(--bg-border)] px-5 py-2">
+        <button type="button" onClick={enableReminders} className="quivo-btn-ghost rounded-full px-3 py-1.5 text-[12px]">
+          <IconBell className="mr-1 inline h-4 w-4" stroke={1.75} />
+          Reminders
+        </button>
+      </div>
 
       <div className="border-b border-[var(--bg-border)] px-5 py-3">
         <div className="flex flex-wrap gap-2">
