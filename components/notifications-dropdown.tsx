@@ -58,7 +58,7 @@ export function NotificationsDropdown() {
       >
         <IconBell className="h-4 w-4" stroke={1.75} />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-violet-500 text-[9px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold text-white" style={{ background: 'var(--quivo-accent)' }}>
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -72,7 +72,8 @@ export function NotificationsDropdown() {
               <button
                 type="button"
                 onClick={markAllRead}
-                className="text-[11px] font-medium text-cyan-400 hover:text-cyan-300"
+                className="text-[11px] font-medium hover:opacity-80"
+                style={{ color: 'var(--quivo-accent)' }}
               >
                 Mark all read
               </button>
@@ -96,7 +97,7 @@ export function NotificationsDropdown() {
                     !n.read ? 'bg-cyan-500/5' : ''
                   }`}
                 >
-                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-violet-500/20 text-cyan-300">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--quivo-accent)]" style={{ background: 'color-mix(in srgb, var(--quivo-accent) 18%, transparent)' }}>
                     <IconBell className="h-3.5 w-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">

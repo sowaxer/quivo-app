@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { StorageMigration } from "@/components/storage-migration";
+import { AccentInit } from "@/components/accent-init";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors">
           <ThemeProvider>
             <StorageMigration />
+            <AccentInit />
             {children}
           </ThemeProvider>
         </body>

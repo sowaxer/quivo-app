@@ -248,7 +248,7 @@ function DashboardInner() {
         {/* Logo */}
         <div className="flex h-[52px] items-center gap-3 border-b border-[var(--bg-border)] px-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] shadow-[inset_0_1px_0_rgba(28,25,23,0.06)]">
-            <span className="bg-gradient-to-br from-cyan-300 to-violet-400 bg-clip-text text-[15px] font-semibold tracking-tight text-transparent">Q</span>
+            <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--quivo-accent)' }}>Q</span>
           </div>
           <span className="text-[15px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">Quivo</span>
         </div>
@@ -300,7 +300,7 @@ function DashboardInner() {
             className="flex w-full items-center gap-3 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2.5 text-left shadow-[0_1px_2px_rgba(28,25,23,0.05)] transition hover:bg-[var(--bg-hover)]"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-base)]">
-              <span className="bg-gradient-to-br from-cyan-300 to-violet-400 bg-clip-text text-[15px] font-semibold tracking-tight text-transparent">Q</span>
+              <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--quivo-accent)' }}>Q</span>
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[13px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">Quivo Pro</span>
