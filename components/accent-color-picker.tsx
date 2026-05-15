@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ACCENT_PRESETS, loadAccentColor, saveAccentColor } from '@/lib/appearance-accent';
 
 export function AccentColorPicker({ compact }: { compact?: boolean }) {
-  const [color, setColor] = useState('#f97316');
+  const [color, setColor] = useState('#2563eb');
 
   useEffect(() => {
     setColor(loadAccentColor());
