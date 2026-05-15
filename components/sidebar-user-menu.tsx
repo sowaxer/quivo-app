@@ -33,7 +33,7 @@ export function SidebarUserMenu({ today }: { today: string }) {
             <button
               type="button"
               onClick={() => void switchAccount()}
-              className="quivo-btn-primary flex w-full items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold"
+              className="quivo-btn-ghost flex w-full items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-medium"
             >
               <IconSwitchHorizontal className="h-4 w-4" stroke={1.75} />
               Switch account
@@ -51,7 +51,7 @@ export function SidebarUserMenu({ today }: { today: string }) {
           <button
             type="button"
             onClick={login}
-            className="quivo-btn-primary flex w-full items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold"
+            className="quivo-btn-ghost flex w-full items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-medium"
           >
             <IconLogin className="h-4 w-4" stroke={2} />
             Log in

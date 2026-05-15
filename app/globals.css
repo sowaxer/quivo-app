@@ -15,7 +15,7 @@
   --bg-card:        #303030;
   --bg-border:      #3d3d3d;
   --bg-hover:       #383838;
-  --quivo-gradient: linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(251, 146, 60, 0.75) 100%);
+  --quivo-gradient: none;
   --text-primary:   #ececec;
   --text-secondary: #b4b4b4;
   --text-muted:     #8e8e8e;
@@ -183,8 +183,8 @@
   --card-foreground: #f5f5f7;
   --popover: #262626;
   --popover-foreground: #f5f5f7;
-  --primary: var(--quivo-accent);
-  --primary-foreground: #262626;
+  --primary: #ececec;
+  --primary-foreground: #212121;
   --secondary: #323232;
   --secondary-foreground: #f5f5f7;
   --muted: #262626;
@@ -194,16 +194,16 @@
   --destructive: #d4a0a0;
   --border: #3f3f46;
   --input: #3f3f46;
-  --ring: var(--quivo-accent);
+  --ring: #52525b;
   --radius: 0.75rem;
   --sidebar: #262626;
   --sidebar-foreground: #f5f5f7;
-  --sidebar-primary: var(--quivo-accent);
-  --sidebar-primary-foreground: #262626;
+  --sidebar-primary: #ececec;
+  --sidebar-primary-foreground: #212121;
   --sidebar-accent: #323232;
   --sidebar-accent-foreground: #f5f5f7;
   --sidebar-border: #3f3f46;
-  --sidebar-ring: var(--quivo-accent);
+  --sidebar-ring: #52525b;
 
   /* Quivo custom tokens */
   --bg-primary: #262626;
@@ -330,47 +330,62 @@
     radial-gradient(ellipse 120% 100% at 100% 100%, rgba(200, 140, 100, 0.08), transparent 48%);
 }
 
+/* Accent glass — main content only; no outer glow (Claude-minimal) */
 .quivo-btn-gradient,
 .quivo-btn-primary {
   color: #fff;
   font-weight: 600;
-  background: var(--btn-glass-bg, color-mix(in srgb, var(--quivo-accent) 26%, transparent));
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--btn-glass-border, color-mix(in srgb, var(--quivo-accent) 48%, transparent));
-  box-shadow:
-    0 4px 20px var(--btn-glass-glow, color-mix(in srgb, var(--quivo-accent) 32%, transparent)),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  background: var(
+    --btn-glass-bg,
+    color-mix(in srgb, var(--quivo-accent) 22%, var(--bg-elevated))
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(
+    --btn-glass-border,
+    color-mix(in srgb, var(--quivo-accent) 38%, var(--bg-border))
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 .quivo-btn-gradient:hover,
 .quivo-btn-primary:hover {
-  background: color-mix(in srgb, var(--quivo-accent) 34%, transparent);
-  box-shadow:
-    0 6px 28px color-mix(in srgb, var(--quivo-accent) 40%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  background: color-mix(in srgb, var(--quivo-accent) 28%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--quivo-accent) 45%, var(--bg-border));
 }
 .quivo-btn-gradient:active,
 .quivo-btn-primary:active {
   transform: scale(0.98);
 }
 
+/* Sidebar: strictly neutral — no accent tint on nav or auth */
+.quivo-sidebar .quivo-btn-primary,
+.quivo-sidebar .quivo-btn-gradient {
+  color: var(--text-primary);
+  font-weight: 500;
+  background: var(--bg-hover);
+  border: 1px solid var(--bg-border);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.quivo-sidebar .quivo-btn-primary:hover,
+.quivo-sidebar .quivo-btn-gradient:hover {
+  background: var(--bg-card);
+  border-color: var(--bg-border);
+}
+
 .quivo-btn-green-glass {
-  color: #ecfdf5;
+  color: #e8f5e9;
   font-weight: 600;
-  background: linear-gradient(135deg, rgba(6, 78, 59, 0.85) 0%, rgba(16, 185, 129, 0.55) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in srgb, #34d399 45%, transparent);
-  box-shadow:
-    0 4px 24px color-mix(in srgb, #10b981 28%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  background: color-mix(in srgb, #166534 55%, var(--bg-elevated));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, #34d399 35%, var(--bg-border));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 .quivo-btn-green-glass:hover {
-  box-shadow:
-    0 6px 28px color-mix(in srgb, #34d399 38%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  background: color-mix(in srgb, #166534 65%, var(--bg-elevated));
 }
 
 .quivo-btn-ghost {

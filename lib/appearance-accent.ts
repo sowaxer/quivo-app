@@ -62,8 +62,7 @@ export function applyAccentColor(color: string) {
   root.style.setProperty('--quivo-accent', color);
   root.style.setProperty('--quivo-accent-light', lighter);
   root.style.setProperty('--accent', color);
-  root.style.setProperty('--primary', color);
-  root.style.setProperty('--ring', color);
+  root.style.setProperty('--ring', '#52525b');
   root.style.setProperty(
     '--quivo-gradient',
     `linear-gradient(135deg, color-mix(in srgb, ${color} 88%, #fff 12%) 0%, color-mix(in srgb, ${lighter} 75%, transparent) 100%)`,
@@ -82,19 +81,8 @@ export function applyAccentColor(color: string) {
       background: linear-gradient(to right, ${color}, ${lighter}) !important;
     }
     .quivo-btn-gradient, .quivo-btn-primary {
-      --btn-glass-bg: color-mix(in srgb, ${color} 24%, transparent);
-      --btn-glass-border: color-mix(in srgb, ${color} 50%, transparent);
-      --btn-glass-glow: color-mix(in srgb, ${color} 35%, transparent);
-      box-shadow:
-        0 4px 20px color-mix(in srgb, ${color} 32%, transparent),
-        0 0 28px color-mix(in srgb, ${color} 18%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    }
-    .quivo-btn-gradient:hover, .quivo-btn-primary:hover {
-      box-shadow:
-        0 6px 28px color-mix(in srgb, ${color} 42%, transparent),
-        0 0 36px color-mix(in srgb, ${color} 24%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      --btn-glass-bg: color-mix(in srgb, ${color} 22%, var(--bg-elevated));
+      --btn-glass-border: color-mix(in srgb, ${color} 38%, var(--bg-border));
     }
   `;
 }
