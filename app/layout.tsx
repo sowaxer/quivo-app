@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { quivoClerkLocalization } from "@/lib/clerk-localization";
 import { ThemeProvider } from "@/components/theme-provider";
 import { StorageMigration } from "@/components/storage-migration";
 import { AccentInit } from "@/components/accent-init";
@@ -29,6 +30,7 @@ export default function RootLayout({
       signInFallbackRedirectUrl="/dashboard?view=overview"
       signUpFallbackRedirectUrl="/dashboard?view=overview"
       afterSignOutUrl="/sign-in"
+      localization={quivoClerkLocalization}
     >
       <html lang="en" data-theme="dark" className={`${inter.variable} h-full antialiased`}>
         <body className={`${inter.className} min-h-full flex flex-col bg-[var(--bg-canvas)] text-[var(--text-primary)] transition-colors`}>
