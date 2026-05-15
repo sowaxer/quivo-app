@@ -27,12 +27,14 @@ import AttioNotesPanel from '@/components/attio-notes-panel';
 import AttioOverview from '@/components/attio-overview';
 import { NotificationsDropdown } from '@/components/notifications-dropdown';
 import { BankStatementSidePanel } from '@/components/bank-statement-side-panel';
+import Link from 'next/link';
 import {
   IconLayoutDashboard, IconRobot, IconNotes, IconMail, IconCreditCard,
   IconCalendar, IconPlug, IconChartBar, IconSettings, IconSparkles,
   IconSearch, IconCloud, IconCheck,
   IconBrain, IconBook, IconMessageCircle, IconDatabase, IconPalette,
   IconFileText, IconKey, IconLayoutList, IconHelp, IconFileInvoice,
+  IconBolt,
 } from '@tabler/icons-react';
 
 type View = 'overview' | 'chat' | 'agents' | 'kb' | 'notes' | 'tasks' | 'gmail' | 'stripe' | 'calendar' | 'plugins' | 'models' | 'prompts' | 'analytics' | 'drive' | 'settings' | 'appearance' | 'docs' | 'apikeys';
@@ -42,6 +44,8 @@ const navStartHere = [
   { id: 'chat'     as View, label: 'Chat',          icon: IconMessageCircle },
   { id: 'apikeys'  as View, label: 'API keys',      icon: IconKey },
 ];
+
+const agentNavHref = '/agent';
 
 const navWorkspace = [
   { id: 'agents' as View, label: 'AI agents',        icon: IconRobot },
@@ -271,6 +275,16 @@ function DashboardInner() {
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 space-y-5">
           <NavSection label="Start here">
             {navStartHere.map(item => <NavItem key={item.id} item={item} />)}
+            <Link
+              href={agentNavHref}
+              className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium tracking-[-0.01em] text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+            >
+              <IconBolt className="h-[18px] w-[18px] shrink-0 opacity-90" strokeWidth={1.75} />
+              <span className="flex-1 text-left">Quivo Agent</span>
+              <span className="rounded-md bg-[var(--bg-card)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
+                MCP
+              </span>
+            </Link>
           </NavSection>
           <NavSection label="Your workspace">
             {navWorkspace.map(item => <NavItem key={item.id} item={item} />)}
