@@ -483,9 +483,25 @@ export default function ApiKeysPanel() {
         body: JSON.stringify({ [prov.field]: val }),
       });
       let errMsg: string | null = null;
+      type SaveOk = {
+        error?: string;
+        success?: boolean;
+        has?: {
+          anthropic?: boolean;
+          openai?: boolean;
+          google_ai?: boolean;
+          deepseek?: boolean;
+          stripe?: boolean;
+          stripe_pub?: boolean;
+          tavily?: boolean;
+          notion?: boolean;
+        };
+        previews?: Record<string, string | null | undefined>;
+      };
+      let data: SaveOk | null = null;
       try {
-        const data = (await res.json()) as { error?: string };
-        if (!res.ok) errMsg = data.error ?? `HTTP ${res.status}`;
+        data = (await res.json()) as SaveOk;
+        if (!res.ok) errMsg = data?.error ?? `HTTP ${res.status}`;
       } catch {
         if (!res.ok) errMsg = `HTTP ${res.status}`;
       }
@@ -493,10 +509,30 @@ export default function ApiKeysPanel() {
         setOne(prov.id, { saving: false, saveError: errMsg });
         return;
       }
+      if (data?.has && data.previews) {
+        setOne('anthropic', { has: !!data.has.anthropic, masked: data.previews.anthropic ?? null, saveError: null });
+        setOne('google_ai', { has: !!data.has.google_ai, masked: data.previews.google_ai ?? null, saveError: null });
+        setOne('openai', { has: !!data.has.openai, masked: data.previews.openai ?? null, saveError: null });
+        setOne('deepseek', { has: !!data.has.deepseek, masked: data.previews.deepseek ?? null, saveError: null });
+        setOne('stripe_secret', {
+          has: !!data.has.stripe,
+          masked: data.previews.stripe_secret ?? null,
+          saveError: null,
+        });
+        setOne('stripe_pub', {
+          has: !!data.has.stripe_pub,
+          masked: data.previews.stripe_pub ?? null,
+          saveError: null,
+        });
+        setOne('tavily', { has: !!data.has.tavily, masked: data.previews.tavily ?? null, saveError: null });
+        setOne('notion', { has: !!data.has.notion, masked: data.previews.notion ?? null, saveError: null });
+      }
+      setOne(prov.id, { saving: false });
     } else {
       const extra = loadExtra();
       extra[prov.id] = val;
       saveExtra(extra);
+      setOne(prov.id, { saving: false, saveError: null });
     }
     await load();
   }
