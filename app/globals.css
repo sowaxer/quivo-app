@@ -18,9 +18,12 @@
   --bg-hover:       #262626;
   --bg-nav-active:  #000000;
   --quivo-gradient: none;
-  --text-primary:   #ececec;
-  --text-secondary: #b4b4b4;
-  --text-muted:     #8e8e8e;
+  --text-primary:   #f5f5f5;
+  --text-secondary: #a3a3a3;
+  --text-muted:     #737373;
+  --text-faint:     #525252;
+  --finance-up:     #3ecf8e;
+  --finance-down:   #f87171;
   --accent:         var(--quivo-accent);
   --accent-hover:   color-mix(in srgb, var(--quivo-accent) 80%, white);
   --success:        #9ecf9e;
@@ -42,6 +45,9 @@
   --text-primary:   #18181b;
   --text-secondary: #52525b;
   --text-muted:     #71717a;
+  --text-faint:     #a1a1aa;
+  --finance-up:     #059669;
+  --finance-down:   #dc2626;
   --accent:         var(--quivo-accent);
   --accent-hover:   color-mix(in srgb, var(--quivo-accent) 85%, #18181b);
   --success:        #166534;
@@ -153,7 +159,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
   --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -234,7 +240,7 @@
     @apply border-border outline-ring/50;
   }
   html {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "kern" 1;
@@ -242,8 +248,8 @@
   body {
     background-color: var(--bg-canvas, #111111);
     color: var(--text-primary, #f5f5f7);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    letter-spacing: -0.011em;
+    font-family: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.015em;
   }
   [data-theme="light"] body {
     letter-spacing: -0.011em;
@@ -406,4 +412,78 @@
 .quivo-btn-ghost:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+/* ─── Perplexity Finance typography & data UI ─────────────────────────────── */
+.quivo-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.quivo-label {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--text-muted);
+}
+.quivo-label-strong {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+}
+.quivo-data-lg {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+.quivo-data-md {
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.quivo-body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.quivo-caption {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-faint);
+  letter-spacing: 0;
+}
+.quivo-finance-up {
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--finance-up);
+}
+.quivo-finance-down {
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--finance-down);
+}
+.quivo-finance-card {
+  border: 1px solid var(--bg-border);
+  background: var(--bg-canvas);
+  border-radius: 12px;
+  transition: background 0.15s ease;
+}
+.quivo-finance-card:hover {
+  background: var(--bg-elevated);
+}
+.quivo-finance-row {
+  border-bottom: 1px solid var(--bg-border);
+}
+.quivo-finance-row:last-child {
+  border-bottom: none;
 }
