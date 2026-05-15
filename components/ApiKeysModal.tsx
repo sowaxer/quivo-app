@@ -4,7 +4,8 @@
 // Se guardan en localStorage — nunca en tu base de datos
 
 import { useState, useEffect } from "react";
-import { loadApiKeys, saveApiKeys, clearApiKeys, type ApiKeys } from "@/hooks/useAgent";
+import { loadApiKeys, saveApiKeys, clearApiKeys, type ApiKeys } from '@/hooks/useAgent';
+import { syncAgentKeysToVault } from '@/lib/agent-keys-sync';
 
 interface Props {
   open: boolean;
@@ -67,6 +68,8 @@ const SERVICES = [
 export default function ApiKeysModal({ open, onClose }: Props) {
   const [keys, setKeys] = useState<ApiKeys>({ anthropic: "" });
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [show, setShow] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -75,8 +78,17 @@ export default function ApiKeysModal({ open, onClose }: Props) {
 
   if (!open) return null;
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!keys.anthropic?.trim()) return;
+    setSaving(true);
+    setSaveError(null);
     saveApiKeys(keys);
+    const vault = await syncAgentKeysToVault(keys);
+    setSaving(false);
+    if (!vault.ok) {
+      setSaveError(vault.error ?? 'No se pudo guardar en tu cuenta');
+      return;
+    }
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
@@ -107,10 +119,9 @@ export default function ApiKeysModal({ open, onClose }: Props) {
         {/* Header */}
         <div className="sticky top-0 bg-[var(--bg-base)] border-b border-[var(--bg-border)] px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 className="font-bold text-lg">Configurar API Keys</h2>
+            <h2 className="font-bold text-lg">Tus API keys</h2>
             <p className="text-xs text-[var(--text-muted)] font-mono mt-0.5">
-              {connectedCount} de {SERVICES.length} servicios configurados •{" "}
-              <span className="text-green-500">guardado solo en tu browser</span>
+              {connectedCount} de {SERVICES.length} • Quivo no incluye keys de proveedores
             </p>
           </div>
           <button
@@ -124,12 +135,11 @@ export default function ApiKeysModal({ open, onClose }: Props) {
         {/* Privacy notice */}
         <div className="mx-6 mt-4 space-y-2">
           <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-xs font-mono text-blue-400">
-            🔒 Keys solo en este navegador (localStorage). Van como headers a /api/agent; Quivo no las
-            guarda en base de datos.
+            🔒 Tus keys: este navegador + cuenta cifrada. Quivo no paga ni almacena keys de la plataforma.
           </div>
           <p className="text-[11px] text-[var(--text-muted)]">
-            Con sesión en Quivo, Gmail/Calendar y Stripe en Settings también funcionan sin pegar token
-            aquí.
+            Se guardan en este navegador y en tu cuenta (cifradas) para Chat y bank statements.
+            Gmail/Calendar: conecta Google en Settings (OAuth).
           </p>
         </div>
 
@@ -165,7 +175,7 @@ export default function ApiKeysModal({ open, onClose }: Props) {
                     onChange={(e) =>
                       setKeys((prev) => ({ ...prev, [svc.key]: e.target.value }))
                     }
-                    className="w-full bg-[var(--bg-card)] border border-[var(--bg-border)] rounded-lg px-3 py-2 pr-10 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--quivo-accent)]/40 focus: border-[var(--quivo-accent)]"
+                    className="w-full bg-[var(--bg-card)] border border-[var(--bg-border)] rounded-lg px-3 py-2 pr-10 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--quivo-accent)]/40 focus:border-[var(--quivo-accent)]"
                   />
                   <button
                     type="button"
@@ -192,20 +202,28 @@ export default function ApiKeysModal({ open, onClose }: Props) {
           })}
         </div>
 
+        {saveError && (
+          <p className="mx-6 mb-2 rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/5 px-3 py-2 text-xs text-[#ef4444]">
+            {saveError}
+          </p>
+        )}
+
         {/* Footer */}
         <div className="sticky bottom-0 bg-[var(--bg-base)] border-t border-[var(--bg-border)] px-6 py-4 flex gap-3">
           <button
+            type="button"
             onClick={handleClear}
             className="px-4 py-2 text-sm text-[var(--text-muted)] hover:text-[#ef4444] border border-[var(--bg-border)] rounded-lg transition-colors"
           >
             Borrar todo
           </button>
           <button
-            onClick={handleSave}
-            disabled={!keys.anthropic}
+            type="button"
+            onClick={() => void handleSave()}
+            disabled={!keys.anthropic?.trim() || saving}
             className="flex-1 py-2.5 bg-[var(--quivo-accent)] text-white font-bold text-sm rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-all flex items-center justify-center gap-2"
           >
-            {saved ? "✓ Guardado" : "Guardar API Keys"}
+            {saving ? 'Guardando…' : saved ? '✓ Guardado' : 'Guardar API Keys'}
           </button>
         </div>
       </div>

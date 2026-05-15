@@ -104,13 +104,12 @@ export async function POST(req: NextRequest) {
     );
     if (rlDenied) return rlDenied;
 
-    const vaultKey = await getDecryptedSecret(userId, 'anthropic', { touchUsed: true });
-    const apiKey = vaultKey ?? process.env.ANTHROPIC_API_KEY?.trim();
+    const apiKey = await getDecryptedSecret(userId, 'anthropic', { touchUsed: true });
     if (!apiKey) {
       return NextResponse.json(
         {
           error:
-            'No Anthropic API key. Add one in API Keys or set ANTHROPIC_API_KEY in the server environment.',
+            'Agrega tu API key de Anthropic en API Keys (dashboard) o en el modal del Agent. Quivo no incluye keys de IA.',
         },
         { status: 400 },
       );

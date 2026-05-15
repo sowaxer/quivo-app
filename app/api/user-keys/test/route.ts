@@ -14,6 +14,7 @@ import {
   verifyDeepSeekKey,
   verifyGoogleAIKey,
   verifyOpenAIKey,
+  verifyStripePublishableKey,
   verifyStripeSecretKey,
 } from '@/lib/provider-key-verify';
 import { getDecryptedSecret } from '@/lib/user-secret-store';
@@ -25,6 +26,8 @@ const PROVIDER_MAP: Record<string, string> = {
   deepseek: 'deepseek',
   stripe: 'stripe_secret',
   stripe_secret: 'stripe_secret',
+  stripe_pub: 'stripe_publishable',
+  tavily: 'tavily',
 };
 
 export async function POST(req: NextRequest) {
@@ -68,6 +71,15 @@ export async function POST(req: NextRequest) {
     case 'stripe_secret': {
       const v = await verifyStripeSecretKey(key);
       result = { success: v.ok, message: v.message };
+      break;
+    }
+    case 'stripe_pub': {
+      const v = verifyStripePublishableKey(key);
+      result = { success: v.ok, message: v.message };
+      break;
+    }
+    case 'tavily': {
+      result = { success: key.length >= 8, message: key.length >= 8 ? 'Tavily key stored' : 'Key too short' };
       break;
     }
     default:

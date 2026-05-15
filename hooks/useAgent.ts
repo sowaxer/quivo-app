@@ -65,7 +65,8 @@ export function useAgent() {
           ...prev,
           {
             role: "assistant",
-            content: "⚠️ Necesitas configurar tu API key de Anthropic para usar Quivo. Ve a Configuración → API Keys.",
+            content:
+              '⚠️ Agrega tu API key de Anthropic (botón API Keys arriba). Quivo es un caparazón: tú traes tus keys, nosotros no incluimos IA.',
             timestamp: new Date(),
             error: true,
           },
