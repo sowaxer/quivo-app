@@ -18,9 +18,9 @@ export function getUserDisplayName(user: ClerkUserLike | null | undefined): stri
 }
 
 export function getUserAvatarUrl(user: ClerkUserLike | null | undefined): string | null {
-  if (!user) return null;
-  if (user.hasImage && user.imageUrl) return user.imageUrl;
-  return null;
+  if (!user?.imageUrl) return null;
+  const url = user.imageUrl.trim();
+  return url.length > 0 ? url : null;
 }
 
 export function getUserInitials(user: ClerkUserLike | null | undefined): string {
