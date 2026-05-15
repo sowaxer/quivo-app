@@ -276,6 +276,7 @@ export type ApiKeyBrandId =
   | 'anthropic'
   | 'google_ai'
   | 'openai'
+  | 'deepseek'
   | 'groq'
   | 'mistral'
   | 'openrouter'
@@ -298,6 +299,8 @@ export function ProviderBrandMark({ id, size = 22 }: { id: string; size?: number
       return <LogoGoogleGemini size={size} />;
     case 'openai':
       return <LogoOpenAI size={size} />;
+    case 'deepseek':
+      return <LogoDeepseek size={size} />;
     case 'groq':
       return <LogoGroq size={size} />;
     case 'mistral':

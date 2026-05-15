@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
-import { getAuthUrl, isConnected, revokeTokens } from '@/lib/google';
+import { getAuthUrl, getGoogleAccountEmail, isConnected, revokeTokens } from '@/lib/google';
 
 export async function GET(req: NextRequest) {
   const { userId } = await auth();
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const rlDenied = await rateLimitExceededResponse('strict', await rateLimitKey('google-auth', userId));
+  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('google-auth', userId));
   if (rlDenied) return rlDenied;
 
   const { searchParams } = req.nextUrl;
@@ -26,7 +26,8 @@ export async function GET(req: NextRequest) {
   // ── Connection status check ──────────────────────────────────────────
   if (status === '1') {
     const connected = await isConnected(userId);
-    return NextResponse.json({ connected });
+    const email = connected ? await getGoogleAccountEmail(userId) : null;
+    return NextResponse.json({ connected, email });
   }
 
   // ── Initiate OAuth flow — signed state binds tokens to this Clerk session
@@ -47,7 +48,7 @@ export async function DELETE() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const rlDenied = await rateLimitExceededResponse('strict', await rateLimitKey('google-auth-del', userId));
+  const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('google-auth-del', userId));
   if (rlDenied) return rlDenied;
   await revokeTokens(userId);
   return NextResponse.json({ success: true });

@@ -35,8 +35,8 @@ const serverEnvSchema = z.object({
   TAVILY_API_KEY: z.string().optional(),
 
   /**
-   * 32-byte AES key as 64 hex chars. Preferred name: ENCRYPTION_SECRET.
-   * ENCRYPTION_KEY is accepted for backward compatibility. Required when persisting user API keys.
+   * 32-byte AES key as 64 hex chars. Prefer **ENCRYPTION_KEY**, then ENCRYPTION_SECRET.
+   * Required when persisting user API keys or OAuth tokens at rest.
    */
   ENCRYPTION_SECRET: z.string().min(1).optional(),
   ENCRYPTION_KEY: z.string().min(1).optional(),
@@ -44,6 +44,8 @@ const serverEnvSchema = z.object({
   // Google OAuth (optional — app works without it, but Google integrations won't load)
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
+  /** Full callback URL; must match Google Console exactly (e.g. https://app.quivo.site/api/google/auth/callback). */
+  GOOGLE_OAUTH_REDIRECT_URI: z.preprocess((v) => (v === '' ? undefined : v), z.string().url().optional()),
   NEXT_PUBLIC_GOOGLE_REDIRECT_URI: z.string().url().optional(),
 
   /** Upstash Redis (rate limits). Set both URL and token, or omit both (not recommended for production). */

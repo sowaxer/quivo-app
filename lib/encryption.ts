@@ -1,3 +1,13 @@
+/**
+ * User secret encryption (server-only).
+ *
+ * Uses AES-256-GCM via @noble/ciphers. Set **ENCRYPTION_KEY** (preferred) or
+ * **ENCRYPTION_SECRET** to a 64-character hex string (32 random bytes):
+ *
+ *   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ *
+ * Never log or return decrypted values to the client.
+ */
 import crypto from 'crypto';
 import { gcm } from '@noble/ciphers/aes';
 import { randomBytes } from '@noble/ciphers/webcrypto';
@@ -8,10 +18,10 @@ const PREFIX_GCM = 'fe256gcm:v1:';
 const PREFIX_CBC = 'fe256cbc:v1:';
 
 function keyBytes(): Uint8Array {
-  const raw = (process.env.ENCRYPTION_SECRET ?? process.env.ENCRYPTION_KEY)?.trim();
+  const raw = (process.env.ENCRYPTION_KEY ?? process.env.ENCRYPTION_SECRET)?.trim();
   if (!raw) {
     throw new Error(
-      'ENCRYPTION_SECRET or ENCRYPTION_KEY is not set. Generate a 32-byte hex key: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"',
+      'ENCRYPTION_KEY or ENCRYPTION_SECRET is not set. Generate a 32-byte hex key: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"',
     );
   }
   if (/^[0-9a-fA-F]{64}$/.test(raw)) {

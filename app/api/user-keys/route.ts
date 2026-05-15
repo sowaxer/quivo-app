@@ -1,8 +1,8 @@
 /**
  * /api/user-keys — legacy path (backward compatible).
  *
- * GET    → has-flags + preferences only (no key material, no masks)
- * POST   → encrypt secrets into user_api_key_vault; preferences → user_api_keys
+ * GET    → has-flags + preferences + key previews (last 4 chars only)
+ * POST   → verify then encrypt secrets into user_api_key_vault
  * DELETE → body { field } — removes vault secret for that field
  */
 
@@ -11,9 +11,11 @@ import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { UserKeysDeleteFieldSchema } from '@/lib/db-safe';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { verifySecretBeforeSave } from '@/lib/provider-key-verify';
 import {
   deleteSecretByField,
   fieldToProvider,
+  getSecretKeyPreviews,
   getSecretPresence,
   setEncryptedSecret,
 } from '@/lib/user-secret-store';
@@ -26,6 +28,7 @@ export async function GET() {
   if (rlDenied) return rlDenied;
 
   const { has, preferences } = await getSecretPresence(userId);
+  const previews = await getSecretKeyPreviews(userId);
 
   return NextResponse.json({
     preferences,
@@ -33,14 +36,20 @@ export async function GET() {
       anthropic: has.anthropic,
       openai: has.openai,
       google_ai: has.google_ai,
+      deepseek: has.deepseek,
       stripe: has.stripe,
       stripe_pub: has.stripe_publishable,
       tavily: has.tavily,
       notion: has.notion,
     },
+    previews,
+    dropbox_oauth_configured: Boolean(
+      process.env.DROPBOX_CLIENT_ID?.trim() && process.env.DROPBOX_CLIENT_SECRET?.trim(),
+    ),
     anthropic_key: null,
     openai_key: null,
     google_ai_key: null,
+    deepseek_key: null,
     stripe_secret: null,
     stripe_pub: null,
     tavily_key: null,
@@ -62,11 +71,15 @@ export async function POST(req: NextRequest) {
     'anthropic_key',
     'openai_key',
     'google_ai_key',
+    'deepseek_key',
     'stripe_secret',
     'stripe_pub',
     'tavily_key',
     'notion_token',
   ] as const;
+
+  type Field = (typeof secretFields)[number];
+  const pending: { field: Field; val: string; provider: string }[] = [];
 
   for (const field of secretFields) {
     if (!(field in body) || typeof body[field] !== 'string') continue;
@@ -74,6 +87,20 @@ export async function POST(req: NextRequest) {
     if (!provider) continue;
     const val = (body[field] as string).trim();
     if (!val) continue;
+    pending.push({ field, val, provider });
+  }
+
+  for (const { val, provider } of pending) {
+    const check = await verifySecretBeforeSave(provider, val);
+    if (!check.ok) {
+      return NextResponse.json(
+        { error: check.message, provider, hint: 'Key was not saved — fix the error and try again.' },
+        { status: 400 },
+      );
+    }
+  }
+
+  for (const { val, provider } of pending) {
     try {
       await setEncryptedSecret(userId, provider, val);
     } catch (e) {

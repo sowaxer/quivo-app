@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { sanitizeTextContent, TavilySearchBodySchema } from '@/lib/db-safe';
-import { getDecryptedSecret } from '@/lib/user-secret-store';
+import { getDecryptedSecret, touchSecretLastUsed } from '@/lib/user-secret-store';
 
 async function getTavilyKey(userId: string): Promise<string | null> {
   return getDecryptedSecret(userId, 'tavily');
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await res.json();
+    void touchSecretLastUsed(userId, 'tavily');
     return NextResponse.json({
       answer: data.answer,
       results: data.results?.map((r: { title: string; url: string; content: string; score: number }) => ({

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
-import { getDecryptedSecret } from '@/lib/user-secret-store';
+import { getDecryptedSecret, touchSecretLastUsed } from '@/lib/user-secret-store';
 
 function db() {
   return getSupabaseAdmin();
@@ -40,6 +40,7 @@ export async function GET() {
         overdueInvoices = (data.data ?? []).filter((i: { due_date: number | null }) =>
           i.due_date && i.due_date * 1000 < Date.now()
         ).length;
+        void touchSecretLastUsed(userId, 'stripe_secret');
       }
     } catch { overdueInvoices = 0; }
   }

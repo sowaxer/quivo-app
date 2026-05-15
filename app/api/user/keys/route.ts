@@ -12,11 +12,13 @@ import {
   getSecretPresence,
   setEncryptedSecret,
 } from '@/lib/user-secret-store';
+import { verifySecretBeforeSave } from '@/lib/provider-key-verify';
 
 const ALLOWED_PROVIDERS = new Set([
   'anthropic',
   'openai',
   'google_ai',
+  'deepseek',
   'stripe_secret',
   'stripe_publishable',
   'tavily',
@@ -36,6 +38,7 @@ export async function GET() {
     { provider: 'anthropic', hasKey: has.anthropic },
     { provider: 'openai', hasKey: has.openai },
     { provider: 'google_ai', hasKey: has.google_ai },
+    { provider: 'deepseek', hasKey: has.deepseek },
     { provider: 'stripe_secret', hasKey: has.stripe },
     { provider: 'stripe_publishable', hasKey: has.stripe_publishable },
     { provider: 'tavily', hasKey: has.tavily },
@@ -59,8 +62,13 @@ export async function POST(req: NextRequest) {
     if (!ALLOWED_PROVIDERS.has(p)) {
       return NextResponse.json({ error: 'Invalid provider' }, { status: 400 });
     }
+    const val = body.key.trim();
+    const check = await verifySecretBeforeSave(p, val);
+    if (!check.ok) {
+      return NextResponse.json({ error: check.message }, { status: 400 });
+    }
     try {
-      await setEncryptedSecret(userId, p, body.key.trim());
+      await setEncryptedSecret(userId, p, val);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Encrypt failed';
       return NextResponse.json({ error: msg }, { status: 500 });
@@ -72,6 +80,7 @@ export async function POST(req: NextRequest) {
     'anthropic_key',
     'openai_key',
     'google_ai_key',
+    'deepseek_key',
     'stripe_secret',
     'stripe_pub',
     'tavily_key',
@@ -88,6 +97,10 @@ export async function POST(req: NextRequest) {
     if (!provider) continue;
     const val = (body[field] as string).trim();
     if (!val) continue;
+    const check = await verifySecretBeforeSave(provider, val);
+    if (!check.ok) {
+      return NextResponse.json({ error: check.message, field }, { status: 400 });
+    }
     try {
       await setEncryptedSecret(userId, provider, val);
     } catch (e) {

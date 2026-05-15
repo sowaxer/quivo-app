@@ -7,6 +7,7 @@ import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { sanitizeTextContent } from '@/lib/db-safe';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { decryptOptionalToken } from '@/lib/encrypted-field';
 
 function db() {
   return getSupabaseAdmin();
@@ -14,7 +15,7 @@ function db() {
 
 async function getToken(userId: string): Promise<string | null> {
   const { data } = await db().from('dropbox_tokens').select('access_token').eq('user_id', userId).single();
-  return data?.access_token ?? null;
+  return decryptOptionalToken(data?.access_token as string | undefined);
 }
 
 export async function GET(req: NextRequest) {
