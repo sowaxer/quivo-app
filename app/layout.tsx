@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { StorageMigration } from "@/components/storage-migration";
 import { AccentInit } from "@/components/accent-init";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Quivo — AI Financial Platform",
@@ -17,8 +24,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" data-theme="dark" className="h-full antialiased">
-        <body className="min-h-full flex flex-col bg-[var(--bg-canvas)] text-[var(--text-primary)] transition-colors">
+      <html lang="en" data-theme="dark" className={`${inter.variable} h-full antialiased`}>
+        <body className={`${inter.className} min-h-full flex flex-col bg-[var(--bg-canvas)] text-[var(--text-primary)] transition-colors`}>
           <ThemeProvider>
             <StorageMigration />
             <AccentInit />

@@ -37,22 +37,22 @@ function MetricCard({ icon, label, value, sub, trend, trendDir }: {
   icon: React.ReactNode; label: string; value: string; sub?: string; trend?: string; trendDir?: 'up' | 'down' | 'neutral';
 }) {
   return (
-    <div className="rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] p-4 flex flex-col gap-2 hover:border-[var(--bg-border)] transition-all">
+    <div className="quivo-finance-card flex flex-col gap-2 p-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+        <div className="flex items-center gap-2">
           {icon}
-          <span className="text-[11px] font-medium">{label}</span>
+          <span className="quivo-label">{label}</span>
         </div>
         {trend && (
-          <span className={`flex items-center gap-0.5 text-[10px] font-semibold ${trendDir === 'up' ? 'text-[#22c55e]' : trendDir === 'down' ? 'text-[#ef4444]' : 'text-[var(--text-secondary)]'}`}>
+          <span className={`flex items-center gap-0.5 text-[10px] font-medium ${trendDir === 'up' ? 'quivo-finance-up' : trendDir === 'down' ? 'quivo-finance-down' : 'text-[var(--text-muted)]'}`}>
             {trendDir === 'up' ? <IconTrendingUp className="h-3 w-3" /> : trendDir === 'down' ? <IconTrendingDown className="h-3 w-3" /> : null}
             {trend}
           </span>
         )}
       </div>
       <div>
-        <p className="text-[22px] font-bold text-[var(--text-primary)] leading-none">{value}</p>
-        {sub && <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{sub}</p>}
+        <p className="quivo-data-lg">{value}</p>
+        {sub && <p className="quivo-caption mt-0.5">{sub}</p>}
       </div>
     </div>
   );
@@ -172,7 +172,7 @@ export default function AttioOverview({ onNavigate }: { onNavigate?: (view: stri
   }
 
   return (
-    <div className="flex h-full flex-col bg-[var(--bg-base)] text-[var(--text-primary)] overflow-y-auto">
+    <div className="flex h-full flex-col bg-[var(--bg-canvas)] text-[var(--text-primary)] overflow-y-auto">
       {/* Top bar */}
       <div className="flex items-center border-b border-[var(--bg-border)] px-4 py-2.5 sticky top-0 bg-[var(--bg-base)] z-10">
         <svg className="h-4 w-4 mr-2 text-[var(--text-secondary)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M2 3h12M2 8h8M2 13h5" /></svg>
@@ -185,7 +185,7 @@ export default function AttioOverview({ onNavigate }: { onNavigate?: (view: stri
       <div className="flex-1 p-8 max-w-[800px] mx-auto w-full">
         {/* Greeting */}
         <div className="mb-8">
-          <h1 className="text-[28px] font-bold text-[var(--text-primary)] leading-tight">
+          <h1 className="text-[26px] font-semibold tracking-[-0.03em] text-[var(--text-primary)] leading-tight">
             {greeting()}{userName ? `, ${userName}` : ''}.
           </h1>
         </div>
