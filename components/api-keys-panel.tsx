@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
-import { IconEye, IconEyeOff, IconCheck, IconX, IconLoader2, IconExternalLink, IconChevronDown, IconChevronUp, IconTrash, IconRefresh, IconRobot, IconTool, IconLink } from '@tabler/icons-react';
+import { IconEye, IconEyeOff, IconCheck, IconX, IconLoader2, IconExternalLink, IconChevronDown, IconChevronUp, IconTrash, IconRefresh, IconRobot, IconTool, IconLink, IconLock } from '@tabler/icons-react';
 import { ProviderBrandMark } from '@/components/provider-brand-icons';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -14,8 +14,28 @@ function saveExtra(data: Record<string, string>) {
   localStorage.setItem(LS_EXTRA, JSON.stringify(data));
 }
 
-interface KS { input: string; masked: string | null; has: boolean; saving: boolean; testing: boolean; testResult: { ok: boolean; msg: string } | null; show: boolean; howOpen: boolean; }
-const mk = (): KS => ({ input: '', masked: null, has: false, saving: false, testing: false, testResult: null, show: false, howOpen: false });
+interface KS {
+  input: string;
+  masked: string | null;
+  has: boolean;
+  saving: boolean;
+  testing: boolean;
+  testResult: { ok: boolean; msg: string } | null;
+  show: boolean;
+  howOpen: boolean;
+  saveError: string | null;
+}
+const mk = (): KS => ({
+  input: '',
+  masked: null,
+  has: false,
+  saving: false,
+  testing: false,
+  testResult: null,
+  show: false,
+  howOpen: false,
+  saveError: null,
+});
 
 // ─── Provider definitions ──────────────────────────────────────────────────────
 const AI_PROVIDERS = [
@@ -51,6 +71,17 @@ const AI_PROVIDERS = [
     url: 'https://platform.openai.com/api-keys',
     testable: true,
     how: `1. Go to platform.openai.com\n2. Click API Keys → Create new secret key\n3. Copy the key starting with sk-\n4. Paste it here and click Save`,
+  },
+  {
+    id: 'deepseek', field: 'deepseek_key', storage: 'server',
+    name: 'DeepSeek',
+    badge: 'Cheap & powerful', badgeColor: 'text-sky-200/90 bg-sky-500/15 border-sky-400/25',
+    models: 'deepseek-chat · deepseek-reasoner (R1)',
+    desc: 'Best for complex reasoning at low cost. OpenAI-compatible API.',
+    prefix: 'sk-',
+    url: 'https://platform.deepseek.com/api_keys',
+    testable: true,
+    how: `1. Go to platform.deepseek.com and sign in\n2. Open API keys → Create key\n3. Copy the key starting with sk-\n4. Paste here — requests go to https://api.deepseek.com`,
   },
   {
     id: 'groq', field: 'groq_key', storage: 'local',
@@ -203,7 +234,17 @@ const INTEGRATION_PROVIDERS = [
   },
 ];
 
-type ProviderDef = typeof AI_PROVIDERS[0];
+const AI_PRIMARY = AI_PROVIDERS.filter(p =>
+  ['anthropic', 'google_ai', 'openai', 'deepseek'].includes(p.id),
+);
+const AI_MORE = AI_PROVIDERS.filter(
+  p => !['anthropic', 'google_ai', 'openai', 'deepseek'].includes(p.id),
+);
+
+type ProviderDef =
+  | (typeof AI_PROVIDERS)[number]
+  | (typeof TOOL_PROVIDERS)[number]
+  | (typeof INTEGRATION_PROVIDERS)[number];
 
 // ─── Provider avatar (real brand mark) ────────────────────────────────────────
 function ProviderAvatar({ id, size = 40 }: { id: string; size?: number }) {
@@ -217,7 +258,29 @@ function ProviderAvatar({ id, size = 40 }: { id: string; size?: number }) {
   );
 }
 
-// ─── Single key row ───────────────────────────────────────────────────────────
+function leftAccentClass(id: string): string {
+  const m: Record<string, string> = {
+    anthropic: 'border-l-orange-500/55',
+    google_ai: 'border-l-sky-500/50',
+    openai: 'border-l-emerald-500/50',
+    deepseek: 'border-l-blue-600/60',
+    groq: 'border-l-amber-500/40',
+    mistral: 'border-l-orange-300/35',
+    openrouter: 'border-l-violet-500/45',
+    perplexity: 'border-l-cyan-500/40',
+    xai: 'border-l-zinc-400/40',
+    tavily: 'border-l-teal-500/45',
+    twilio_sid: 'border-l-red-400/35',
+    twilio_token: 'border-l-red-400/35',
+    sendgrid: 'border-l-blue-400/40',
+    stripe_secret: 'border-l-indigo-500/50',
+    stripe_pub: 'border-l-violet-400/45',
+    notion: 'border-l-stone-400/40',
+    github: 'border-l-gray-500/45',
+  };
+  return m[id] ?? 'border-l-white/[0.08]';
+}
+
 function KeyRow({
   prov, state, onChange, onSave, onRemove, onTest, onToggleShow, onToggleHow,
 }: {
@@ -231,25 +294,33 @@ function KeyRow({
   onToggleHow: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-[var(--bg-card)] overflow-hidden transition-all hover:border-white/[0.12]">
+    <div
+      className={`rounded-2xl border border-y border-r border-white/[0.08] border-l-4 bg-[var(--bg-card)] overflow-hidden transition-all hover:border-white/[0.12] ${leftAccentClass(prov.id)}`}
+    >
       {/* Header row */}
       <div className="flex items-center gap-4 px-5 py-4">
         <ProviderAvatar id={prov.id} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-0.5">
             <p className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{prov.name}</p>
-            {prov.badge && (
-              <span className={`rounded-md border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${prov.badgeColor}`}>
+            {prov.id === 'anthropic' && prov.badge ? (
+              <span className="rounded-md border border-transparent bg-gradient-to-r from-blue-600/90 to-violet-600/85 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-md shadow-violet-900/25">
                 {prov.badge}
               </span>
+            ) : (
+              prov.badge && (
+                <span className={`rounded-md border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${prov.badgeColor}`}>
+                  {prov.badge}
+                </span>
+              )
             )}
             {state.has && (
-              <span className="flex items-center gap-1 rounded-md border border-emerald-400/25 bg-emerald-400/[0.08] px-1.5 py-0.5 text-[9px] font-semibold text-emerald-200/95">
+              <span className="flex items-center gap-1 rounded-md border border-emerald-400/30 bg-emerald-400/[0.08] px-1.5 py-0.5 text-[9px] font-semibold text-emerald-200/95 shadow-[0_0_14px_rgba(52,211,153,0.22)]">
                 <IconCheck className="h-2.5 w-2.5" strokeWidth={3} /> Connected
               </span>
             )}
             {!state.has && (
-              <span className="flex items-center gap-1 rounded-md border border-rose-300/25 bg-rose-400/[0.08] px-1.5 py-0.5 text-[9px] font-semibold text-rose-200/95">
+              <span className="flex items-center gap-1 rounded-md border border-rose-400/30 bg-rose-400/[0.08] px-1.5 py-0.5 text-[9px] font-semibold text-rose-200/95 shadow-[0_0_12px_rgba(248,113,113,0.2)]">
                 <IconX className="h-2.5 w-2.5" strokeWidth={3} /> Not connected
               </span>
             )}
@@ -267,12 +338,17 @@ function KeyRow({
       <div className="border-t border-white/[0.06] px-5 py-3">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
+            {state.has && (
+              <span className="pointer-events-none absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-emerald-300/85">
+                <IconLock className="h-3.5 w-3.5" aria-hidden />
+              </span>
+            )}
             <input
               type={state.show ? 'text' : 'password'}
               value={state.has && !state.input ? (state.masked ?? '') : state.input}
               onChange={e => onChange(e.target.value)}
               placeholder={state.has ? `${prov.prefix}••••••••••••••••••••` : `Paste your ${prov.name} API key here…`}
-              className="w-full rounded-xl border border-white/[0.08] bg-[var(--bg-surface)] py-2.5 pl-4 pr-10 text-[13px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[color-mix(in_srgb,var(--finedge-accent)_45%,transparent)] focus:outline-none focus:ring-1 focus:ring-[color-mix(in_srgb,var(--finedge-accent)_35%,transparent)] transition-all"
+              className={`w-full rounded-xl border border-white/[0.08] bg-[var(--bg-surface)] py-2.5 pr-10 text-[13px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[color-mix(in_srgb,var(--finedge-accent)_45%,transparent)] focus:outline-none focus:ring-1 focus:ring-[color-mix(in_srgb,var(--finedge-accent)_35%,transparent)] transition-all ${state.has ? 'pl-10' : 'pl-4'}`}
             />
             <button onClick={onToggleShow}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
@@ -282,7 +358,7 @@ function KeyRow({
 
           {/* Save */}
           <button onClick={onSave} disabled={state.saving || !state.input.trim()}
-            className="flex items-center gap-1.5 rounded-xl bg-[color-mix(in_srgb,var(--finedge-accent)_85%,#2a3038)] px-4 py-2.5 text-[12px] font-semibold text-white shadow-sm transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 px-4 py-2.5 text-[12px] font-semibold text-white shadow-sm transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
             {state.saving ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconCheck className="h-3.5 w-3.5" />}
             Save
           </button>
@@ -304,6 +380,10 @@ function KeyRow({
             </button>
           )}
         </div>
+
+        {state.saveError && (
+          <p className="mt-2 text-[12px] font-medium text-rose-300/95">{state.saveError}</p>
+        )}
 
         {/* Test result */}
         {state.testResult && (
@@ -337,7 +417,10 @@ function SectionHeader({ icon, title, desc }: { icon: ReactNode; title: string; 
         {icon}
       </div>
       <div>
-        <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{title}</h2>
+        <h2 className="relative inline-block text-[17px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
+          {title}
+          <span className="absolute -bottom-1 left-0 h-0.5 w-14 rounded-full bg-gradient-to-r from-sky-500 to-violet-500 opacity-90" aria-hidden />
+        </h2>
         <p className="mt-0.5 text-[13px] leading-snug text-[var(--text-secondary)]">{desc}</p>
       </div>
     </div>
@@ -361,13 +444,18 @@ export default function ApiKeysPanel() {
       if (res.ok) {
         const d = await res.json();
         // Server keys
-        setOne('anthropic',    { has: !!d.has.anthropic,  masked: null });
-        setOne('google_ai',    { has: !!d.has.google_ai,  masked: null });
-        setOne('openai',       { has: !!d.has.openai,     masked: null });
-        setOne('stripe_secret',{ has: !!d.has.stripe,     masked: null });
-        setOne('stripe_pub',   { has: !!d.has.stripe_pub, masked: null });
-        setOne('tavily',       { has: !!d.has.tavily,     masked: null });
-        setOne('notion',       { has: !!d.has.notion,     masked: null });
+        setOne('anthropic', { has: !!d.has.anthropic, masked: d.previews?.anthropic ?? null, saveError: null });
+        setOne('google_ai', { has: !!d.has.google_ai, masked: d.previews?.google_ai ?? null, saveError: null });
+        setOne('openai', { has: !!d.has.openai, masked: d.previews?.openai ?? null, saveError: null });
+        setOne('deepseek', { has: !!d.has.deepseek, masked: d.previews?.deepseek ?? null, saveError: null });
+        setOne('stripe_secret', {
+          has: !!d.has.stripe,
+          masked: d.previews?.stripe_secret ?? null,
+          saveError: null,
+        });
+        setOne('stripe_pub', { has: !!d.has.stripe_pub, masked: d.previews?.stripe_pub ?? null, saveError: null });
+        setOne('tavily', { has: !!d.has.tavily, masked: d.previews?.tavily ?? null, saveError: null });
+        setOne('notion', { has: !!d.has.notion, masked: d.previews?.notion ?? null, saveError: null });
       }
     } catch {/* ignore */} finally {
       setLoading(false);
@@ -385,20 +473,32 @@ export default function ApiKeysPanel() {
   async function save(prov: ProviderDef, state: KS) {
     const val = state.input.trim();
     if (!val) return;
-    setOne(prov.id, { saving: true });
+    setOne(prov.id, { saving: true, saveError: null });
 
     if (prov.storage === 'server') {
-      await fetch('/api/user-keys', {
-        method: 'POST', credentials: 'include',
+      const res = await fetch('/api/user-keys', {
+        method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [prov.field]: val }),
       });
+      let errMsg: string | null = null;
+      try {
+        const data = (await res.json()) as { error?: string };
+        if (!res.ok) errMsg = data.error ?? `HTTP ${res.status}`;
+      } catch {
+        if (!res.ok) errMsg = `HTTP ${res.status}`;
+      }
+      if (errMsg) {
+        setOne(prov.id, { saving: false, saveError: errMsg });
+        return;
+      }
     } else {
       const extra = loadExtra();
       extra[prov.id] = val;
       saveExtra(extra);
     }
-    setOne(prov.id, { saving: false, has: true, input: '', masked: val.slice(0, 6) + '••••••••' + val.slice(-4), testResult: null });
+    await load();
   }
 
   // ── Remove handler ───────────────────────────────────────────────────────
@@ -453,11 +553,30 @@ export default function ApiKeysPanel() {
           {/* How it works cards */}
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
-              { title: 'You add keys', desc: 'From Claude, Google, OpenAI, and more.', tone: 'from-sky-400/15 to-violet-400/10' },
-              { title: 'We connect them', desc: 'Chat, agents, and automations use your keys.', tone: 'from-violet-400/15 to-rose-400/10' },
-              { title: 'You pay providers', desc: 'Only the services you use — not Finedge.', tone: 'from-emerald-400/15 to-sky-400/10' },
+              {
+                title: 'You add keys',
+                desc: 'From Claude, Google, OpenAI, DeepSeek, and more.',
+                from: '#1a2744',
+                to: '#243454',
+              },
+              {
+                title: 'We connect them',
+                desc: 'Chat, agents, and automations use your keys.',
+                from: '#2d1b4e',
+                to: '#3d2560',
+              },
+              {
+                title: 'You pay providers',
+                desc: 'Only the services you use — not Finedge.',
+                from: '#0d3320',
+                to: '#144a32',
+              },
             ].map(c => (
-              <div key={c.title} className={`rounded-2xl border border-white/[0.08] bg-gradient-to-br ${c.tone} p-4`}>
+              <div
+                key={c.title}
+                className="rounded-2xl border border-white/[0.08] p-4"
+                style={{ background: `linear-gradient(145deg, ${c.from}, ${c.to})` }}
+              >
                 <p className="text-[14px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{c.title}</p>
                 <p className="mt-1 text-[12px] leading-snug text-[var(--text-secondary)]">{c.desc}</p>
               </div>
@@ -465,14 +584,25 @@ export default function ApiKeysPanel() {
           </div>
 
           {/* Stats bar */}
-          <div className="mt-5 flex flex-col gap-2 rounded-2xl border border-white/[0.08] bg-[var(--bg-card)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-emerald-300/80" />
-              <p className="text-[13px] text-[var(--text-secondary)]">
-                <strong className="font-semibold text-[var(--text-primary)]">{loading ? '…' : connectedCount}</strong> of {totalCount} providers connected
-              </p>
+          <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-[var(--bg-card)] px-4 py-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-300/80 shadow-[0_0_10px_rgba(52,211,153,0.45)]" />
+                <p className="text-[13px] text-[var(--text-secondary)]">
+                  <strong className="font-semibold text-[var(--text-primary)]">{loading ? '…' : connectedCount}</strong>{' '}
+                  of {totalCount} providers connected
+                </p>
+              </div>
+              <p className="text-[12px] text-emerald-200/80">Keys are encrypted. You can remove them anytime.</p>
             </div>
-            <p className="text-[12px] text-emerald-200/80">Keys are encrypted. You can remove them anytime.</p>
+            {!loading && totalCount > 0 && (
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-sky-500 to-violet-500 transition-[width] duration-500"
+                  style={{ width: `${Math.min(100, Math.round((connectedCount / totalCount) * 100))}%` }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -480,11 +610,11 @@ export default function ApiKeysPanel() {
         <div className="mb-10">
           <SectionHeader
             icon={<IconRobot className="h-5 w-5" stroke={1.5} />}
-            title="AI providers"
-            desc="Add at least one model key to use chat and agents."
+            title="AI models"
+            desc="Claude, Gemini, GPT, and DeepSeek — add the keys for models you want in Chat."
           />
           <div className="space-y-3">
-            {AI_PROVIDERS.map(prov => (
+            {AI_PRIMARY.map(prov => (
               <KeyRow key={prov.id} prov={prov} state={st(prov.id)}
                 onChange={v => setOne(prov.id, { input: v, testResult: null })}
                 onSave={() => save(prov, st(prov.id))}
@@ -496,6 +626,28 @@ export default function ApiKeysPanel() {
             ))}
           </div>
         </div>
+
+        {AI_MORE.length > 0 && (
+          <div className="mb-10">
+            <SectionHeader
+              icon={<IconRobot className="h-5 w-5" stroke={1.5} />}
+              title="More AI providers"
+              desc="Optional — local browser storage or additional hosts."
+            />
+            <div className="space-y-3">
+              {AI_MORE.map(prov => (
+                <KeyRow key={prov.id} prov={prov} state={st(prov.id)}
+                  onChange={v => setOne(prov.id, { input: v, testResult: null })}
+                  onSave={() => save(prov, st(prov.id))}
+                  onRemove={() => remove(prov)}
+                  onTest={() => test(prov.id)}
+                  onToggleShow={() => setOne(prov.id, { show: !st(prov.id).show })}
+                  onToggleHow={() => setOne(prov.id, { howOpen: !st(prov.id).howOpen })}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Tools & Search ─────────────────────────────────────────────── */}
         <div className="mb-10">

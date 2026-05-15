@@ -11,13 +11,13 @@ import {
   IconFile, IconCode, IconBrain, IconEdit,
   IconSchool, IconChartLine, IconBrandGoogleDrive, IconMail, IconChevronDown,
 } from '@tabler/icons-react';
-import { LogoGoogleGemini, LogoAnthropicClaude } from '@/components/provider-brand-icons';
+import { LogoGoogleGemini, LogoAnthropicClaude, LogoDeepseek } from '@/components/provider-brand-icons';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface ToolCall { name: string; status: 'running' | 'done'; }
 interface Message {
   id: string; role: 'user' | 'assistant'; content: string;
-  model?: 'claude' | 'gemini'; timestamp: Date;
+  model?: 'claude' | 'gemini' | 'deepseek'; timestamp: Date;
   streaming?: boolean; toolCalls?: ToolCall[];
 }
 interface ChatSession {
@@ -52,10 +52,27 @@ const PREBUILT_AGENTS: Agent[] = [
   { id:'pre_consultant',name:'Business Consultant',avatar:'🤝',category:'Consulting',model:'claude-sonnet-4-5',description:'Strategy, process optimization, growth.',systemInstruction:'You are a senior business consultant. Help with strategic planning, operational efficiency, client retention, and growth roadmaps.'},
 ];
 
-const MODELS = [
-  { value: 'claude-sonnet-4-5', label: 'Claude Sonnet 4.5', kind: 'claude' as const },
-  { value: 'gemini',            label: 'Gemini 1.5 Pro',    kind: 'gemini' as const },
+const MODEL_CATALOG: {
+  value: string;
+  label: string;
+  kind: 'claude' | 'gemini' | 'deepseek';
+  /** Which vault key must exist to use this model */
+  key: 'anthropic' | 'google_ai' | 'deepseek';
+}[] = [
+  { value: 'claude-sonnet-4-5', label: 'Claude Sonnet 4.5', kind: 'claude', key: 'anthropic' },
+  { value: 'gemini', label: 'Gemini 1.5 Pro', kind: 'gemini', key: 'google_ai' },
+  { value: 'deepseek-chat', label: 'DeepSeek Chat', kind: 'deepseek', key: 'deepseek' },
+  { value: 'deepseek-reasoner', label: '🧠 DeepSeek R1', kind: 'deepseek', key: 'deepseek' },
 ];
+
+function shortModelLabel(value: string) {
+  const m = MODEL_CATALOG.find(x => x.value === value);
+  if (!m) return 'Sonnet 4.5';
+  if (m.kind === 'claude') return 'Sonnet 4.5';
+  if (m.kind === 'gemini') return 'Gemini 1.5 Pro';
+  if (m.value === 'deepseek-reasoner') return 'DeepSeek R1';
+  return 'DeepSeek Chat';
+}
 
 /** Claude-style short greeting (e.g. "Evening, Alex") */
 function getClaudeGreeting() {
@@ -63,12 +80,6 @@ function getClaudeGreeting() {
   if (h < 12) return 'Morning';
   if (h < 17) return 'Afternoon';
   return 'Evening';
-}
-
-function shortModelLabel(value: string) {
-  const m = MODELS.find(x => x.value === value);
-  if (!m) return 'Sonnet 4.5';
-  return m.kind === 'claude' ? 'Sonnet 4.5' : 'Gemini 1.5 Pro';
 }
 
 function ClaudeWaveform({ className }: { className?: string }) {
@@ -164,18 +175,35 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
   const [selectedModel, setSelectedModel] = useState('claude-sonnet-4-5');
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [kbEnabled, setKbEnabled]       = useState(false);
-  const [hasApiKey, setHasApiKey]       = useState<boolean | null>(null);
+  const [keyConn, setKeyConn] = useState({
+    anthropic: false,
+    google_ai: false,
+    deepseek: false,
+    openai: false,
+  });
   const [showCapMenu, setShowCapMenu]   = useState(false);
   const [activeCapabilities, setActiveCapabilities] = useState<Set<string>>(new Set());
   const [sidebarOpen, setSidebarOpen]   = useState(true);
   const [sidebarSearch, setSidebarSearch] = useState('');
 
+  const hasApiKey =
+    keyConn.anthropic || keyConn.openai || keyConn.google_ai || keyConn.deepseek;
+
   // Check API key
   useEffect(() => {
     fetch('/api/user-keys', { credentials: 'include' })
       .then(r => r.json())
-      .then(d => setHasApiKey(!!(d.has?.anthropic || d.has?.openai || d.has?.google_ai)))
-      .catch(() => setHasApiKey(false));
+      .then(d => {
+        setKeyConn({
+          anthropic: !!d.has?.anthropic,
+          google_ai: !!d.has?.google_ai,
+          deepseek: !!d.has?.deepseek,
+          openai: !!d.has?.openai,
+        });
+      })
+      .catch(() =>
+        setKeyConn({ anthropic: false, google_ai: false, deepseek: false, openai: false }),
+      );
   }, []);
 
   // Load sessions + handle pending agent
@@ -298,7 +326,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
       const reader = res.body.getReader();
       const dec = new TextDecoder();
       let buffer = '';
-      let detectedModel: 'claude' | 'gemini' = 'claude';
+      let detectedModel: 'claude' | 'gemini' | 'deepseek' = 'claude';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -313,7 +341,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
             if (evt.done) {
               setMessages(prev => { const u = prev.map(m => m.id === assistantId ? { ...m, streaming: false, model: detectedModel } : m); persistMessages(sessionId!, u); return u; });
             } else if (evt.text) {
-              if (evt.model) detectedModel = evt.model as 'claude' | 'gemini';
+              if (evt.model) detectedModel = evt.model as 'claude' | 'gemini' | 'deepseek';
               setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: m.content + evt.text, model: detectedModel } : m));
             } else if (evt.tool) {
               setMessages(prev => prev.map(m => {
@@ -413,13 +441,47 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
 
           {/* Model selector */}
           <div className="flex items-center gap-1 rounded-full border border-[#353538] bg-[#252525] p-0.5">
-            {MODELS.map(m => (
-              <button key={m.value} onClick={() => setSelectedModel(m.value)}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${selectedModel === m.value ? 'bg-[#363636] text-[#ececec]' : 'text-[#9b9b9b] hover:text-[#ececec]'}`}>
-                {m.kind === 'gemini' ? <LogoGoogleGemini size={14} /> : <LogoAnthropicClaude size={14} />}
-                {m.label}
-              </button>
-            ))}
+            {MODEL_CATALOG.map(m => {
+              const connected = keyConn[m.key];
+              return (
+                <button
+                  key={m.value}
+                  type="button"
+                  title={connected ? m.label : `Add ${m.key} key in Settings`}
+                  disabled={!connected}
+                  onClick={() => connected && setSelectedModel(m.value)}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                    selectedModel === m.value
+                      ? 'bg-[#363636] text-[#ececec]'
+                      : connected
+                        ? 'text-[#9b9b9b] hover:text-[#ececec]'
+                        : 'cursor-not-allowed text-[#9b9b9b]/35 opacity-50'
+                  }`}
+                >
+                  <span className="relative flex shrink-0">
+                    {m.kind === 'gemini' ? (
+                      <LogoGoogleGemini size={14} />
+                    ) : m.kind === 'deepseek' ? (
+                      <LogoDeepseek size={14} />
+                    ) : (
+                      <LogoAnthropicClaude size={14} />
+                    )}
+                    {connected && (
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 rounded-full border border-[#252525] ${
+                          m.kind === 'claude'
+                            ? 'bg-orange-400'
+                            : m.kind === 'gemini'
+                              ? 'bg-sky-400'
+                              : 'bg-blue-500'
+                        }`}
+                      />
+                    )}
+                  </span>
+                  {m.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Agent badge */}
@@ -494,7 +556,14 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
 
                     {msg.role === 'assistant' && (
                       <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#333] bg-[#242424] text-sm">
-                        {selectedAgent?.avatar ?? (msg.model === 'gemini' ? <LogoGoogleGemini size={16} className="rounded-full" /> : <LogoAnthropicClaude size={16} className="rounded-full" />)}
+                        {selectedAgent?.avatar ??
+                          (msg.model === 'gemini' ? (
+                            <LogoGoogleGemini size={16} className="rounded-full" />
+                          ) : msg.model === 'deepseek' ? (
+                            <LogoDeepseek size={16} />
+                          ) : (
+                            <LogoAnthropicClaude size={16} className="rounded-full" />
+                          ))}
                       </div>
                     )}
 
@@ -518,7 +587,15 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                         <div className="text-[#d4d4d4]">
                           {msg.model && !msg.streaming && (
                             <p className="mb-2 font-sans text-[10px] font-medium uppercase tracking-wide text-[#6b6b6b]">
-                              {selectedAgent ? `${selectedAgent.avatar} ${selectedAgent.name}` : msg.model === 'claude' ? 'Claude Sonnet 4.5' : 'Gemini 1.5 Pro'}
+                              {selectedAgent
+                                ? `${selectedAgent.avatar} ${selectedAgent.name}`
+                                : msg.model === 'claude'
+                                  ? 'Claude Sonnet 4.5'
+                                  : msg.model === 'gemini'
+                                    ? 'Gemini 1.5 Pro'
+                                    : msg.model === 'deepseek'
+                                      ? 'DeepSeek'
+                                      : 'AI'}
                             </p>
                           )}
                           <p className="whitespace-pre-wrap font-serif text-[15px] leading-[1.65] tracking-[-0.01em]">
@@ -626,7 +703,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                     aria-label="Model"
                     className="absolute inset-0 cursor-pointer opacity-0"
                   >
-                    {MODELS.map(m => (
+                    {MODEL_CATALOG.map(m => (
                       <option key={m.value} value={m.value}>{m.label}</option>
                     ))}
                   </select>

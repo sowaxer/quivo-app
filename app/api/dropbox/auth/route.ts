@@ -9,6 +9,7 @@ import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { createSignedOAuthState, verifySignedOAuthState } from '@/lib/oauth-state';
+import { encryptOptionalToken } from '@/lib/encrypted-field';
 
 const DROPBOX_CLIENT_ID     = process.env.DROPBOX_CLIENT_ID ?? '';
 const DROPBOX_CLIENT_SECRET = process.env.DROPBOX_CLIENT_SECRET ?? '';
@@ -59,8 +60,8 @@ export async function GET(req: NextRequest) {
 
       await db().from('dropbox_tokens').upsert({
         user_id: userId,
-        access_token: token.access_token,
-        refresh_token: token.refresh_token ?? null,
+        access_token: encryptOptionalToken(token.access_token) as string,
+        refresh_token: encryptOptionalToken(token.refresh_token ?? null),
         account_id: token.account_id,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });

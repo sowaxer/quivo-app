@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
-import { exchangeCodeForTokens } from '@/lib/google';
+import { exchangeCodeForTokens, getGoogleOAuthConfigSnapshot } from '@/lib/google';
 import { logErrorChain } from '@/lib/log-error-chain';
 import { verifySignedOAuthState } from '@/lib/oauth-state';
 
@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
     hasState: !!req.nextUrl.searchParams.get('state'),
     hasError: !!req.nextUrl.searchParams.get('error'),
     appUrl: process.env.NEXT_PUBLIC_APP_URL ?? '(not set)',
+    oauth: getGoogleOAuthConfigSnapshot(),
   });
 
   const rlDenied = await rateLimitExceededResponse('default', await rateLimitKey('google-oauth-callback'));

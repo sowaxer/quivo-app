@@ -114,6 +114,7 @@ export const UserKeysDeleteFieldSchema = z.object({
     'anthropic_key',
     'openai_key',
     'google_ai_key',
+    'deepseek_key',
     'stripe_secret',
     'stripe_pub',
     'tavily_key',

@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { getGoogleOAuthConfigSnapshot, getGoogleOAuthRedirectUri } from '@/lib/google';
 
 export async function GET() {
   const { userId } = await auth();
@@ -27,11 +28,24 @@ export async function GET() {
   // 2. Client secret set
   checks.push({ label: 'GOOGLE_CLIENT_SECRET in .env.local', ok: !!process.env.GOOGLE_CLIENT_SECRET, note: process.env.GOOGLE_CLIENT_SECRET ? '✓ set' : 'Missing' });
 
-  // 3. App URL set
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-  const redirectUri = `${appUrl.replace(/\/$/, '')}/api/google/auth/callback`;
-  checks.push({ label: 'NEXT_PUBLIC_APP_URL', ok: !!process.env.NEXT_PUBLIC_APP_URL, note: appUrl });
-  checks.push({ label: 'Expected redirect URI', ok: true, note: redirectUri });
+  // 3. Redirect URI (must match Google Cloud Console exactly)
+  const { uri: redirectUri, source: redirectSource } = getGoogleOAuthRedirectUri();
+  const snap = getGoogleOAuthConfigSnapshot();
+  checks.push({
+    label: 'OAuth redirect URI resolution',
+    ok: !!redirectUri,
+    note: `${redirectUri} (source: ${redirectSource})`,
+  });
+  checks.push({
+    label: 'NEXT_PUBLIC_APP_URL',
+    ok: !!process.env.NEXT_PUBLIC_APP_URL?.trim(),
+    note: process.env.NEXT_PUBLIC_APP_URL?.trim() ?? '(not set)',
+  });
+  checks.push({
+    label: 'GOOGLE_OAUTH_REDIRECT_URI (optional; use in prod for exact Console match)',
+    ok: true,
+    note: process.env.GOOGLE_OAUTH_REDIRECT_URI?.trim() ?? '(not set — using NEXT_PUBLIC_APP_URL / VERCEL_URL / localhost)',
+  });
 
   // 4. google_tokens table exists
   let tableExists = false;
@@ -58,6 +72,10 @@ export async function GET() {
   return NextResponse.json({
     userId,
     redirectUri,
+    redirectUriSource: redirectSource,
+    oauthClientId: snap.clientId,
+    clientSecretLength: snap.clientSecretLength,
+    clientSecretPreview: snap.clientSecretPreview,
     allOk,
     checks,
     nextStep: allOk

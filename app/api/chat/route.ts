@@ -20,22 +20,11 @@ import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
 import { createAnthropicClient } from '@/lib/ai-clients';
 import { createStripeClient } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
-import { getDecryptedSecret } from '@/lib/user-secret-store';
+import { getDecryptedSecret, touchSecretLastUsed } from '@/lib/user-secret-store';
+import { loadTokens } from '@/lib/google';
 
-// ─── Supabase ─────────────────────────────────────────────────────────────────
 function db() {
   return getSupabaseAdmin();
-}
-
-async function getGoogleTokens(userId: string) {
-  try {
-    const { data } = await db()
-      .from('google_tokens')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    return data;
-  } catch { return null; }
 }
 
 // ─── Tool implementations ──────────────────────────────────────────────────────
@@ -285,11 +274,111 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid agent instruction' }, { status: 400 });
   }
 
-  const [anthropicKey, stripeKey, tavilyKey, googleTokens] = await Promise.all([
-    getDecryptedSecret(userId, 'anthropic'),
+  const deepseekModel = model === 'deepseek-chat' || model === 'deepseek-reasoner';
+  if (deepseekModel) {
+    const deepseekKey = await getDecryptedSecret(userId, 'deepseek', { touchUsed: true });
+    const enc = new TextEncoder();
+    if (!deepseekKey) {
+      const stream = new ReadableStream({
+        start(c) {
+          c.enqueue(
+            enc.encode(
+              sse({
+                error:
+                  'No DeepSeek API key found. Add it under API Keys or Settings → AI Providers.',
+              }),
+            ),
+          );
+          c.close();
+        },
+      });
+      return new NextResponse(stream, {
+        headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' },
+      });
+    }
+
+    const dsModel = model === 'deepseek-reasoner' ? 'deepseek-reasoner' : 'deepseek-chat';
+    const systemText = agentInstruction
+      ? `${agentInstruction}\n\nToday: ${new Date().toLocaleDateString('en-US')}`
+      : `You are Finedge AI, a financial and business assistant.\nToday: ${new Date().toLocaleDateString('en-US')}`;
+    const apiMessages = [
+      { role: 'system' as const, content: systemText },
+      ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+    ];
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const send = (data: object) => controller.enqueue(enc.encode(sse(data)));
+        try {
+          const res = await fetch('https://api.deepseek.com/chat/completions', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${deepseekKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: dsModel,
+              messages: apiMessages,
+              stream: true,
+              max_tokens: 4096,
+            }),
+          });
+          if (!res.ok) {
+            const errText = await res.text();
+            send({ error: `DeepSeek: HTTP ${res.status} — ${errText.slice(0, 240)}` });
+            send({ done: true, model: 'deepseek' });
+            return;
+          }
+          const reader = res.body!.getReader();
+          const dec = new TextDecoder();
+          let buffer = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += dec.decode(value, { stream: true });
+            const parts = buffer.split(/\r?\n/);
+            buffer = parts.pop() ?? '';
+            for (const part of parts) {
+              const line = part.trim();
+              if (!line.startsWith('data:')) continue;
+              const payload = line.startsWith('data: ') ? line.slice(6).trim() : line.slice(5).trim();
+              if (payload === '[DONE]') continue;
+              try {
+                const json = JSON.parse(payload) as {
+                  choices?: { delta?: { content?: string; reasoning_content?: string } }[];
+                };
+                const d = json.choices?.[0]?.delta;
+                const chunk = d?.content ?? d?.reasoning_content;
+                if (typeof chunk === 'string' && chunk.length) send({ text: chunk, model: 'deepseek' });
+              } catch {
+                /* ignore parse errors for partial chunks */
+              }
+            }
+          }
+          send({ done: true, model: 'deepseek' });
+        } catch (e) {
+          send({ error: e instanceof Error ? e.message : 'DeepSeek request failed' });
+          send({ done: true, model: 'deepseek' });
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new NextResponse(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+      },
+    });
+  }
+
+  const [anthropicKey, stripeKey, tavilyKey, googleCreds] = await Promise.all([
+    getDecryptedSecret(userId, 'anthropic', { touchUsed: true }),
     getDecryptedSecret(userId, 'stripe_secret'),
     getDecryptedSecret(userId, 'tavily'),
-    getGoogleTokens(userId),
+    loadTokens(userId),
   ]);
 
   if (!anthropicKey) {
@@ -303,11 +392,13 @@ export async function POST(req: NextRequest) {
     return new NextResponse(stream, { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' } });
   }
 
+  const googleConnected = Boolean(googleCreds?.refresh_token);
+
   // Build system prompt with context about what's connected
   const connectedServices = [
     stripeKey    ? '✓ Stripe (can query invoices, MRR, customers)'    : '✗ Stripe (not connected)',
-    googleTokens ? '✓ Gmail (can read emails)'                         : '✗ Gmail (not connected)',
-    googleTokens ? '✓ Google Calendar (can read events)'               : '✗ Calendar (not connected)',
+    googleConnected ? '✓ Gmail (can read emails)'                         : '✗ Gmail (not connected)',
+    googleConnected ? '✓ Google Calendar (can read events)'               : '✗ Calendar (not connected)',
     tavilyKey    ? '✓ Web Search (can search internet in real-time)'   : '✗ Web Search (no Tavily key)',
   ].join('\n');
 
@@ -339,8 +430,8 @@ IMPORTANT RULES:
   // Determine which tools to include based on what's available
   const availableTools = TOOLS.filter(t => {
     if (t.name === 'query_stripe'   && !stripeKey)    return false;
-    if (t.name === 'query_gmail'    && !googleTokens) return false;
-    if (t.name === 'query_calendar' && !googleTokens) return false;
+    if (t.name === 'query_gmail'    && !googleConnected) return false;
+    if (t.name === 'query_calendar' && !googleConnected) return false;
     if (t.name === 'web_search'     && !tavilyKey)    return false;
     return true;
   });
@@ -398,10 +489,16 @@ IMPORTANT RULES:
             const input = tu.input as Record<string, string>;
             let result: unknown;
 
-            if (tu.name === 'query_stripe'   && stripeKey)    result = await toolQueryStripe(input, stripeKey);
-            else if (tu.name === 'query_gmail' && googleTokens)   result = await toolQueryGmail(input, googleTokens as Record<string, unknown>);
-            else if (tu.name === 'query_calendar' && googleTokens) result = await toolQueryCalendar(input, googleTokens as Record<string, unknown>);
-            else if (tu.name === 'web_search' && tavilyKey)   result = await toolWebSearch(input, tavilyKey);
+            if (tu.name === 'query_stripe'   && stripeKey) {
+              result = await toolQueryStripe(input, stripeKey);
+              void touchSecretLastUsed(userId, 'stripe_secret');
+            }
+            else if (tu.name === 'query_gmail' && googleCreds)   result = await toolQueryGmail(input, googleCreds as Record<string, unknown>);
+            else if (tu.name === 'query_calendar' && googleCreds) result = await toolQueryCalendar(input, googleCreds as Record<string, unknown>);
+            else if (tu.name === 'web_search' && tavilyKey) {
+              result = await toolWebSearch(input, tavilyKey);
+              void touchSecretLastUsed(userId, 'tavily');
+            }
             else if (tu.name === 'query_notes')                result = await toolQueryNotes(userId);
             else result = { error: 'Service not connected' };
 

@@ -9,80 +9,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { rateLimitExceededResponse, rateLimitKey } from '@/lib/api-rate-limit';
+import {
+  verifyAnthropicKey,
+  verifyDeepSeekKey,
+  verifyGoogleAIKey,
+  verifyOpenAIKey,
+  verifyStripeSecretKey,
+} from '@/lib/provider-key-verify';
 import { getDecryptedSecret } from '@/lib/user-secret-store';
 
 const PROVIDER_MAP: Record<string, string> = {
   anthropic: 'anthropic',
   openai: 'openai',
   google_ai: 'google_ai',
+  deepseek: 'deepseek',
   stripe: 'stripe_secret',
+  stripe_secret: 'stripe_secret',
 };
-
-async function testAnthropic(key: string): Promise<{ success: boolean; message: string }> {
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'Hi' }],
-      }),
-    });
-    if (res.ok) return { success: true, message: 'Claude connected' };
-    const err = await res.json().catch(() => ({}));
-    return { success: false, message: (err as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}` };
-  } catch (e) {
-    return { success: false, message: String(e) };
-  }
-}
-
-async function testOpenAI(key: string): Promise<{ success: boolean; message: string }> {
-  try {
-    const res = await fetch('https://api.openai.com/v1/models', {
-      headers: { Authorization: `Bearer ${key}` },
-    });
-    if (res.ok) return { success: true, message: 'OpenAI connected' };
-    const err = await res.json().catch(() => ({}));
-    return { success: false, message: (err as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}` };
-  } catch (e) {
-    return { success: false, message: String(e) };
-  }
-}
-
-async function testGoogleAI(key: string): Promise<{ success: boolean; message: string }> {
-  try {
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models', {
-      headers: { 'x-goog-api-key': key },
-    });
-    if (res.ok) return { success: true, message: 'Gemini connected' };
-    const err = await res.json().catch(() => ({}));
-    return { success: false, message: (err as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}` };
-  } catch (e) {
-    return { success: false, message: String(e) };
-  }
-}
-
-async function testStripe(key: string): Promise<{ success: boolean; message: string; mode?: string }> {
-  try {
-    const res = await fetch('https://api.stripe.com/v1/account', {
-      headers: { Authorization: `Bearer ${key}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const mode = key.startsWith('sk_live') ? 'Live' : 'Test';
-      return { success: true, message: `Stripe ${mode} connected · ${(data as { email?: string }).email ?? ''}`, mode };
-    }
-    const err = await res.json().catch(() => ({}));
-    return { success: false, message: (err as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}` };
-  } catch (e) {
-    return { success: false, message: String(e) };
-  }
-}
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
@@ -101,18 +44,32 @@ export async function POST(req: NextRequest) {
 
   let result: { success: boolean; message: string };
   switch (provider) {
-    case 'anthropic':
-      result = await testAnthropic(key);
+    case 'anthropic': {
+      const v = await verifyAnthropicKey(key);
+      result = { success: v.ok, message: v.message };
       break;
-    case 'openai':
-      result = await testOpenAI(key);
+    }
+    case 'openai': {
+      const v = await verifyOpenAIKey(key);
+      result = { success: v.ok, message: v.message };
       break;
-    case 'google_ai':
-      result = await testGoogleAI(key);
+    }
+    case 'google_ai': {
+      const v = await verifyGoogleAIKey(key);
+      result = { success: v.ok, message: v.message };
       break;
+    }
+    case 'deepseek': {
+      const v = await verifyDeepSeekKey(key);
+      result = { success: v.ok, message: v.message };
+      break;
+    }
     case 'stripe':
-      result = await testStripe(key);
+    case 'stripe_secret': {
+      const v = await verifyStripeSecretKey(key);
+      result = { success: v.ok, message: v.message };
       break;
+    }
     default:
       result = { success: false, message: 'Unknown provider' };
   }

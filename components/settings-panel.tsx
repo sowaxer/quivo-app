@@ -7,10 +7,10 @@ import {
   IconCheck, IconX, IconLoader2, IconEye, IconEyeOff,
   IconTrash, IconDownload, IconRefresh, IconExternalLink,
   IconBrandGoogle, IconBrandStripe, IconSparkles,
-  IconAlertTriangle, IconSend, IconUpload, IconKey,
+  IconAlertTriangle, IconSend, IconUpload, IconKey, IconLock,
 } from '@tabler/icons-react';
 import { useTheme } from '@/components/theme-provider';
-import { GeminiMarkIcon, OpenAIMarkIcon, AnthropicMarkIcon } from '@/components/provider-brand-icons';
+import { GeminiMarkIcon, OpenAIMarkIcon, AnthropicMarkIcon, LogoDeepseek } from '@/components/provider-brand-icons';
 
 // ─── Inline theme toggle for settings ────────────────────────────────────────
 function ThemeToggleInline() {
@@ -57,7 +57,7 @@ function TabBtn({ active, onClick, icon: Icon, label }: { active: boolean; onCli
   return (
     <button onClick={onClick}
       className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium rounded-xl transition-all ${
-        active ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-900/30'
+        active ? 'bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-violet-900/35'
                : 'text-[#8b949e] hover:bg-[#1e2836] hover:text-[#e6edf3]'}`}>
       <Icon className="h-4 w-4" />
       {label}
@@ -95,7 +95,7 @@ function SectionCard({ title, subtitle, children }: { title: string; subtitle?: 
 // ─── Provider Key Editor ──────────────────────────────────────────────────────
 function ProviderKeyEditor({
   name, icon: Icon, iconColor, keyPrefix, placeholder, docUrl,
-  state, onChange, onSave, onRemove, onTest, howToGet,
+  state, onChange, onSave, onRemove, onTest, howToGet, onToggleShow,
 }: {
   name: string; icon: React.ElementType; iconColor: string; keyPrefix?: string;
   placeholder: string; docUrl: string; howToGet?: string;
@@ -104,6 +104,7 @@ function ProviderKeyEditor({
   onSave: () => void;
   onRemove: () => void;
   onTest: () => void;
+  onToggleShow: () => void;
 }) {
   return (
     <div className="rounded-xl border border-[#1e2836] bg-[#0f1419] p-4">
@@ -130,15 +131,23 @@ function ProviderKeyEditor({
       {/* Key input */}
       <div className="flex gap-2">
         <div className="relative flex-1">
+          {state.has && (
+            <span className="pointer-events-none absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-emerald-400/90">
+              <IconLock className="h-3.5 w-3.5" aria-hidden />
+            </span>
+          )}
           <input
             type={state.show ? 'text' : 'password'}
-            value={state.input || (state.has ? '••••••••••••••••••••••••' : '')}
+            value={state.input || (state.has ? (state.masked ?? '••••••••••••••••••••••••') : '')}
             onChange={e => onChange(e.target.value)}
-            onFocus={e => { if (!state.input && state.has) e.target.value = ''; onChange(''); }}
             placeholder={placeholder}
-            className="w-full rounded-xl border border-[#1e2836] bg-[#0a0e1a] py-2.5 pl-4 pr-10 text-sm text-[#e6edf3] placeholder-[#8b949e] focus:border-[#3b82f6]/50 focus:outline-none font-mono"
+            className={`w-full rounded-xl border border-[#1e2836] bg-[#0a0e1a] py-2.5 pr-10 text-sm text-[#e6edf3] placeholder-[#8b949e] focus:border-[#3b82f6]/50 focus:outline-none font-mono ${state.has ? 'pl-10' : 'pl-4'}`}
           />
-          <button onClick={() => onChange(state.input)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8b949e] hover:text-[#e6edf3]">
+          <button
+            type="button"
+            onClick={onToggleShow}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8b949e] hover:text-[#e6edf3]"
+          >
             {state.show ? <IconEyeOff className="h-3.5 w-3.5" /> : <IconEye className="h-3.5 w-3.5" />}
           </button>
         </div>
@@ -191,7 +200,10 @@ export default function SettingsPanel() {
   const [googleAI, setGoogleAI]   = useState<KeyState>(mkKey());
   const [stripeSecret, setStripeSecret] = useState<KeyState>(mkKey());
   const [stripePub, setStripePub]       = useState<KeyState>(mkKey());
-  const [tavily, setTavily]             = useState<KeyState>(mkKey());
+  const [deepseek, setDeepseek] = useState<KeyState>(mkKey());
+  const [tavily, setTavily] = useState<KeyState>(mkKey());
+  const [googleEmail, setGoogleEmail] = useState<string | null>(null);
+  const [dropboxOauthReady, setDropboxOauthReady] = useState(true);
 
   // Integration status
   const [googleConnected, setGoogleConnected]   = useState<boolean | null>(null);
@@ -212,6 +224,11 @@ export default function SettingsPanel() {
     chatWidth:            'standard',
   });
   const [prefSaved, setPrefSaved] = useState(false);
+  const [oauthRedirectBase, setOauthRedirectBase] = useState('');
+
+  useEffect(() => {
+    setOauthRedirectBase(typeof window !== 'undefined' ? window.location.origin : '');
+  }, []);
 
   // ── Load keys from server ──────────────────────────────────────────────────
   const loadKeys = useCallback(async () => {
@@ -225,22 +242,38 @@ export default function SettingsPanel() {
 
       if (keysRes.status === 'fulfilled' && keysRes.value.ok) {
         const d = await keysRes.value.json();
-        const update = (setter: React.Dispatch<React.SetStateAction<KeyState>>, field: string) => {
-          setter(prev => ({ ...prev, has: d.has[field] ?? false, masked: null }));
+        const update = (
+          setter: React.Dispatch<React.SetStateAction<KeyState>>,
+          field: string,
+          preview?: string | null,
+        ) => {
+          setter(prev => ({ ...prev, has: d.has[field] ?? false, masked: preview ?? null }));
         };
-        update(setAnthropic, 'anthropic');
-        update(setOpenai,    'openai');
-        update(setGoogleAI,  'google_ai');
-        setStripeSecret(prev => ({ ...prev, has: d.has.stripe ?? false, masked: null }));
-        setStripePub(prev => ({ ...prev, has: d.has.stripe_pub ?? false, masked: null }));
-        setTavily(prev => ({ ...prev, has: d.has.tavily ?? false }));
+        update(setAnthropic, 'anthropic', d.previews?.anthropic);
+        update(setOpenai,    'openai',    d.previews?.openai);
+        update(setGoogleAI,  'google_ai', d.previews?.google_ai);
+        update(setDeepseek,  'deepseek',  d.previews?.deepseek);
+        setStripeSecret(prev => ({
+          ...prev,
+          has: d.has.stripe ?? false,
+          masked: d.previews?.stripe_secret ?? null,
+        }));
+        setStripePub(prev => ({
+          ...prev,
+          has: d.has.stripe_pub ?? false,
+          masked: d.previews?.stripe_pub ?? null,
+        }));
+        setTavily(prev => ({ ...prev, has: d.has.tavily ?? false, masked: d.previews?.tavily ?? null }));
+        setDropboxOauthReady(d.dropbox_oauth_configured !== false);
       }
 
       if (googleRes.status === 'fulfilled' && googleRes.value.ok) {
         const g = await googleRes.value.json();
         setGoogleConnected(g.connected);
+        setGoogleEmail(typeof g.email === 'string' ? g.email : null);
       } else {
         setGoogleConnected(false);
+        setGoogleEmail(null);
       }
 
       if (dropboxRes.status === 'fulfilled' && dropboxRes.value.ok) {
@@ -264,12 +297,24 @@ export default function SettingsPanel() {
   ) {
     if (!input.trim()) return;
     setter(p => ({ ...p, saving: true, testResult: null }));
-    await fetch('/api/user-keys', {
+    const res = await fetch('/api/user-keys', {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ [field]: input.trim() }),
     });
-    setter(p => ({ ...p, saving: false, has: true, input: '', masked: null }));
+    let msg: string | undefined;
+    try {
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) msg = data.error ?? `HTTP ${res.status}`;
+    } catch {
+      if (!res.ok) msg = `HTTP ${res.status}`;
+    }
+    if (msg) {
+      setter(p => ({ ...p, saving: false, testResult: { success: false, message: msg } }));
+      return;
+    }
+    await loadKeys();
+    setter(p => ({ ...p, saving: false, input: '' }));
   }
 
   // ── Generic remove key ─────────────────────────────────────────────────────
@@ -390,6 +435,7 @@ export default function SettingsPanel() {
                 onSave={() => saveKey('anthropic_key', anthropic.input, setAnthropic)}
                 onRemove={() => removeKey('anthropic_key', setAnthropic)}
                 onTest={() => testKey('anthropic', setAnthropic)}
+                onToggleShow={() => setAnthropic(p => ({ ...p, show: !p.show }))}
               />
             </SectionCard>
 
@@ -403,19 +449,35 @@ export default function SettingsPanel() {
                 onSave={() => saveKey('google_ai_key', googleAI.input, setGoogleAI)}
                 onRemove={() => removeKey('google_ai_key', setGoogleAI)}
                 onTest={() => testKey('google_ai', setGoogleAI)}
+                onToggleShow={() => setGoogleAI(p => ({ ...p, show: !p.show }))}
               />
             </SectionCard>
 
             <SectionCard title="OpenAI GPT" subtitle="gpt-4o · gpt-4o-mini · o3 · o4-mini">
               <ProviderKeyEditor
                 name="OpenAI" icon={OpenAIMarkIcon} iconColor="bg-[#141b26] border border-[#30363d]"
-                keyPrefix="sk-proj-" placeholder="sk-proj-..."
+                keyPrefix="sk-" placeholder="sk-..."
                 docUrl="https://platform.openai.com/api-keys"
-                howToGet={`1. Go to platform.openai.com and create an account\n2. Add a payment method in Billing settings\n3. Go to API Keys → Create new secret key\n4. Copy the key that starts with sk-proj-\n5. Paste it above and click Save`}
+                howToGet={`1. Go to platform.openai.com and create an account\n2. Add a payment method in Billing settings\n3. Go to API Keys → Create new secret key\n4. Copy the key that starts with sk-\n5. Paste it above and click Save`}
                 state={openai} onChange={v => setOpenai(p => ({ ...p, input: v }))}
                 onSave={() => saveKey('openai_key', openai.input, setOpenai)}
                 onRemove={() => removeKey('openai_key', setOpenai)}
                 onTest={() => testKey('openai', setOpenai)}
+                onToggleShow={() => setOpenai(p => ({ ...p, show: !p.show }))}
+              />
+            </SectionCard>
+
+            <SectionCard title="DeepSeek" subtitle="deepseek-chat · deepseek-reasoner (R1) — Low cost, strong reasoning">
+              <ProviderKeyEditor
+                name="DeepSeek" icon={LogoDeepseek} iconColor="bg-[#141b26] border border-[#30363d]"
+                keyPrefix="sk-" placeholder="sk-..."
+                docUrl="https://platform.deepseek.com/api_keys"
+                howToGet={`1. Go to platform.deepseek.com and sign in\n2. Open API keys → Create key\n3. Copy the key starting with sk-\n4. Paste above — API base is https://api.deepseek.com`}
+                state={deepseek} onChange={v => setDeepseek(p => ({ ...p, input: v }))}
+                onSave={() => saveKey('deepseek_key', deepseek.input, setDeepseek)}
+                onRemove={() => removeKey('deepseek_key', setDeepseek)}
+                onTest={() => testKey('deepseek', setDeepseek)}
+                onToggleShow={() => setDeepseek(p => ({ ...p, show: !p.show }))}
               />
             </SectionCard>
 
@@ -429,6 +491,7 @@ export default function SettingsPanel() {
                 onSave={() => saveKey('tavily_key', tavily.input, setTavily)}
                 onRemove={() => removeKey('tavily_key', setTavily)}
                 onTest={() => {}}
+                onToggleShow={() => setTavily(p => ({ ...p, show: !p.show }))}
               />
             </SectionCard>
           </div>
@@ -452,8 +515,17 @@ export default function SettingsPanel() {
                   <div>
                     <p className="text-sm font-semibold text-[#e6edf3]">Google OAuth 2.0</p>
                     <p className="text-xs text-[#8b949e]">Scopes: Gmail read/send · Calendar · Drive</p>
-                    <div className="mt-1">
-                      <StatusBadge ok={googleConnected} msg={googleConnected ? 'Workspace connected' : 'Not connected'} />
+                    <div className="mt-1 space-y-0.5">
+                      <StatusBadge
+                        ok={googleConnected}
+                        msg={
+                          googleConnected
+                            ? googleEmail
+                              ? `Connected · ${googleEmail}`
+                              : 'Workspace connected'
+                            : 'Not connected'
+                        }
+                      />
                     </div>
                   </div>
                 </div>
@@ -463,6 +535,7 @@ export default function SettingsPanel() {
                       onClick={async () => {
                         await fetch('/api/google/auth', { method: 'DELETE', credentials: 'include' });
                         setGoogleConnected(false);
+                        setGoogleEmail(null);
                       }}
                       className="flex items-center gap-1.5 rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/5 px-3 py-2 text-xs text-[#ef4444] hover:bg-[#ef4444]/10 transition-all">
                       <IconX className="h-3.5 w-3.5" /> Disconnect
@@ -489,16 +562,25 @@ export default function SettingsPanel() {
                   <div className="mt-3 space-y-3 rounded-xl border border-[#f59e0b]/20 bg-[#f59e0b]/5 p-4 text-[11px] text-[#8b949e]">
                     <p className="font-semibold text-[#f59e0b]">In Google Cloud Console you must add this exact Authorized Redirect URI:</p>
                     <code className="block select-all rounded-lg border border-[#1e2836] bg-[#0d1117] px-3 py-2 text-[#22c55e] font-mono text-xs">
-                      http://localhost:3000/api/google/auth/callback
+                      {oauthRedirectBase || '(your app origin)'}/api/google/auth/callback
                     </code>
                     <ol className="space-y-1.5 list-decimal list-inside">
                       <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-[#3b82f6] underline">console.cloud.google.com/apis/credentials</a></li>
                       <li>Click your OAuth 2.0 Client ID (Finedge Dashboard)</li>
                       <li>Under <strong className="text-[#e6edf3]">Authorized redirect URIs</strong>, click <strong className="text-[#e6edf3]">+ ADD URI</strong></li>
-                      <li>Paste: <code className="text-[#22c55e]">http://localhost:3000/api/google/auth/callback</code></li>
+                      <li>
+                        Paste:{' '}
+                        <code className="text-[#22c55e]">
+                          {oauthRedirectBase || 'https://YOUR_DOMAIN'}/api/google/auth/callback
+                        </code>
+                      </li>
                       <li>Click <strong className="text-[#e6edf3]">SAVE</strong>, wait 30 seconds, then try connecting again</li>
                     </ol>
-                    <p className="text-[10px] text-[#8b949e]/70">Note: For production, add your real domain URI too (e.g. https://app.finedge.com/api/google/auth/callback)</p>
+                    <p className="text-[10px] text-[#8b949e]/70">
+                      Production tip: set server env <code className="text-[#fcd34d]">GOOGLE_OAUTH_REDIRECT_URI</code> to the
+                      exact URI registered in Google (e.g. https://app.quivo.site/api/google/auth/callback) so token exchange
+                      matches the authorize step even if <code className="text-[#fcd34d]">NEXT_PUBLIC_APP_URL</code> differs.
+                    </p>
                   </div>
                 </details>
               )}
@@ -517,6 +599,7 @@ export default function SettingsPanel() {
                     onSave={() => saveKey('stripe_secret', stripeSecret.input, setStripeSecret)}
                     onRemove={() => removeKey('stripe_secret', setStripeSecret)}
                     onTest={() => testKey('stripe', setStripeSecret)}
+                    onToggleShow={() => setStripeSecret(p => ({ ...p, show: !p.show }))}
                   />
                 </div>
                 <div>
@@ -529,6 +612,7 @@ export default function SettingsPanel() {
                     onSave={() => saveKey('stripe_pub', stripePub.input, setStripePub)}
                     onRemove={() => removeKey('stripe_pub', setStripePub)}
                     onTest={() => {}}
+                    onToggleShow={() => setStripePub(p => ({ ...p, show: !p.show }))}
                   />
                 </div>
               </div>
@@ -561,10 +645,16 @@ export default function SettingsPanel() {
                   )}
                 </div>
               </div>
-              {!process.env.NEXT_PUBLIC_APP_URL?.includes('localhost') && !dropboxConnected && (
+              {!dropboxOauthReady && !dropboxConnected && (
                 <div className="mt-3 rounded-lg border border-[#f59e0b]/20 bg-[#f59e0b]/5 px-3 py-2 text-[11px] text-[#f59e0b]">
-                  Add <code>DROPBOX_CLIENT_ID</code> and <code>DROPBOX_CLIENT_SECRET</code> to .env.local. Get them at{' '}
-                  <a href="https://www.dropbox.com/developers/apps" target="_blank" rel="noopener noreferrer" className="underline">dropbox.com/developers</a>
+                  Set <code className="text-[#fcd34d]">DROPBOX_CLIENT_ID</code> and{' '}
+                  <code className="text-[#fcd34d]">DROPBOX_CLIENT_SECRET</code> in Vercel Environment Variables (or{' '}
+                  <code className="text-[#fcd34d]">.env.local</code> for dev). Create an app at{' '}
+                  <a href="https://www.dropbox.com/developers/apps" target="_blank" rel="noopener noreferrer" className="underline">
+                    dropbox.com/developers
+                  </a>
+                  , add redirect URI <code className="text-[#fcd34d]">{oauthRedirectBase || 'http://localhost:3000'}/api/dropbox/auth/callback</code>
+                  , then redeploy.
                 </div>
               )}
             </SectionCard>
