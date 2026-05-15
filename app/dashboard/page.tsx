@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense, type ReactNode } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import ChatInterface from '@/components/chat-interface';
 import OnboardingModal from '@/components/onboarding-modal';
 import GmailMonitor from '@/components/gmail-monitor';
@@ -22,10 +20,12 @@ import AppearanceSettings from '@/components/appearance-settings';
 import DocsPanel from '@/components/docs-panel';
 import ApiKeysPanel from '@/components/api-keys-panel';
 import PerplexityFocusBar from '@/components/perplexity-focus-bar';
-import TasksPanel from '@/components/tasks-panel';
-import AttioNotesPanel from '@/components/attio-notes-panel';
+import PlannerPanel from '@/components/planner-panel';
 import AttioOverview from '@/components/attio-overview';
 import { NotificationsDropdown } from '@/components/notifications-dropdown';
+import { SidebarUserMenu } from '@/components/sidebar-user-menu';
+import { usePlannerReminders } from '@/hooks/use-planner-reminders';
+import { loadPlannerItems } from '@/lib/planner-storage';
 import { BankStatementSidePanel } from '@/components/bank-statement-side-panel';
 import Link from 'next/link';
 import {
@@ -37,7 +37,7 @@ import {
   IconBolt,
 } from '@tabler/icons-react';
 
-type View = 'overview' | 'chat' | 'agents' | 'kb' | 'notes' | 'tasks' | 'gmail' | 'stripe' | 'calendar' | 'plugins' | 'models' | 'prompts' | 'analytics' | 'drive' | 'settings' | 'appearance' | 'docs' | 'apikeys';
+type View = 'overview' | 'chat' | 'agents' | 'kb' | 'planner' | 'notes' | 'tasks' | 'gmail' | 'stripe' | 'calendar' | 'plugins' | 'models' | 'prompts' | 'analytics' | 'drive' | 'settings' | 'appearance' | 'docs' | 'apikeys';
 
 const navStartHere = [
   { id: 'overview' as View, label: 'Home',           icon: IconLayoutDashboard },
@@ -48,10 +48,9 @@ const navStartHere = [
 const agentNavHref = '/agent';
 
 const navWorkspace = [
-  { id: 'agents' as View, label: 'AI agents',        icon: IconRobot },
-  { id: 'kb'     as View, label: 'Knowledge base',   icon: IconDatabase },
-  { id: 'tasks'  as View, label: 'Tasks',            icon: IconLayoutList },
-  { id: 'notes'  as View, label: 'Notes',            icon: IconNotes },
+  { id: 'agents'  as View, label: 'AI agents',       icon: IconRobot },
+  { id: 'kb'      as View, label: 'Knowledge base',  icon: IconDatabase },
+  { id: 'planner' as View, label: 'Tasks & Notes',   icon: IconLayoutList },
 ];
 
 const navIntegrations = [
@@ -62,13 +61,8 @@ const navIntegrations = [
 ];
 
 const navTools = [
-  { id: 'prompts'    as View, label: 'Prompts',    icon: IconBook },
-  { id: 'models'     as View, label: 'Models',     icon: IconBrain },
-  { id: 'plugins'    as View, label: 'Plugins',    icon: IconPlug },
-  { id: 'analytics'  as View, label: 'Analytics',  icon: IconChartBar },
-  { id: 'appearance' as View, label: 'Appearance', icon: IconPalette },
-  { id: 'docs'       as View, label: 'Docs',       icon: IconFileText },
-  { id: 'settings'   as View, label: 'Settings',   icon: IconSettings },
+  { id: 'settings' as View, label: 'Settings', icon: IconSettings },
+  { id: 'docs'     as View, label: 'Help',     icon: IconHelp },
 ];
 
 const viewTitles: Record<View, { title: string; subtitle: string }> = {
@@ -79,8 +73,9 @@ const viewTitles: Record<View, { title: string; subtitle: string }> = {
   appearance:  { title: 'Appearance',       subtitle: 'Customize themes, colors, fonts, and animations' },
   docs:        { title: 'Documentation',    subtitle: 'Platform guide, API reference, and integration docs' },
   apikeys:     { title: 'API Keys',         subtitle: 'Add your provider keys — you pay them directly, not Quivo' },
-  tasks:       { title: 'Tasks',            subtitle: 'Manage your tasks and to-dos' },
-  notes:       { title: 'Notes',            subtitle: 'Smart notes with AI automation' },
+  planner:     { title: 'Tasks & Notes',    subtitle: 'To-dos, notes, and timed reminders' },
+  tasks:       { title: 'Tasks & Notes',    subtitle: 'To-dos, notes, and timed reminders' },
+  notes:       { title: 'Tasks & Notes',    subtitle: 'To-dos, notes, and timed reminders' },
   gmail:       { title: 'Gmail Monitor',   subtitle: 'Intelligent email analysis' },
   stripe:      { title: 'Billing',         subtitle: 'Stripe billing & payments' },
   calendar:    { title: 'Calendar',        subtitle: 'Schedule & meetings' },
@@ -93,14 +88,14 @@ const viewTitles: Record<View, { title: string; subtitle: string }> = {
 };
 
 function DashboardInner() {
-  const { user } = useUser();
+  usePlannerReminders();
   const searchParams = useSearchParams();
   const [activeView, setActiveView] = useState<View>('overview');
   const [showBriefing, setShowBriefing] = useState(true);
   const [googleToast, setGoogleToast] = useState<'connected' | 'error' | null>(null);
   const [dropboxToast, setDropboxToast] = useState<'connected' | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [pendingNotesCount, setPendingNotesCount] = useState(0);
+  const [plannerBadge, setPlannerBadge] = useState(0);
   const [statementPanelOpen, setStatementPanelOpen] = useState(false);
 
   // Show onboarding on first visit if no API keys are saved
@@ -122,26 +117,35 @@ function DashboardInner() {
     localStorage.setItem('quivo_onboarding_done', '1');
   }
 
-  // Live notes badge from localStorage
   useEffect(() => {
     function updateBadge() {
       try {
-        const raw = localStorage.getItem('quivo_notes');
-        const notes = raw ? JSON.parse(raw) : [];
-        const pending = notes.filter((n: { status: string }) => n.status === 'pending').length;
-        setPendingNotesCount(pending);
-      } catch { setPendingNotesCount(0); }
+        const pending = loadPlannerItems().filter(i => !i.completed).length;
+        setPlannerBadge(pending);
+      } catch {
+        setPlannerBadge(0);
+      }
     }
     updateBadge();
+    window.addEventListener('quivo:planner-updated', updateBadge);
     window.addEventListener('storage', updateBadge);
     const interval = setInterval(updateBadge, 5000);
-    return () => { window.removeEventListener('storage', updateBadge); clearInterval(interval); };
+    return () => {
+      window.removeEventListener('quivo:planner-updated', updateBadge);
+      window.removeEventListener('storage', updateBadge);
+      clearInterval(interval);
+    };
   }, []);
 
   // Handle URL view param
   useEffect(() => {
     const v = searchParams.get('view') as View | null;
-    if (v && viewTitles[v]) setActiveView(v);
+    if (!v) return;
+    if (v === 'tasks' || v === 'notes') {
+      setActiveView('planner');
+      return;
+    }
+    if (viewTitles[v]) setActiveView(v);
   }, [searchParams]);
 
   // Handle OAuth redirect params
@@ -177,7 +181,7 @@ function DashboardInner() {
   function NavItem({ item }: { item: { id: View; label: string; icon: React.ElementType } }) {
     const Icon = item.icon;
     const active = activeView === item.id;
-    const badge = item.id === 'notes' ? pendingNotesCount : 0;
+    const badge = item.id === 'planner' ? plannerBadge : 0;
     return (
       <button
         type="button"
@@ -244,32 +248,12 @@ function DashboardInner() {
         {/* Logo */}
         <div className="flex h-[52px] items-center gap-3 border-b border-[var(--bg-border)] px-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--bg-border)] bg-[var(--bg-card)] shadow-[inset_0_1px_0_rgba(28,25,23,0.06)]">
-            <span className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">F</span>
+            <span className="bg-gradient-to-br from-cyan-300 to-violet-400 bg-clip-text text-[15px] font-semibold tracking-tight text-transparent">Q</span>
           </div>
           <span className="text-[15px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">Quivo</span>
         </div>
 
-        {/* User section */}
-        <div className="border-b border-[var(--bg-border)] px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Image
-                src={user?.imageUrl ?? `https://api.dicebear.com/7.x/initials/svg?seed=${user?.firstName ?? 'U'}`}
-                alt={user?.fullName || 'User'}
-                width={36}
-                height={36}
-                className="rounded-full ring-1 ring-[var(--bg-border)]"
-              />
-              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400/90 ring-2 ring-[var(--bg-base)]" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-[13px] font-medium text-[var(--text-primary)]">
-                Hi, {user?.firstName ?? 'there'}
-              </p>
-              <p className="truncate text-[12px] text-[var(--text-muted)]">{today}</p>
-            </div>
-          </div>
-        </div>
+        <SidebarUserMenu today={today} />
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 space-y-5">
@@ -316,7 +300,7 @@ function DashboardInner() {
             className="flex w-full items-center gap-3 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2.5 text-left shadow-[0_1px_2px_rgba(28,25,23,0.05)] transition hover:bg-[var(--bg-hover)]"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-base)]">
-              <span className="bg-gradient-to-b from-[var(--text-primary)] to-[var(--text-muted)] bg-clip-text text-[15px] font-semibold tracking-tight text-transparent">F</span>
+              <span className="bg-gradient-to-br from-cyan-300 to-violet-400 bg-clip-text text-[15px] font-semibold tracking-tight text-transparent">Q</span>
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[13px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">Quivo Pro</span>
@@ -331,7 +315,7 @@ function DashboardInner() {
         <PerplexityFocusBar />
 
         {/* Top bar — hidden for views that have their own header */}
-        <header className={`flex h-14 shrink-0 items-center justify-between border-b border-[var(--bg-border)] bg-[var(--bg-elevated)] px-6 ${['chat','agents','appearance','docs','apikeys','overview','tasks','notes','kb'].includes(activeView) ? 'hidden' : ''}`}>
+        <header className={`flex h-14 shrink-0 items-center justify-between border-b border-[var(--bg-border)] bg-[var(--bg-elevated)] px-6 ${['chat','agents','appearance','docs','apikeys','overview','planner','tasks','notes','kb'].includes(activeView) ? 'hidden' : ''}`}>
           <div className="flex items-center gap-4">
             <div>
               <h1 className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{title}</h1>
@@ -347,16 +331,6 @@ function DashboardInner() {
               <IconSearch className="h-4 w-4" stroke={1.75} />
             </button>
             <NotificationsDropdown />
-            <div className="flex items-center gap-2 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-2.5 py-1">
-              <Image
-                src={user?.imageUrl ?? `https://api.dicebear.com/7.x/initials/svg?seed=${user?.firstName ?? 'U'}`}
-                alt={user?.fullName || 'User'}
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-              <span className="text-[12px] font-medium text-[var(--text-primary)]">{user?.firstName ?? 'User'}</span>
-            </div>
           </div>
         </header>
 
@@ -385,8 +359,9 @@ function DashboardInner() {
               <KnowledgeBasePanel onChatWithKb={() => setActiveView('chat')} />
             </div>
           )}
-          {activeView === 'tasks'     && <div className="h-full overflow-hidden"><TasksPanel /></div>}
-          {activeView === 'notes'     && <div className="h-full overflow-hidden"><AttioNotesPanel /></div>}
+          {(activeView === 'planner' || activeView === 'tasks' || activeView === 'notes') && (
+            <div className="h-full overflow-hidden"><PlannerPanel /></div>
+          )}
           {activeView === 'gmail'     && <div className="h-full overflow-y-auto"><GmailMonitor /></div>}
           {activeView === 'stripe'    && <div className="h-full overflow-y-auto"><StripePanel /></div>}
           {activeView === 'calendar'  && <div className="h-full overflow-y-auto"><CalendarView /></div>}

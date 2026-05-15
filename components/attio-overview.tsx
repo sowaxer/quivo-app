@@ -269,10 +269,10 @@ export default function AttioOverview({ onNavigate }: { onNavigate?: (view: stri
               )}
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => onNavigate?.('tasks')} className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
+              <button onClick={() => onNavigate?.('planner')} className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
                 View all <IconArrowUpRight className="h-3 w-3" />
               </button>
-              <button onClick={() => onNavigate?.('tasks')} className="flex items-center gap-1 rounded-md p-1 text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]">
+              <button onClick={() => onNavigate?.('planner')} className="flex items-center gap-1 rounded-md p-1 text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]">
                 <IconPlus className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -294,7 +294,7 @@ export default function AttioOverview({ onNavigate }: { onNavigate?: (view: stri
                 );
               })}
               {pendingTasks.length > 5 && (
-                <button onClick={() => onNavigate?.('tasks')} className="w-full py-2 text-center text-[11px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-all">
+                <button onClick={() => onNavigate?.('planner')} className="w-full py-2 text-center text-[11px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-all">
                   +{pendingTasks.length - 5} more tasks
                 </button>
               )}
@@ -307,13 +307,13 @@ export default function AttioOverview({ onNavigate }: { onNavigate?: (view: stri
           <div className="mb-6 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-base)] overflow-hidden">
             <div className="flex items-center justify-between border-b border-[var(--bg-border)] px-4 py-2.5">
               <span className="text-[13px] font-semibold text-[var(--text-primary)]">Recent Notes</span>
-              <button onClick={() => onNavigate?.('notes')} className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1">
+              <button onClick={() => onNavigate?.('planner')} className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1">
                 View all <IconArrowUpRight className="h-3 w-3" />
               </button>
             </div>
             <div>
               {notes.slice(0, 3).map(n => (
-                <div key={n.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--bg-border)]/50 last:border-0 hover:bg-[var(--bg-hover)] transition-all cursor-pointer" onClick={() => onNavigate?.('notes')}>
+                <div key={n.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--bg-border)]/50 last:border-0 hover:bg-[var(--bg-hover)] transition-all cursor-pointer" onClick={() => onNavigate?.('planner')}>
                   <div className="h-6 w-6 rounded shrink-0 border border-[var(--bg-border)] flex items-center justify-center bg-[var(--bg-hover)] text-xs">
                     {n.title[0]?.toUpperCase() ?? '📝'}
                   </div>
