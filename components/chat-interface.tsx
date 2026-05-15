@@ -651,7 +651,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
         {/* ── Input area (Claude-style pill composer) ───────────────────── */}
         <div className="shrink-0 border-t border-[var(--bg-border)] bg-[var(--bg-base)] px-4 pb-5 pt-3">
           <div className="mx-auto max-w-[720px]">
-            <div className="relative rounded-[26px] border border-[var(--bg-border)] bg-[var(--bg-card)] text-[var(--text-primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors focus-within:border-[var(--text-muted)]/40 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="relative rounded-[26px] border border-[var(--bg-border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors focus-within:border-[var(--text-muted)]/40">
               <textarea ref={textareaRef} value={input}
                 onChange={e => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'; }}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
@@ -760,7 +760,7 @@ export default function ChatInterface({ onGoToSettings, onGoToAgents, onGoToKB }
                       type="button"
                       disabled={isStreaming}
                       onClick={() => void sendMessage(s.prompt)}
-                      className="inline-flex items-center gap-2 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3.5 py-2 text-[13px] font-normal text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)] disabled:opacity-40"
+                      className="inline-flex items-center gap-2 rounded-full border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-3.5 py-2 text-[13px] font-normal text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-hover)] disabled:opacity-40"
                     >
                       <Icon className="h-4 w-4 shrink-0 text-[var(--text-muted)]" stroke={1.5} />
                       {s.label}

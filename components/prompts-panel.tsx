@@ -345,7 +345,7 @@ export default function PromptsPanel({ onUsePrompt }: Props) {
       )}
 
       {/* Sidebar */}
-      <div className="w-52 shrink-0 border-r border-[var(--bg-border)] bg-[var(--bg-base)] p-4 overflow-y-auto">
+      <div className="w-52 shrink-0 border-r border-[var(--bg-border)] bg-[var(--bg-sidebar)] p-4 overflow-y-auto">
         <p className="mb-3 px-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Prompt Library</p>
         <div className="space-y-1">
           {(['library', 'mine'] as const).map(t => (

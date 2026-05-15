@@ -27,7 +27,7 @@ export default function PerplexityFocusBar() {
   if (quotes.length === 0) return null;
 
   return (
-    <div className="shrink-0 border-b border-[var(--bg-border)] bg-[var(--bg-base)]/90 px-4 py-2 backdrop-blur-md">
+    <div className="shrink-0 border-b border-[var(--bg-border)] bg-[var(--bg-canvas)]/90 px-4 py-2 backdrop-blur-md">
       <div className="flex items-center gap-4 overflow-x-auto">
         {quotes.slice(0, 6).map(q => (
           <div key={q.symbol} className="flex shrink-0 items-baseline gap-2 whitespace-nowrap text-[12px]">

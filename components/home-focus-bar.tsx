@@ -37,7 +37,7 @@ export default function HomeFocusBar({ active, onChange }: Props) {
   }, [load]);
 
   return (
-    <div className="shrink-0 border-b border-[var(--bg-border)] bg-[var(--bg-base)]">
+    <div className="shrink-0 border-b border-[var(--bg-border)] bg-[var(--bg-canvas)]">
       <div className="flex items-center justify-center gap-8 px-4 pt-3">
         {TOPICS.map(t => {
           const isActive = active === t.id;

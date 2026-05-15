@@ -13,7 +13,7 @@ type Props = {
 
 export function ViewChrome({ title, subtitle, showBack, onBack, showSearch = true }: Props) {
   return (
-    <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-[var(--bg-border)] bg-[var(--bg-base)]/80 px-4 backdrop-blur-md">
+    <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-[var(--bg-border)] bg-[var(--bg-canvas)]/90 px-4 backdrop-blur-md">
       <div className="flex min-w-0 flex-1 items-center gap-2">
         {showBack ? (
           <button

@@ -20,7 +20,7 @@ export function BankStatementSidePanel({ open, onClose }: Props) {
         onClick={onClose}
       />
       <aside
-        className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[420px] flex-col border-l border-[var(--bg-border)] bg-[var(--bg-base)] shadow-2xl"
+        className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[420px] flex-col border-l border-[var(--bg-border)] bg-[var(--bg-sidebar)] shadow-2xl"
         role="dialog"
         aria-labelledby="bank-statement-panel-title"
       >

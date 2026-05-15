@@ -236,7 +236,7 @@ function DashboardInner() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-base)]">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-canvas)]">
       {showOnboarding && <OnboardingModal onClose={closeOnboarding} />}
       <BankStatementSidePanel open={statementPanelOpen} onClose={() => setStatementPanelOpen(false)} />
 
@@ -263,7 +263,7 @@ function DashboardInner() {
       )}
 
       {/* ── SIDEBAR ──────────────────────────────────────────────────────── */}
-      <aside className="quivo-sidebar flex w-[260px] shrink-0 flex-col border-r border-[var(--bg-border)] bg-[var(--bg-base)]">
+      <aside className="quivo-sidebar flex w-[260px] shrink-0 flex-col border-r border-[var(--bg-border)]">
 
         {/* Logo */}
         <div className="flex h-[52px] items-center gap-3 border-b border-[var(--bg-border)] px-4">
@@ -319,7 +319,7 @@ function DashboardInner() {
             onClick={() => goToView('settings')}
             className="flex w-full items-center gap-3 rounded-full border border-[var(--bg-border)] bg-[var(--bg-card)] px-3 py-2.5 text-left shadow-[0_1px_2px_rgba(28,25,23,0.05)] transition hover:bg-[var(--bg-hover)]"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-base)]">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--bg-elevated)]">
               <span className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">Q</span>
             </span>
             <span className="min-w-0 flex-1">
@@ -337,7 +337,7 @@ function DashboardInner() {
         )}
 
         {/* Content */}
-        <main className="flex-1 overflow-hidden bg-[var(--bg-base)]">
+        <main className="quivo-canvas flex-1 overflow-hidden">
           {activeView === 'overview'  && (
             <div className="h-full overflow-hidden">
               <HomeHub onNavigate={(v) => goToView(v as View)} />

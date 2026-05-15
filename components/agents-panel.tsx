@@ -496,7 +496,7 @@ export default function AgentsPanel({ onChatWithAgent }: Props) {
     <div className="flex h-full overflow-hidden">
 
       {/* ── Left icon bar ──────────────────────────────────────────────────── */}
-      <div className="flex w-10 shrink-0 flex-col items-center gap-2 border-r border-[var(--bg-border)] bg-[var(--bg-base)] py-3">
+      <div className="flex w-10 shrink-0 flex-col items-center gap-2 border-r border-[var(--bg-border)] bg-[var(--bg-sidebar)] py-3">
         <button onClick={() => { setShowCreate(true); setLeftPanel(null); }}
           className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all ${showCreate ? 'bg-[var(--text-primary)] text-[var(--bg-base)]' : 'text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'}`}>
           <IconPlus className="h-4 w-4" />
@@ -520,7 +520,7 @@ export default function AgentsPanel({ onChatWithAgent }: Props) {
         {(leftPanel || showCreate) && (
           <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 200, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="shrink-0 overflow-hidden border-r border-[var(--bg-border)] bg-[var(--bg-base)]" style={{ width: 200 }}>
+            className="shrink-0 overflow-hidden border-r border-[var(--bg-border)] bg-[var(--bg-sidebar)]" style={{ width: 200 }}>
             {showCreate && (
               <CreateAgentForm
                 existing={editingAgent}
