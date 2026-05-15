@@ -66,7 +66,7 @@ const navTools = [
 ];
 
 const viewTitles: Record<View, { title: string; subtitle: string }> = {
-  overview:    { title: 'Home',             subtitle: 'Finance, markets, and news at a glance' },
+  overview:    { title: 'Home',             subtitle: 'Dashboard, finance, and news at a glance' },
   chat:        { title: 'AI Chat',          subtitle: 'Powered by Claude & Gemini — your API key, your cost' },
   agents:      { title: 'AI Agents',        subtitle: 'Finance specialists: tax, audit, bookkeeping, CFO, and more' },
   kb:          { title: 'Knowledge Base',   subtitle: 'Upload documents for AI agents to reference' },
@@ -207,17 +207,10 @@ function DashboardInner() {
       <button
         type="button"
         onClick={() => goToView(item.id)}
-        style={
+        className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
           active
-            ? {
-                boxShadow: 'inset 0 0 0 1px var(--bg-border)',
-              }
-            : undefined
-        }
-        className={`group flex w-full items-center gap-3 rounded-full px-3 py-2 text-[13px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
-          active
-            ? 'bg-[var(--bg-hover)] text-[var(--text-primary)]'
-            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+            ? 'bg-[var(--bg-nav-active)] text-[var(--text-primary)]'
+            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]/70 hover:text-[var(--text-primary)]'
         }`}
       >
         <Icon className="h-[18px] w-[18px] shrink-0 opacity-90" strokeWidth={active ? 2 : 1.75} />
@@ -225,7 +218,7 @@ function DashboardInner() {
         {badge > 0 && (
           <span
             className={`rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums ${
-              active ? 'bg-[var(--bg-border)] text-[var(--text-primary)]' : 'bg-[var(--bg-hover)] text-[var(--text-secondary)]'
+              active ? 'bg-white/10 text-[var(--text-primary)]' : 'bg-[var(--bg-hover)] text-[var(--text-secondary)]'
             }`}
           >
             {badge}
@@ -392,7 +385,7 @@ function DashboardInner() {
 
 export default function Dashboard() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[var(--bg-base)]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--bg-border)] border-t-[var(--text-muted)]" /></div>}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[var(--bg-canvas)]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--bg-border)] border-t-[var(--text-muted)]" /></div>}>
       <DashboardInner />
     </Suspense>
   );

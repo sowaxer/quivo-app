@@ -1,16 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { IconSearch, IconChevronDown } from '@tabler/icons-react';
+import { IconSearch } from '@tabler/icons-react';
 
 type Quote = { symbol: string; shortName: string; price: number; changePct: number };
-
-const NEWS = [
-  { title: 'US markets steady as investors weigh inflation data', time: '2h ago' },
-  { title: 'Tech earnings season: what to watch this week', time: '4h ago' },
-  { title: 'Fed speakers signal patience on rate cuts', time: '6h ago' },
-  { title: 'Energy sector leads gains amid supply updates', time: '8h ago' },
-];
 
 export default function FinanceDiscover() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
@@ -65,25 +58,6 @@ export default function FinanceDiscover() {
               ))}
             </div>
           )}
-
-          <div>
-            <h2 className="mb-3 text-[13px] font-semibold text-[var(--text-primary)]">Market summary</h2>
-            <div className="divide-y divide-[var(--bg-border)] rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-card)]">
-              {NEWS.map((n, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left transition hover:bg-[var(--bg-hover)]"
-                >
-                  <span className="text-[14px] text-[var(--text-primary)]">{n.title}</span>
-                  <span className="flex shrink-0 items-center gap-2 text-[12px] text-[var(--text-muted)]">
-                    {n.time}
-                    <IconChevronDown className="h-4 w-4" />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-card)] p-4">
             <p className="text-[13px] text-[var(--text-secondary)]">
