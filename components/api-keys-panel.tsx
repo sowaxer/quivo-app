@@ -252,35 +252,12 @@ type ProviderDef =
 function ProviderAvatar({ id, size = 40 }: { id: string; size?: number }) {
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-2xl border border-white/[0.1] bg-gradient-to-br from-white/[0.07] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+      className="flex shrink-0 items-center justify-center rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)]"
       style={{ width: size, height: size }}
     >
       <ProviderBrandMark id={id} size={Math.round(size * 0.58)} />
     </div>
   );
-}
-
-function leftAccentClass(id: string): string {
-  const m: Record<string, string> = {
-    anthropic: 'border-l-orange-500/55',
-    google_ai: 'border-l-sky-500/50',
-    openai: 'border-l-emerald-500/50',
-    deepseek: 'border-l-blue-600/60',
-    groq: 'border-l-amber-500/40',
-    mistral: 'border-l-orange-300/35',
-    openrouter: 'border-l-violet-500/45',
-    perplexity: 'border-l-cyan-500/40',
-    xai: 'border-l-zinc-400/40',
-    tavily: 'border-l-teal-500/45',
-    twilio_sid: 'border-l-red-400/35',
-    twilio_token: 'border-l-red-400/35',
-    sendgrid: 'border-l-blue-400/40',
-    stripe_secret: 'border-l-indigo-500/50',
-    stripe_pub: 'border-l-violet-400/45',
-    notion: 'border-l-stone-400/40',
-    github: 'border-l-gray-500/45',
-  };
-  return m[id] ?? 'border-l-white/[0.08]';
 }
 
 function KeyRow({
@@ -296,61 +273,50 @@ function KeyRow({
   onToggleHow: () => void;
 }) {
   return (
-    <div
-      className={`rounded-2xl border border-y border-r border-[var(--bg-border)] border-l-4 bg-[var(--bg-card)] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all hover:opacity-[0.98] ${leftAccentClass(prov.id)}`}
-    >
+    <div className="overflow-hidden rounded-xl border border-[var(--bg-border)] bg-[var(--bg-elevated)] transition-colors hover:bg-[var(--bg-hover)]/40">
       {/* Header row */}
       <div className="flex items-center gap-4 px-5 py-4">
         <ProviderAvatar id={prov.id} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-0.5">
             <p className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{prov.name}</p>
-            {prov.id === 'anthropic' && prov.badge ? (
-              <span className="rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[var(--text-secondary)]">
+            {prov.badge ? (
+              <span className="rounded-full border border-[var(--bg-border)] bg-[var(--bg-canvas)] px-2 py-0.5 text-[9px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
                 {prov.badge}
               </span>
+            ) : null}
+            {state.has ? (
+              <span className="quivo-caption flex items-center gap-1 text-[var(--text-secondary)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--finance-up)]" />
+                Connected
+              </span>
             ) : (
-              prov.badge && (
-                <span className={`rounded-md border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${prov.badgeColor}`}>
-                  {prov.badge}
-                </span>
-              )
-            )}
-            {state.has && (
-              <span className="flex items-center gap-1 rounded-md border border-emerald-400/30 bg-emerald-400/[0.08] px-1.5 py-0.5 text-[9px] font-semibold text-emerald-200/95 shadow-[0_0_14px_rgba(52,211,153,0.22)]">
-                <IconCheck className="h-2.5 w-2.5" strokeWidth={3} /> Connected
-              </span>
-            )}
-            {!state.has && (
-              <span className="flex items-center gap-1 rounded-md border border-rose-400/30 bg-rose-400/[0.08] px-1.5 py-0.5 text-[9px] font-semibold text-rose-200/95 shadow-[0_0_12px_rgba(248,113,113,0.2)]">
-                <IconX className="h-2.5 w-2.5" strokeWidth={3} /> Not connected
-              </span>
+              <span className="quivo-caption text-[var(--text-faint)]">Not connected</span>
             )}
           </div>
           <p className="text-[12px] text-[var(--text-secondary)]">{prov.models}</p>
           <p className="mt-0.5 text-[12px] leading-snug text-[var(--text-muted)]">{prov.desc}</p>
         </div>
-        <a href={prov.url} target="_blank" rel="noopener noreferrer"
-          className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--bg-border)] bg-gradient-to-r from-sky-500/12 via-violet-500/10 to-fuchsia-500/12 px-3 py-2 text-[12px] font-medium text-[var(--text-primary)] transition-all hover:from-sky-500/20 hover:via-violet-500/18 hover:to-fuchsia-500/20 dark:text-zinc-200 dark:hover:text-white">
-          Get API key <IconExternalLink className="h-3 w-3 opacity-70" />
+        <a
+          href={prov.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="quivo-btn-ghost flex shrink-0 items-center gap-1 rounded-full px-3 py-2 text-[12px] font-medium"
+        >
+          Get API key <IconExternalLink className="h-3 w-3 opacity-60" stroke={1.5} />
         </a>
       </div>
 
       {/* Input row */}
-      <div className="border-t border-white/[0.06] px-5 py-3">
+      <div className="border-t border-[var(--bg-border)] px-5 py-3">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            {state.has && (
-              <span className="pointer-events-none absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-emerald-300/85">
-                <IconLock className="h-3.5 w-3.5" aria-hidden />
-              </span>
-            )}
             <input
               type={state.show ? 'text' : 'password'}
               value={state.has && !state.input ? (state.masked ?? '') : state.input}
               onChange={e => onChange(e.target.value)}
               placeholder={state.has ? `${prov.prefix}••••••••••••••••••••` : `Paste your ${prov.name} API key here…`}
-              className={`w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-surface)] py-2.5 pr-10 text-[13px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-violet-400/35 focus:outline-none focus:ring-1 focus:ring-violet-500/25 transition-all ${state.has ? 'pl-10' : 'pl-4'}`}
+              className="w-full rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] py-2.5 pl-4 pr-10 text-[13px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:border-[var(--text-muted)] focus:outline-none"
             />
             <button onClick={onToggleShow}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]">
@@ -359,16 +325,22 @@ function KeyRow({
           </div>
 
           {/* Save */}
-          <button onClick={onSave} disabled={state.saving || !state.input.trim()}
-            className="quivo-btn-green-glass flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[12px] font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+          <button
+            onClick={onSave}
+            disabled={state.saving || !state.input.trim()}
+            className="rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-4 py-2.5 text-[12px] font-medium text-[var(--bg-canvas)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          >
             {state.saving ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconCheck className="h-3.5 w-3.5" />}
             Save
           </button>
 
           {/* Test */}
           {prov.testable && state.has && (
-            <button onClick={onTest} disabled={state.testing}
-              className="flex items-center gap-1.5 rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-3 py-2.5 text-[12px] font-medium text-[var(--text-secondary)] transition-all hover:border-violet-400/25 hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] disabled:opacity-40">
+            <button
+              onClick={onTest}
+              disabled={state.testing}
+              className="quivo-btn-ghost flex items-center gap-1.5 rounded-full px-3 py-2.5 text-[12px] disabled:opacity-40"
+            >
               {state.testing ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconRefresh className="h-3.5 w-3.5" />}
               Test
             </button>
@@ -376,8 +348,10 @@ function KeyRow({
 
           {/* Remove */}
           {state.has && (
-            <button onClick={onRemove}
-              className="flex items-center gap-1 rounded-xl border border-rose-300/20 bg-rose-500/[0.06] px-3 py-2.5 text-[12px] text-rose-200/90 hover:bg-rose-500/[0.12] transition-all">
+            <button
+              onClick={onRemove}
+              className="rounded-full p-2.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+            >
               <IconTrash className="h-3.5 w-3.5" />
             </button>
           )}
@@ -415,15 +389,12 @@ function KeyRow({
 function SectionHeader({ icon, title, desc }: { icon: ReactNode; title: string; desc: string }) {
   return (
     <div className="mb-4 flex items-start gap-3">
-      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--bg-border)] bg-gradient-to-br from-sky-500/15 via-violet-500/12 to-emerald-500/15 text-[var(--text-muted)]">
+      <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--bg-border)] bg-[var(--bg-canvas)] text-[var(--text-muted)]">
         {icon}
       </div>
       <div>
-        <h2 className="relative inline-block text-[17px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
-          {title}
-          <span className="absolute -bottom-1 left-0 h-0.5 w-16 rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-emerald-400 opacity-90" aria-hidden />
-        </h2>
-        <p className="mt-0.5 text-[13px] leading-snug text-[var(--text-secondary)]">{desc}</p>
+        <h2 className="quivo-section-title text-[15px]">{title}</h2>
+        <p className="quivo-body mt-0.5 text-[13px]">{desc}</p>
       </div>
     </div>
   );
@@ -579,7 +550,7 @@ export default function ApiKeysPanel() {
   const totalCount = AI_PROVIDERS.length + TOOL_PROVIDERS.length + INTEGRATION_PROVIDERS.length;
 
   return (
-    <div className="h-full overflow-y-auto bg-[var(--bg-base)]">
+    <div className="h-full overflow-y-auto bg-[var(--bg-canvas)]">
       <div className="mx-auto max-w-2xl px-6 py-10">
 
         {/* ── Page header ────────────────────────────────────────────────── */}
@@ -607,32 +578,41 @@ export default function ApiKeysPanel() {
             ].map(c => (
               <div
                 key={c.title}
-                className="rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-base)] p-4 shadow-none"
+                className={`rounded-xl border border-[var(--bg-border)] bg-gradient-to-br p-4 ${
+                  c.title === 'You add keys'
+                    ? 'from-emerald-500/12 to-transparent'
+                    : c.title === 'We connect them'
+                      ? 'from-sky-500/12 to-transparent'
+                      : 'from-violet-500/12 to-transparent'
+                }`}
               >
+                <span
+                  className={`mb-2 inline-block h-1.5 w-1.5 rounded-full ${
+                    c.title === 'You add keys'
+                      ? 'bg-emerald-400/80'
+                      : c.title === 'We connect them'
+                        ? 'bg-sky-400/80'
+                        : 'bg-violet-400/70'
+                  }`}
+                />
                 <p className="text-[14px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{c.title}</p>
-                <p className="mt-1 text-[12px] leading-snug text-[var(--text-secondary)]">{c.desc}</p>
+                <p className="mt-1 text-[12px] font-normal leading-snug text-[var(--text-muted)]">{c.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Stats bar */}
-          <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-base)] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <div className="mt-5 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-4 py-3">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-400/90 shadow-[0_0_12px_rgba(52,211,153,0.55)]" />
-                <p className="text-[13px] text-[var(--text-secondary)]">
-                  <strong className="font-semibold text-[var(--text-primary)]">{loading ? '…' : connectedCount}</strong>{' '}
-                  of {totalCount} providers connected
-                </p>
-              </div>
-              <p className="text-[12px] bg-gradient-to-r from-emerald-300/90 via-sky-300/85 to-violet-300/90 bg-clip-text font-medium text-transparent">
-                Keys are encrypted. You can remove them anytime.
+              <p className="text-[13px] text-[var(--text-secondary)]">
+                <span className="font-medium text-[var(--text-primary)]">{loading ? '…' : connectedCount}</span> of {totalCount} connected
               </p>
+              <p className="quivo-caption">Keys are encrypted · remove anytime</p>
             </div>
             {!loading && totalCount > 0 && (
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-[var(--bg-border)]">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-sky-500 to-violet-500 transition-[width] duration-500"
+                  className="h-full rounded-full bg-[var(--text-muted)] transition-[width] duration-500"
                   style={{ width: `${Math.min(100, Math.round((connectedCount / totalCount) * 100))}%` }}
                 />
               </div>

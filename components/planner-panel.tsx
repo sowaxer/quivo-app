@@ -132,7 +132,7 @@ export default function PlannerPanel() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-[var(--bg-base)] text-[var(--text-primary)]">
+    <div className="flex h-full flex-col bg-[var(--bg-canvas)] text-[var(--text-primary)]">
       <div className="flex items-center justify-end border-b border-[var(--bg-border)] px-5 py-2">
         <button type="button" onClick={enableReminders} className="quivo-btn-ghost rounded-full px-3 py-1.5 text-[12px]">
           <IconBell className="mr-1 inline h-4 w-4" stroke={1.75} />
@@ -140,7 +140,7 @@ export default function PlannerPanel() {
         </button>
       </div>
 
-      <div className="border-b border-[var(--bg-border)] px-5 py-3">
+      <div className="border-b border-[var(--bg-border)] bg-[var(--bg-elevated)]/50 px-5 py-4 backdrop-blur-sm">
         <div className="flex flex-wrap gap-2">
           {(['all', 'task', 'note'] as const).map(f => (
             <button
@@ -164,14 +164,14 @@ export default function PlannerPanel() {
             <button
               type="button"
               onClick={() => setKind('task')}
-              className={`rounded-full px-3 py-1 text-[11px] font-medium ${kind === 'task' ? 'quivo-btn-gradient !py-1' : 'text-[var(--text-muted)]'}`}
+              className={`rounded-full px-3 py-1 text-[11px] font-medium ${kind === 'task' ? 'bg-[var(--text-primary)] text-[var(--bg-canvas)]' : 'text-[var(--text-muted)]'}`}
             >
               Task
             </button>
             <button
               type="button"
               onClick={() => setKind('note')}
-              className={`rounded-full px-3 py-1 text-[11px] font-medium ${kind === 'note' ? 'quivo-btn-gradient !py-1' : 'text-[var(--text-muted)]'}`}
+              className={`rounded-full px-3 py-1 text-[11px] font-medium ${kind === 'note' ? 'bg-[var(--text-primary)] text-[var(--bg-canvas)]' : 'text-[var(--text-muted)]'}`}
             >
               Note
             </button>
@@ -181,7 +181,7 @@ export default function PlannerPanel() {
             onChange={e => setTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addItem()}
             placeholder={kind === 'task' ? 'What do you need to do?' : 'Note title…'}
-            className="min-w-[200px] flex-1 rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-4 py-2 text-[13px] outline-none focus:ring-1 focus:ring-[color-mix(in_srgb,var(--quivo-accent)_50%,transparent)]"
+            className="min-w-[200px] flex-1 rounded-xl border border-[var(--bg-border)] bg-[var(--bg-canvas)] px-4 py-2.5 text-[13px] outline-none transition-shadow focus:border-[var(--text-muted)] focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
           />
           <input
             type="date"
@@ -197,7 +197,7 @@ export default function PlannerPanel() {
             className="rounded-full border border-[var(--bg-border)] bg-[var(--bg-hover)] px-3 py-2 text-[12px] text-[var(--text-secondary)]"
             aria-label="Reminder time"
           />
-          <button type="button" onClick={addItem} className="quivo-btn-gradient flex items-center gap-1 rounded-full px-4 py-2 text-[12px]">
+          <button type="button" onClick={addItem} className="flex items-center gap-1 rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-4 py-2.5 text-[12px] font-medium text-[var(--bg-canvas)] transition-opacity hover:opacity-90">
             <IconPlus className="h-4 w-4" stroke={2} />
             Add
           </button>
@@ -223,16 +223,16 @@ export default function PlannerPanel() {
               return (
                 <li
                   key={item.id}
-                  className="group flex items-start gap-3 rounded-2xl border border-transparent px-3 py-2.5 transition-colors hover:border-[var(--bg-border)] hover:bg-[var(--bg-hover)]"
+                  className="group flex items-start gap-3 rounded-xl border border-[var(--bg-border)]/60 bg-[var(--bg-elevated)]/40 px-3 py-3 transition-all hover:border-[var(--bg-border)] hover:bg-[var(--bg-elevated)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
                 >
                   {item.kind === 'task' ? (
                     <button
                       type="button"
                       onClick={() => toggleComplete(item.id)}
-                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
                         item.completed
-                          ? 'border-emerald-400/60 bg-emerald-500/20 text-emerald-300'
-                          : 'border-[var(--bg-border)] hover:border-cyan-400/50'
+                          ? 'border-[var(--finance-up)]/50 bg-[var(--finance-up)]/15 text-[var(--finance-up)]'
+                          : 'border-[var(--bg-border)] group-hover:border-[var(--text-muted)]'
                       }`}
                       aria-label={item.completed ? 'Mark incomplete' : 'Mark complete'}
                     >
@@ -335,7 +335,7 @@ export default function PlannerPanel() {
               <button type="button" onClick={() => setEditing(null)} className="quivo-btn-ghost rounded-full px-4 py-2 text-[13px]">
                 Cancel
               </button>
-              <button type="button" onClick={saveEdit} className="quivo-btn-gradient rounded-full px-4 py-2 text-[13px]">
+              <button type="button" onClick={saveEdit} className="bg-[var(--bg-hover)] text-[var(--text-primary)] ring-1 ring-[var(--bg-border)] rounded-full px-4 py-2 text-[13px]">
                 Save
               </button>
             </div>

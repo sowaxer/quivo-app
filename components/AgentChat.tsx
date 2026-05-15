@@ -1,29 +1,26 @@
 "use client";
-// components/AgentChat.tsx
-// UI principal del agente — chat + upload de PDFs + estado de conexiones
 
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { IconArrowLeft, IconKey, IconPaperclip } from "@tabler/icons-react";
 import { useAgent, loadApiKeys } from "@/hooks/useAgent";
 import ApiKeysModal from "./ApiKeysModal";
-import ReactMarkdown from "react-markdown"; // npm install react-markdown
+import ReactMarkdown from "react-markdown";
 
-// Comandos rápidos para contabilidad
 const QUICK_COMMANDS = [
-  { label: "📊 P&L este mes", cmd: "Muéstrame el P&L de este mes desde QuickBooks" },
-  { label: "💰 Cobros pendientes", cmd: "¿Qué facturas están pendientes de pago?" },
-  { label: "📧 Email de cobro", cmd: "Redacta un email de cobro profesional para un cliente con 30 días de mora" },
-  { label: "🏦 Balance sheet", cmd: "Muéstrame el balance sheet actual" },
-  { label: "📅 Deadlines fiscales", cmd: "¿Cuáles son los próximos deadlines fiscales importantes?" },
-  { label: "💳 Pagos Stripe", cmd: "¿Cuánto recibimos en Stripe este mes?" },
+  { label: "P&L este mes", cmd: "Muéstrame el P&L de este mes desde QuickBooks" },
+  { label: "Cobros pendientes", cmd: "¿Qué facturas están pendientes de pago?" },
+  { label: "Email de cobro", cmd: "Redacta un email de cobro profesional para un cliente con 30 días de mora" },
+  { label: "Balance sheet", cmd: "Muéstrame el balance sheet actual" },
 ];
 
 function fmtTime(d: Date) {
   return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
 
-type Props = { fullWidth?: boolean };
+type Props = { fullWidth?: boolean; showBack?: boolean };
 
-export default function AgentChat({ fullWidth = false }: Props) {
+export default function AgentChat({ fullWidth = false, showBack = false }: Props) {
   const { messages, isLoading, sendMessage, clearChat } = useAgent();
   const [input, setInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -33,13 +30,11 @@ export default function AgentChat({ fullWidth = false }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Verificar si hay keys configuradas
   useEffect(() => {
     const keys = loadApiKeys();
     setHasKeys(!!keys.anthropic);
   }, [keysOpen]);
 
-  // Auto-scroll al último mensaje
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
@@ -60,67 +55,72 @@ export default function AgentChat({ fullWidth = false }: Props) {
   };
 
   return (
-    <div
-      className={`flex h-full w-full flex-col ${fullWidth ? 'max-w-none' : 'mx-auto max-w-3xl'}`}
-    >
-
-      {/* ── Top bar ── */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--bg-border)]">
+    <div className={`flex h-full w-full flex-col bg-[var(--bg-canvas)] ${fullWidth ? "max-w-none" : "mx-auto max-w-3xl"}`}>
+      <div className="flex items-center justify-between border-b border-[var(--bg-border)] px-4 py-2.5">
         <div className="flex items-center gap-3">
-          <div className={`w-2.5 h-2.5 rounded-full ${hasKeys ? "bg-green-500" : "bg-orange-400"} animate-pulse`} />
-          <span className="font-bold text-sm">Quivo Agent</span>
-          <span className="text-xs text-[var(--text-muted)] font-mono">
-            {hasKeys ? "listo" : "configura tus API keys"}
+          {showBack && (
+            <Link
+              href="/dashboard?view=overview"
+              className="quivo-btn-ghost flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium"
+            >
+              <IconArrowLeft className="h-4 w-4" stroke={1.75} />
+              Back
+            </Link>
+          )}
+          <div className={`h-2 w-2 rounded-full ${hasKeys ? "bg-[var(--finance-up)]" : "bg-[var(--text-muted)]"}`} />
+          <span className="text-[14px] font-semibold tracking-[-0.02em]">Quivo Agent</span>
+          <span className="text-[12px] text-[var(--text-muted)]">
+            {hasKeys ? "Ready" : "Add API keys"}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={clearChat}
-            className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] px-2 py-1 rounded hover:bg-[var(--bg-card)] transition-colors"
+            className="text-[12px] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
           >
-            Limpiar chat
+            Clear
           </button>
           <button
+            type="button"
             onClick={() => setKeysOpen(true)}
-            className="text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-hover)]/80 px-3 py-1.5 rounded-lg font-mono transition-colors flex items-center gap-1.5"
+            className="quivo-btn-ghost flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium"
           >
-            🔑 API Keys
-            {!hasKeys && <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />}
+            <IconKey className="h-3.5 w-3.5" stroke={1.75} />
+            API Keys
           </button>
         </div>
       </div>
 
-      {/* ── Messages ── */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
-
-        {/* Empty state */}
+      <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-6">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-6 text-center">
-            <div className="text-5xl">✦</div>
+          <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
+              ✦
+            </div>
             <div>
-              <p className="font-bold text-xl">Quivo Agent</p>
-              <p className="text-sm text-[var(--text-muted)] mt-1 max-w-md">
-                Quivo es un caparazón: tú pones tus API keys. Nosotros conectamos Claude, Stripe y
-                Google con tu cuenta.
+              <p className="text-[18px] font-semibold tracking-[-0.03em]">Quivo Agent</p>
+              <p className="quivo-body mt-2 max-w-md text-[13px]">
+                Connect your API keys. We link Claude, Stripe, and Google to your workspace.
               </p>
             </div>
-
             {!hasKeys && (
               <button
+                type="button"
                 onClick={() => setKeysOpen(true)}
-                className="px-6 py-3 bg-[var(--quivo-accent)] text-white font-bold rounded-xl hover:opacity-90 transition-opacity"
+                className="rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] px-5 py-2.5 text-[13px] font-medium text-[var(--bg-canvas)] transition-opacity hover:opacity-90"
               >
-                🔑 Configurar API Keys para empezar
+                Configure API keys
               </button>
             )}
-
             {hasKeys && (
-              <div className="grid grid-cols-2 gap-2 w-full max-w-md">
+              <div className="grid w-full max-w-md grid-cols-2 gap-2">
                 {QUICK_COMMANDS.map((q) => (
                   <button
                     key={q.cmd}
+                    type="button"
                     onClick={() => sendMessage(q.cmd)}
-                    className="text-left text-xs border border-[var(--bg-border)] rounded-xl px-3 py-2.5 hover: border-[var(--quivo-accent)]/50 hover:bg-[var(--bg-card)] transition-all font-medium"
+                    className="rounded-xl border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-3 py-2.5 text-left text-[12px] font-normal text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
                   >
                     {q.label}
                   </button>
@@ -130,38 +130,23 @@ export default function AgentChat({ fullWidth = false }: Props) {
           </div>
         )}
 
-        {/* Message list */}
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
-          >
-            {/* Avatar */}
-            <div className={`
-              w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0
-              ${msg.role === "user" ? "bg-[var(--quivo-accent)]/15 text-[var(--quivo-accent)]" : "bg-[var(--bg-card)] text-[var(--text-primary)]"}
-            `}>
-              {msg.role === "user" ? "👤" : "✦"}
+          <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--bg-border)] bg-[var(--bg-elevated)] text-[12px] text-[var(--text-muted)]">
+              {msg.role === "user" ? "U" : "✦"}
             </div>
-
-            {/* Bubble */}
-            <div className={`
-              max-w-[80%] rounded-2xl px-4 py-3 text-sm
-              ${msg.role === "user"
-                ? "bg-[var(--quivo-accent)] text-white rounded-tr-sm"
-                : msg.error
-                  ? "bg-[#ef4444]/10 border border-[#ef4444]/30 text-[#ef4444] rounded-tl-sm"
-                  : "bg-[var(--bg-card)] rounded-tl-sm"
-              }
-            `}>
-              {/* File attachment badge */}
+            <div
+              className={`max-w-[80%] rounded-2xl px-4 py-3 text-[14px] ${
+                msg.role === "user"
+                  ? "bg-[var(--bg-elevated)] text-[var(--text-primary)]"
+                  : msg.error
+                    ? "border border-[var(--bg-border)] bg-[var(--bg-elevated)] text-[var(--finance-down)]"
+                    : "border border-[var(--bg-border)] bg-[var(--bg-elevated)] text-[var(--text-primary)]"
+              }`}
+            >
               {msg.file && (
-                <div className="flex items-center gap-2 mb-2 text-xs opacity-70 font-mono">
-                  📄 {msg.file.name}
-                </div>
+                <div className="mb-2 text-[11px] text-[var(--text-muted)]">📄 {msg.file.name}</div>
               )}
-
-              {/* Content */}
               {msg.role === "assistant" ? (
                 <div className="prose prose-sm dark:prose-invert max-w-none">
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -169,99 +154,61 @@ export default function AgentChat({ fullWidth = false }: Props) {
               ) : (
                 <p className="whitespace-pre-wrap">{msg.content}</p>
               )}
-
-              {/* Connected services badge */}
-              {msg.connectedServices && msg.connectedServices.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-[var(--bg-border)]/30">
-                  {msg.connectedServices.map((s) => (
-                    <span key={s} className="text-xs font-mono bg-[var(--bg-base)]/50 px-1.5 py-0.5 rounded text-[var(--text-muted)]">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Timestamp */}
-              <p className={`text-xs mt-1.5 opacity-50 font-mono ${msg.role === "user" ? "text-right" : ""}`}>
-                {fmtTime(msg.timestamp)}
-              </p>
+              <p className="mt-1.5 text-[10px] text-[var(--text-faint)]">{fmtTime(msg.timestamp)}</p>
             </div>
           </div>
         ))}
 
-        {/* Loading */}
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--bg-card)] flex items-center justify-center text-sm">✦</div>
-            <div className="bg-[var(--bg-card)] rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--quivo-accent)] animate-bounce [animation-delay:-0.3s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--quivo-accent)] animate-bounce [animation-delay:-0.15s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--quivo-accent)] animate-bounce" />
+            <div className="h-8 w-8 rounded-lg border border-[var(--bg-border)] bg-[var(--bg-elevated)]" />
+            <div className="flex items-center gap-1.5 rounded-2xl border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-4 py-3">
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--text-muted)]" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--text-muted)] [animation-delay:0.15s]" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--text-muted)] [animation-delay:0.3s]" />
             </div>
           </div>
         )}
-
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Input area ── */}
       <div className="border-t border-[var(--bg-border)] px-4 py-3">
-
-        {/* File preview */}
         {file && (
-          <div className="flex items-center gap-2 mb-2 bg-[var(--bg-card)] rounded-lg px-3 py-2 text-xs font-mono">
-            <span>📄</span>
+          <div className="mb-2 flex items-center gap-2 rounded-lg border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-3 py-2 text-[11px] text-[var(--text-muted)]">
             <span className="flex-1 truncate">{file.name}</span>
-            <button onClick={() => setFile(null)} className="text-[var(--text-muted)] hover:text-[#ef4444]">✕</button>
+            <button type="button" onClick={() => setFile(null)} className="hover:text-[var(--text-primary)]">✕</button>
           </div>
         )}
-
-        <div className="flex gap-2 items-end">
-          {/* PDF attach */}
+        <div className="mx-auto flex max-w-3xl items-end gap-2">
           <button
+            type="button"
             onClick={() => fileRef.current?.click()}
-            className="w-9 h-9 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--bg-card)] transition-colors flex-shrink-0"
-            title="Adjuntar bank statement PDF"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
           >
-            📎
+            <IconPaperclip className="h-4 w-4" stroke={1.5} />
           </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".pdf,image/*"
-            className="hidden"
-            onChange={(e) => e.target.files?.[0] && setFile(e.target.files[0])}
-          />
-
-          {/* Text input */}
+          <input ref={fileRef} type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => e.target.files?.[0] && setFile(e.target.files[0])} />
           <textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={hasKeys ? "Pregunta algo o sube un PDF..." : "Configura tus API keys primero..."}
+            placeholder={hasKeys ? "Ask anything…" : "Add API keys to start…"}
             disabled={!hasKeys || isLoading}
             rows={1}
-            className="flex-1 bg-[var(--bg-card)] rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--quivo-accent)]/40 disabled:opacity-50 max-h-32 font-sans"
-            style={{ overflowY: input.split("\n").length > 3 ? "auto" : "hidden" }}
+            className="flex-1 resize-none rounded-[22px] border border-[var(--bg-border)] bg-[var(--bg-elevated)] px-4 py-2.5 text-[14px] focus:border-[var(--text-muted)] focus:outline-none disabled:opacity-50"
           />
-
-          {/* Send */}
           <button
+            type="button"
             onClick={handleSend}
             disabled={(!input.trim() && !file) || !hasKeys || isLoading}
-            className="w-9 h-9 bg-[var(--quivo-accent)] text-white rounded-lg flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-all flex-shrink-0"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--bg-border)] bg-[var(--text-primary)] text-[var(--bg-canvas)] disabled:opacity-40"
           >
             ↑
           </button>
         </div>
-
-        <p className="text-xs text-[var(--text-muted)] font-mono mt-2 text-center">
-          Enter para enviar · Shift+Enter para nueva línea · 📎 para PDFs
-        </p>
       </div>
 
-      {/* API Keys Modal */}
       <ApiKeysModal open={keysOpen} onClose={() => setKeysOpen(false)} />
     </div>
   );
