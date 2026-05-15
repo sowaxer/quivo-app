@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/components/theme-provider';
 import { IconCheck, IconChevronDown, IconDeviceFloppy, IconLoader2 } from '@tabler/icons-react';
+import { applyAccentColor as applyAccent } from '@/lib/appearance-accent';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const LS_APPEARANCE = 'quivo_appearance_v2';
@@ -22,7 +23,7 @@ interface AppearanceState {
 }
 
 const DEFAULT: AppearanceState = {
-  accentColor: '#292524',
+  accentColor: '#f97316',
   neutralColor: '#44403C',
   language: 'system',
   responseAnimation: 'agile',
@@ -78,48 +79,6 @@ function lightenHex(hex: string, amount = 30): string {
   const g = Math.min(255, ((n >> 8) & 0xff) + amount);
   const b = Math.min(255, (n & 0xff) + amount);
   return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
-}
-
-// Apply accent color — sets CSS variables AND injects a live style tag
-function applyAccent(color: string) {
-  const root = document.documentElement;
-  root.style.setProperty('--quivo-accent', color);
-  root.style.setProperty('--accent', color);
-  root.style.setProperty('--primary', color);
-  root.style.setProperty('--ring', color);
-
-  const lighter = lightenHex(color, 25);
-
-  let tag = document.getElementById('quivo-accent-override') as HTMLStyleElement | null;
-  if (!tag) {
-    tag = document.createElement('style');
-    tag.id = 'quivo-accent-override';
-    document.head.appendChild(tag);
-  }
-  tag.textContent = `
-    /* Gradient buttons */
-    .from-blue-600 { --tw-gradient-from: ${color} !important; }
-    .to-cyan-600   { --tw-gradient-to:   ${lighter} !important; }
-    /* Solid blue backgrounds */
-    .bg-\\[\\#3b82f6\\]  { background-color: ${color} !important; }
-    /* Blue text */
-    .text-\\[\\#3b82f6\\] { color: ${color} !important; }
-    /* Blue borders */
-    .border-\\[\\#3b82f6\\] { border-color: ${color} !important; }
-    /* Blue ring */
-    .ring-\\[\\#3b82f6\\]  { --tw-ring-color: ${color} !important; }
-    /* Focus ring */
-    .focus\\:border-\\[\\#3b82f6\\]\\/50:focus { border-color: ${color}80 !important; }
-    /* Nav active gradient */
-    .bg-gradient-to-r.from-blue-600.to-cyan-600 {
-      background: linear-gradient(to right, ${color}, ${lighter}) !important;
-    }
-    /* Sidebar active item */
-    .from-blue-600.to-cyan-600 {
-      --tw-gradient-from: ${color};
-      --tw-gradient-to: ${lighter};
-    }
-  `;
 }
 
 // ─── Theme colors — same order as product reference (custom picker + rainbow) ─

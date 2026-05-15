@@ -41,8 +41,12 @@ export function UserAvatar({ size = 36, className = '' }: Props) {
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-violet-500 text-[11px] font-semibold text-white ring-1 ring-[var(--bg-border)] ${className}`}
-      style={{ width: px, height: px }}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white ring-1 ring-[var(--bg-border)] ${className}`}
+      style={{
+        width: px,
+        height: px,
+        background: 'color-mix(in srgb, var(--quivo-accent) 70%, #1a1a1e)',
+      }}
       aria-hidden
     >
       {initials}

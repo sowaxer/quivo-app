@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { getUserDisplayName } from '@/lib/user-display';
 import { UserAvatar } from '@/components/user-avatar';
+import { AccentColorPicker } from '@/components/accent-color-picker';
+import { useAuthActions } from '@/hooks/use-auth-actions';
+import { clearQuivoChatHistory, clearQuivoLocalData } from '@/lib/clear-local-data';
 import {
   IconRobot, IconPlug, IconSettings, IconDatabase,
   IconCheck, IconX, IconLoader2, IconEye, IconEyeOff,
@@ -196,7 +199,9 @@ function ProviderKeyEditor({
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function SettingsPanel() {
   const { user } = useUser();
+  const { logout, switchAccount } = useAuthActions();
   const [tab, setTab] = useState<Tab>('ai');
+  const [accountBusy, setAccountBusy] = useState<'delete' | 'clear' | null>(null);
 
   // Keys state
   const [anthropic, setAnthropic] = useState<KeyState>(mkKey());
@@ -377,6 +382,39 @@ export default function SettingsPanel() {
     const a = document.createElement('a');
     a.href = url; a.download = `quivo-export-${Date.now()}.json`; a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function clearAllChatHistory() {
+    if (!confirm('Clear all chat history on this device? This cannot be undone.')) return;
+    setAccountBusy('clear');
+    try {
+      clearQuivoChatHistory();
+      alert('Chat history cleared.');
+    } finally {
+      setAccountBusy(null);
+    }
+  }
+
+  async function deleteAccount() {
+    const typed = prompt(
+      'This permanently deletes your Quivo account and server data.\n\nType DELETE to confirm:',
+    );
+    if (typed !== 'DELETE') return;
+    setAccountBusy('delete');
+    try {
+      const res = await fetch('/api/account', { method: 'DELETE', credentials: 'include' });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        alert(data.error ?? 'Could not delete account. Try again or contact support.');
+        return;
+      }
+      clearQuivoLocalData();
+      await logout();
+    } catch {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setAccountBusy(null);
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -716,10 +754,30 @@ export default function SettingsPanel() {
               <p className="mt-1 text-sm text-[var(--text-muted)]">Customize your Quivo experience.</p>
             </div>
 
-            <SectionCard
-              title="Look & feel"
-              subtitle="Theme, typography, and layout. For accent colors and animations, open Appearance in the main sidebar."
-            >
+            <SectionCard title="Button color" subtitle="Glass-style primary buttons across Quivo">
+              <AccentColorPicker />
+            </SectionCard>
+
+            <SectionCard title="Account" subtitle="Sign out or use another email">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => void switchAccount()}
+                  className="quivo-btn-primary flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-semibold"
+                >
+                  Switch account
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void logout()}
+                  className="quivo-btn-ghost flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium"
+                >
+                  Log out
+                </button>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Look & feel" subtitle="Theme, typography, and layout">
               <div className="space-y-5">
                 <div>
                   <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Theme</label>
@@ -870,17 +928,21 @@ export default function SettingsPanel() {
             <SectionCard title="Danger Zone">
               <div className="space-y-3">
                 <button
-                  onClick={() => { if (confirm('Clear all chat history? This cannot be undone.')) {} }}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#ef4444]/20 bg-[#ef4444]/5 p-4 text-left hover:bg-[#ef4444]/10 transition-all">
+                  type="button"
+                  disabled={accountBusy !== null}
+                  onClick={() => void clearAllChatHistory()}
+                  className="flex w-full items-center gap-3 rounded-xl border border-[#ef4444]/20 bg-[#ef4444]/5 p-4 text-left hover:bg-[#ef4444]/10 transition-all disabled:opacity-50">
                   <IconTrash className="h-4 w-4 text-[#ef4444]" />
                   <div>
                     <p className="text-sm font-semibold text-[#ef4444]">Clear All Chat History</p>
-                    <p className="text-xs text-[var(--text-muted)]">Permanently delete all conversations</p>
+                    <p className="text-xs text-[var(--text-muted)]">Permanently delete all conversations on this device</p>
                   </div>
                 </button>
                 <button
-                  onClick={() => { if (confirm('Delete your Quivo account? This is permanent.')) {} }}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/5 p-4 text-left hover:bg-[#ef4444]/10 transition-all">
+                  type="button"
+                  disabled={accountBusy !== null}
+                  onClick={() => void deleteAccount()}
+                  className="flex w-full items-center gap-3 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/5 p-4 text-left hover:bg-[#ef4444]/10 transition-all disabled:opacity-50">
                   <IconX className="h-4 w-4 text-[#ef4444]" />
                   <div>
                     <p className="text-sm font-semibold text-[#ef4444]">Delete Account</p>
