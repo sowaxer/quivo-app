@@ -14,6 +14,8 @@ Bring-your-own-key (BYOK) architecture with an encrypted credential vault, real-
 ![Clerk](https://img.shields.io/badge/Auth-Clerk-6C47FF?style=flat-square&logo=clerk&logoColor=white)
 ![Encryption](https://img.shields.io/badge/Encryption-AES--256--GCM-orange?style=flat-square)
 
+[Overview](#overview) · [Features](#features) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Security](#security-design) · [Engineering](#engineering-highlights)
+
 </div>
 
 https://github.com/user-attachments/assets/92c372ea-5072-4240-a9d8-23abcecfddc7
@@ -40,6 +42,15 @@ flowchart LR
     A["🔑 Connect<br/>API keys + OAuth apps"] --> B["🔒 Encrypt<br/>AES-256-GCM vault"]
     B --> C["🤖 Orchestrate<br/>agents + tool calling"]
     C --> D["📊 Act<br/>answers, reports, exports"]
+    classDef indigo fill:#4F46E5,stroke:#3730A3,color:#fff
+    classDef teal fill:#0D9488,stroke:#0F766E,color:#fff
+    classDef amber fill:#D97706,stroke:#B45309,color:#fff
+    classDef rose fill:#E11D48,stroke:#BE123C,color:#fff
+    classDef slate fill:#334155,stroke:#1E293B,color:#fff
+    class A indigo
+    class B rose
+    class C teal
+    class D amber
 ```
 
 ```mermaid
@@ -138,6 +149,19 @@ flowchart TB
     Vault <-->|ciphertext only| DB
     API -->|user's API key| AI
     API -->|user's OAuth token| Apps
+    classDef indigo fill:#4F46E5,stroke:#3730A3,color:#fff
+    classDef teal fill:#0D9488,stroke:#0F766E,color:#fff
+    classDef amber fill:#D97706,stroke:#B45309,color:#fff
+    classDef rose fill:#E11D48,stroke:#BE123C,color:#fff
+    classDef slate fill:#334155,stroke:#1E293B,color:#fff
+    class User slate
+    class Proxy,API indigo
+    class Vault rose
+    class Clerk,Redis,DB teal
+    class AI,Apps amber
+    style Edge fill:#EEF2FF,stroke:#6366F1,color:#1E1B4B
+    style Services fill:#F0FDFA,stroke:#14B8A6,color:#134E4A
+    style External fill:#FFFBEB,stroke:#F59E0B,color:#78350F
 ```
 
 ### What happens when a user sends a chat message
@@ -153,13 +177,21 @@ sequenceDiagram
     participant C as Claude API
     participant G as Gmail API
 
+    rect rgba(79, 70, 229, 0.12)
+    Note over U,R: 1 · Authenticate and validate
     U->>P: POST message
     P->>P: Verify Clerk session + IP rate limit
     P->>R: Forward request
     R->>R: Validate body (Zod)
+    end
+    rect rgba(225, 29, 72, 0.12)
+    Note over R,DB: 2 · Unlock the user's key
     R->>DB: Load encrypted key
     DB-->>V: fe256gcm:v1:…
     V-->>R: Decrypt in memory (never sent to browser)
+    end
+    rect rgba(13, 148, 136, 0.12)
+    Note over R,G: 3 · Reason and call tools
     R->>C: Stream request with the user's key
     C-->>R: tool_use: query_gmail
     R->>G: Search inbox with the user's OAuth token
@@ -167,6 +199,7 @@ sequenceDiagram
     R->>C: Tool result
     C-->>R: Streamed answer
     R-->>U: Stream tokens to the browser
+    end
 ```
 
 ## Security design
@@ -179,6 +212,16 @@ flowchart LR
     B --> C["3 · Input validation<br/>Zod schemas"]
     C --> D["4 · Encryption<br/>AES-256-GCM"]
     D --> E["5 · Row Level Security<br/>Postgres policies"]
+    classDef indigo fill:#4F46E5,stroke:#3730A3,color:#fff
+    classDef teal fill:#0D9488,stroke:#0F766E,color:#fff
+    classDef amber fill:#D97706,stroke:#B45309,color:#fff
+    classDef rose fill:#E11D48,stroke:#BE123C,color:#fff
+    classDef slate fill:#334155,stroke:#1E293B,color:#fff
+    class A indigo
+    class B slate
+    class C teal
+    class D rose
+    class E amber
 ```
 
 ### 1 · Encryption at rest (AES-256-GCM)
