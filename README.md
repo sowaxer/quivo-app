@@ -66,10 +66,10 @@ flowchart LR
     A["🔑 Connect<br/>API keys + apps"] --> B["🔒 Encrypt<br/>locked in a vault"]
     B --> C["🤖 Orchestrate<br/>agents pick the right tools"]
     C --> D["📊 Deliver<br/>answers, reports, Excel"]
-    classDef p1 fill:#E0E7FF,stroke:#A5B4FC,color:#1E1B4B
-    classDef p2 fill:#FCE7F3,stroke:#F9A8D4,color:#500724
-    classDef p3 fill:#D1FAE5,stroke:#6EE7B7,color:#064E3B
-    classDef p4 fill:#FEF3C7,stroke:#FCD34D,color:#78350F
+    classDef p1 fill:#EEF0FF,stroke:#C9CEF5,color:#334155
+    classDef p2 fill:#FDEEF4,stroke:#F2C6D8,color:#334155
+    classDef p3 fill:#E6F7F0,stroke:#B8E3D0,color:#334155
+    classDef p4 fill:#FFF7E0,stroke:#F2DFA8,color:#334155
     class A p1
     class B p2
     class C p3
@@ -77,7 +77,7 @@ flowchart LR
 ```
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#C4B5FD', 'primaryTextColor': '#1F2937', 'primaryBorderColor': '#A78BFA', 'cScale0': '#DDD6FE', 'cScaleLabel0': '#2E1065', 'cScale1': '#FBCFE8', 'cScaleLabel1': '#500724', 'cScale2': '#A7F3D0', 'cScaleLabel2': '#064E3B', 'cScale3': '#FDE68A', 'cScaleLabel3': '#78350F', 'cScale4': '#C7D2FE', 'cScaleLabel4': '#1E1B4B', 'cScale5': '#BAE6FD', 'cScaleLabel5': '#0C4A6E', 'cScale6': '#FED7AA', 'cScaleLabel6': '#7C2D12', 'cScale7': '#E9D5FF', 'cScaleLabel7': '#3B0764', 'cScale8': '#BBF7D0', 'cScaleLabel8': '#14532D', 'cScale9': '#FECDD3', 'cScaleLabel9': '#4C0519', 'cScale10': '#BFDBFE', 'cScaleLabel10': '#1E3A8A', 'cScale11': '#FEF08A', 'cScaleLabel11': '#713F12'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ECE6F8', 'primaryTextColor': '#334155', 'primaryBorderColor': '#D5C8F0', 'lineColor': '#CBD5E1', 'cScale0': '#E3E6FB', 'cScaleLabel0': '#334155', 'cScale1': '#FBE3EC', 'cScaleLabel1': '#334155', 'cScale2': '#DDF2E8', 'cScaleLabel2': '#334155', 'cScale3': '#FCF0CF', 'cScaleLabel3': '#334155', 'cScale4': '#E2EFF8', 'cScaleLabel4': '#334155', 'cScale5': '#ECE6F8', 'cScaleLabel5': '#334155', 'cScale6': '#E3E6FB', 'cScaleLabel6': '#334155', 'cScale7': '#FBE3EC', 'cScaleLabel7': '#334155', 'cScale8': '#DDF2E8', 'cScaleLabel8': '#334155', 'cScale9': '#FCF0CF', 'cScaleLabel9': '#334155', 'cScale10': '#E2EFF8', 'cScaleLabel10': '#334155', 'cScale11': '#ECE6F8', 'cScaleLabel11': '#334155'}}}%%
 mindmap
   root((Quivo))
     AI layer
@@ -151,19 +151,19 @@ flowchart TB
     API -->|user's API key| AI
     API -->|user's OAuth token| Apps
 
-    classDef p1 fill:#E0E7FF,stroke:#A5B4FC,color:#1E1B4B
-    classDef p2 fill:#FCE7F3,stroke:#F9A8D4,color:#500724
-    classDef p3 fill:#D1FAE5,stroke:#6EE7B7,color:#064E3B
-    classDef p4 fill:#FEF3C7,stroke:#FCD34D,color:#78350F
-    classDef p5 fill:#F1F5F9,stroke:#CBD5E1,color:#0F172A
+    classDef p1 fill:#EEF0FF,stroke:#C9CEF5,color:#334155
+    classDef p2 fill:#FDEEF4,stroke:#F2C6D8,color:#334155
+    classDef p3 fill:#E6F7F0,stroke:#B8E3D0,color:#334155
+    classDef p4 fill:#FFF7E0,stroke:#F2DFA8,color:#334155
+    classDef p5 fill:#F3EEFC,stroke:#D5C8F0,color:#334155
     class User p5
     class Proxy,API p1
     class Vault p2
     class Clerk,Redis,DB p3
     class AI,Apps p4
-    style Edge fill:#F5F7FF,stroke:#C7D2FE,color:#1E1B4B
-    style Services fill:#F0FDF9,stroke:#A7F3D0,color:#064E3B
-    style External fill:#FFFCF0,stroke:#FDE68A,color:#78350F
+    style Edge fill:#F8F9FF,stroke:#DDE1F8,color:#334155
+    style Services fill:#F5FBF8,stroke:#CFEBDD,color:#334155
+    style External fill:#FFFCF3,stroke:#F2E6C2,color:#334155
 ```
 
 ### What happens when a user sends a chat message
@@ -179,20 +179,20 @@ sequenceDiagram
     participant C as Claude API
     participant G as Gmail API
 
-    rect rgba(199, 210, 254, 0.35)
+    rect rgba(165, 180, 252, 0.15)
     Note over U,R: 1 · Authenticate and validate
     U->>P: POST message
     P->>P: Verify Clerk session + IP rate limit
     P->>R: Forward request
     R->>R: Validate body (Zod)
     end
-    rect rgba(251, 207, 232, 0.35)
+    rect rgba(244, 164, 196, 0.15)
     Note over R,DB: 2 · Unlock the user's key
     R->>DB: Load encrypted key
     DB-->>V: fe256gcm:v1:…
     V-->>R: Decrypt in memory (never sent to browser)
     end
-    rect rgba(167, 243, 208, 0.35)
+    rect rgba(134, 214, 178, 0.15)
     Note over R,G: 3 · Reason and call tools
     R->>C: Stream request with the user's key
     C-->>R: tool_use: query_gmail
@@ -214,11 +214,11 @@ flowchart LR
     B --> C["3 · Validation<br/>Zod schemas"]
     C --> D["4 · Encryption<br/>AES-256-GCM"]
     D --> E["5 · Row Level Security<br/>Postgres policies"]
-    classDef p1 fill:#E0E7FF,stroke:#A5B4FC,color:#1E1B4B
-    classDef p2 fill:#FCE7F3,stroke:#F9A8D4,color:#500724
-    classDef p3 fill:#D1FAE5,stroke:#6EE7B7,color:#064E3B
-    classDef p4 fill:#FEF3C7,stroke:#FCD34D,color:#78350F
-    classDef p5 fill:#EDE9FE,stroke:#C4B5FD,color:#2E1065
+    classDef p1 fill:#EEF0FF,stroke:#C9CEF5,color:#334155
+    classDef p2 fill:#FDEEF4,stroke:#F2C6D8,color:#334155
+    classDef p3 fill:#E6F7F0,stroke:#B8E3D0,color:#334155
+    classDef p4 fill:#FFF7E0,stroke:#F2DFA8,color:#334155
+    classDef p5 fill:#F3EEFC,stroke:#D5C8F0,color:#334155
     class A p1
     class B p5
     class C p3
