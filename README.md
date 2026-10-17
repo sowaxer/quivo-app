@@ -2,10 +2,10 @@
 
 # Quivo
 
-### An AI workspace for accounting firms — bring your own API keys
+### A unified AI command center for accounting firms
 
-Multi-model chat, 16 finance agents, a document knowledge base and connected apps in one dashboard.<br/>
-Each firm plugs in its **own** AI provider keys, encrypted at rest. Quivo never pays for, or marks up, AI usage.
+One dashboard to centralize AI providers, specialized finance agents and business apps.<br/>
+Bring-your-own-key (BYOK) architecture with an encrypted credential vault, real-time tool calling and multi-tenant isolation.
 
 ![Status](https://img.shields.io/badge/status-archived-lightgrey?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=nextdotjs)
@@ -19,7 +19,7 @@ Each firm plugs in its **own** AI provider keys, encrypted at rest. Quivo never 
 https://github.com/user-attachments/assets/92c372ea-5072-4240-a9d8-23abcecfddc7
 
 > [!NOTE]
-> **Portfolio project — archived.** I built Quivo in 2026 to learn how a production SaaS app is put together. Development has stopped and there is no live demo; the code is public so others can see how it works.
+> **Status: archived.** This repository is published as a portfolio reference. Development has concluded and there is no public deployment.
 
 <div align="center">
 
@@ -31,18 +31,41 @@ https://github.com/user-attachments/assets/92c372ea-5072-4240-a9d8-23abcecfddc7
 
 ---
 
-## The idea
+## Overview
 
-Accounting firms want AI, but most tools either **resell model usage at a markup** or **don't understand accounting work**. Quivo takes a different approach:
+Quivo brings an accounting firm's AI providers, data sources and daily workflows into a single workspace. A user connects their own API keys and accounts once; from there, an AI agent can read their inbox, calendar, files and Stripe data, answer questions in real time, and run specialized finance tasks — without the firm paying a markup on AI usage.
 
 ```mermaid
 flowchart LR
-    A["🏢 Firm adds its own keys<br/>Anthropic · Google · OpenAI · DeepSeek"] --> B["🔒 Quivo encrypts and stores them"]
-    B --> C["🤖 Chat, agents and tools<br/>use those keys"]
-    C --> D["💳 Firm pays providers directly<br/>at their price"]
+    A["🔑 Connect<br/>API keys + OAuth apps"] --> B["🔒 Encrypt<br/>AES-256-GCM vault"]
+    B --> C["🤖 Orchestrate<br/>agents + tool calling"]
+    C --> D["📊 Act<br/>answers, reports, exports"]
 ```
 
-I work in accounting, at a firm that handles US tax compliance for foreign entrepreneurs, so the agents and workflows come from problems I see every day. I am not a software engineer by training: I built Quivo by directing AI coding tools (mainly Cursor), which meant learning to read, question and debug every change — especially around authentication and security.
+```mermaid
+mindmap
+  root((Quivo))
+    AI layer
+      Multi-model chat
+      16 finance agents
+      Custom agents
+      Tool calling
+    Data
+      Knowledge base
+      Bank statements → Excel
+      Notes and tasks
+    Connected apps
+      Gmail
+      Google Calendar
+      Google Drive
+      Dropbox
+      Stripe
+    Platform
+      Encrypted key vault
+      Row Level Security
+      Rate limiting
+      Reminders and notifications
+```
 
 ## Features
 
@@ -50,12 +73,12 @@ I work in accounting, at a firm that handles US tax compliance for foreign entre
 | :---: | --- | --- |
 | 💬 | **Multi-model chat** | Streaming chat with model switching. Claude (with tool calling) and DeepSeek are wired end-to-end; Gemini, OpenAI and xAI keys can be stored and verified. |
 | 🧾 | **16 finance agents** | Tax Advisor, Bookkeeper, Virtual CFO, Audit Assistant, Payroll, IRS Notice Handler, Due Diligence, Entity & Corp Law and more — each with its own system prompt. Users can also create custom agents. |
-| 🛠️ | **Tool use** | In chat, Claude can query the user's Gmail, Calendar, Stripe, notes and the web — only for integrations the user has connected. |
+| 🛠️ | **Real-time tool calling** | The agent decides when to query the user's Gmail, Calendar, Stripe, notes or the live web (Tavily) mid-conversation, and only for integrations the user has connected. |
 | 📚 | **Knowledge Base** | Upload text documents or PDFs. Relevant excerpts are found by keyword match and injected into the prompt — a lightweight retrieval-augmented generation, without a vector database. |
-| 🏦 | **Bank statement processor** | Reads a statement with Claude vision, categorizes transactions and exports a 4-sheet Excel workbook. |
-| 🔌 | **Connected apps** | OAuth for Gmail, Google Calendar, Google Drive and Dropbox; Stripe through the user's own key. |
-| ✅ | **Tasks & Notes** | Unified planner with timed reminders. |
-| 📈 | **Finance view** | Live index ticker; headlines and watchlist use demo data. |
+| 🏦 | **Bank statement analysis** | Parses statement images and PDFs with Claude vision, categorizes transactions and generates a 4-sheet Excel workbook. |
+| 🔌 | **Unified dashboard** | Inbox, Drive files, calendar and Stripe billing viewable in one place — Google and Dropbox via OAuth 2.0, Stripe via the user's own key. |
+| ⏰ | **Tasks, notes & reminders** | Unified planner with scheduled reminders and in-app notifications. |
+| 📈 | **Market module** | Live index ticker from Yahoo Finance quotes; headlines and watchlist ship with a demo data feed. |
 
 ## Screenshots
 
@@ -208,11 +231,16 @@ OAuth token tables (`google_tokens`, `dropbox_tokens`) go further: **only the se
 | Key hints | The UI shows `sk-ant-…a8Kz`, never the full key. |
 | Content-Security-Policy | CSP headers in `next.config.ts`, allowing only the app's own origins plus Clerk. |
 
-## What I learned
+## Engineering highlights
 
-- **Reading code I didn't write.** Working with AI tools meant understanding each change before accepting it — especially in auth and encryption code.
-- **Test that security works, not just that it exists.** The `auth.uid()` vs. Clerk ID mismatch showed me a policy can exist and still protect nothing.
-- **Scope is a skill.** Quivo grew from a simple chat into a full workspace. Knowing when to stop adding features matters as much as building them.
+| Challenge | Approach |
+| --- | --- |
+| **Bridging Clerk identity with Postgres RLS** | Clerk issues text user IDs, so Supabase's `auth.uid()` never matches. Policies read the Clerk `sub` claim from the JWT instead, and OAuth token tables are locked to the service role. |
+| **Streaming with tool calls** | The chat route streams tokens to the browser while handling Claude's `tool_use` turns server-side — running the tool with the user's credentials and feeding results back into the same stream. |
+| **Multi-provider key management** | Each key is verified live against its provider's API before it is saved, encrypted, and stored with a non-secret hint and `last_used` timestamp so the UI never needs to decrypt it. |
+| **Crypto agility** | Ciphertexts carry a version prefix. The vault moved from AES-256-CBC to AES-256-GCM while existing rows stayed readable during migration. |
+| **Defense against abuse** | Edge-level IP limits in `proxy.ts`, per-user limits per route, and hard caps on payload size (120 messages, 120k characters each) before any model call. |
+| **Fail-closed configuration** | Environment variables are schema-validated; a production build without an encryption key fails instead of deploying insecurely. |
 
 <details>
 <summary><b>📁 Project structure</b></summary>
