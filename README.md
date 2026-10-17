@@ -1,7 +1,3 @@
-
-
-https://github.com/user-attachments/assets/92c372ea-5072-4240-a9d8-23abcecfddc7
-
 <div align="center">
 
 # Quivo
@@ -16,9 +12,9 @@ Multi-model chat, 16 built-in finance agents, a document knowledge base and conn
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3ECF8E?logo=supabase&logoColor=white)
 ![Clerk](https://img.shields.io/badge/Auth-Clerk-6C47FF?logo=clerk&logoColor=white)
 
-![Quivo dashboard](docs/screenshots/dashboard.png)
-
 </div>
+
+https://github.com/user-attachments/assets/92c372ea-5072-4240-a9d8-23abcecfddc7
 
 > **Portfolio project — no longer maintained.** Quivo was a personal project I built in 2026 to learn how a real SaaS app is put together. Development has stopped and there is no live demo; the code is published here so others can see how it works.
 
